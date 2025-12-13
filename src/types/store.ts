@@ -3,4 +3,6 @@ export interface Store {
     storeName: string;
     storeAdd?: string;
     storeTel?: string;
+    createdAt: string;
+    updatedAt?: string;
 }

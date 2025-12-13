@@ -3,6 +3,7 @@ export interface Item {
     storeId: number;
     itemName: string;
     createdAt: string;
+    isDel: boolean;
 }
 
 // 가게 재고
