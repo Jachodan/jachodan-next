@@ -1,6 +1,7 @@
 export interface Item {
     itemId: number;
     storeId: number;
+    imageId?: number;
     itemName: string;
     createdAt: string;
     isDel: boolean;
@@ -9,9 +10,9 @@ export interface Item {
 // 가게 재고
 export interface Stock {
     itemId: number;
-    storeId: number;
+    storeId: number; // 매장id
     stockId: number;
-    quantity: number;
+    quantity?: number;
     isFavorite: boolean;
 }
 

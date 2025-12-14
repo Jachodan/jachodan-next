@@ -1,5 +1,7 @@
 // 근로기록부
-export type WorkStatus = "출근" | "휴무" | "대타" | "지각" | "결근" ;
+export const WORK_STATUS = ["출근", "휴무", "대타", "지각", "결근", "퇴근"] as const;
+
+export type WorkStatus = (typeof SCHEDULE_DAYS)[number];
 export interface Work {
     workId: number;
     albaId: number;
@@ -10,11 +12,11 @@ export interface Work {
 }
 
 // 근무자 근무요일
-export const SCHEDULE_DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"] as const;
+export const SCHEDULE_DAYS = ["일", "월", "화", "수", "목", "금", "토"] as const;
 export type ScheduleDays = (typeof SCHEDULE_DAYS)[number];
 
 export interface Schedule {
     scheduleId: number;
     albaId: number;
-    scheduleDay: ScheduleDays[];
+    scheduleDay?: ScheduleDays[];
 }

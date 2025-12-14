@@ -1,4 +1,5 @@
-export type BoardType = "공지사항" | "자유게시판" | "익명게시판" ;
+export const BOARD_TYPE = ["공지사항", "자유게시판", "익명게시판"] as const;
+export type BoardType = (typeof BOARD_TYPE)[number];
 
 export interface Board {
     boardId: number;
