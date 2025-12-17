@@ -6,28 +6,12 @@ on:
 
 jobs:
   notify-on-merge:
+    if: >
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check if PR is merged and target is main
-        run: |
-          merged=$(jq -r '.pull_request.merged' "$GITHUB_EVENT_PATH")
-          base_branch=$(jq -r '.pull_request.base.ref' "$GITHUB_EVENT_PATH")
-
-          if [[ "$merged" != "true" ]]; then
-            echo "PR not merged. Skipping."
-            exit 0
-          fi
-
-          if [[ "$base_branch" != "main" ]]; then
-            echo "PR not merged into main. Skipping."
-            exit 0
-          fi
-
-          echo "merged=true" >> $GITHUB_ENV
-
       - name: Get PR Info
-        id: pr_info
         run: |
           title=$(jq -r ".pull_request.title" "$GITHUB_EVENT_PATH")
           url=$(jq -r ".pull_request.html_url" "$GITHUB_EVENT_PATH")
@@ -43,6 +27,8 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
+          set -euo pipefail
+
           if [[ "${{ env.changed_files }}" -eq 0 ]]; then
             change_msg="⚠️ 변경된 코드 없음"
           else
@@ -65,9 +51,7 @@ jobs:
               ]
             }')
 
-          echo "$payload" > payload.json
-
           curl -H "Content-Type: application/json" \
               -X POST \
-              -d @payload.json \
+              -d "$payload" \
               "$DISCORD_WEBHOOK"

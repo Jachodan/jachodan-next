@@ -1,0 +1,101 @@
+name: PR Notify Discord
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get PR Info + Parse Type (PR title or last commit)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          action=$(jq -r ".action" "$GITHUB_EVENT_PATH")
+          pr_title=$(jq -r ".pull_request.title" "$GITHUB_EVENT_PATH")
+          url=$(jq -r ".pull_request.html_url" "$GITHUB_EVENT_PATH")
+          number=$(jq -r ".pull_request.number" "$GITHUB_EVENT_PATH")
+          actor="${{ github.actor }}"
+
+          if [ "$action" = "synchronize" ]; then
+            last_commit_msg=$(gh api \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/${{ github.repository }}/pulls/${number}/commits" \
+              --jq '.[-1].commit.message' \
+              | head -n 1 || true)
+
+            if [ -z "${last_commit_msg:-}" ] || [ "${last_commit_msg}" = "null" ]; then
+              sourceText="$pr_title"
+            else
+              sourceText="$last_commit_msg"
+            fi
+
+            baseTitle="🔄 커밋 추가됨! PR 업데이트"
+            color=10181046
+            extra="**유형-** 커밋 추가(synchronize)\n**기준-** 마지막 커밋 메시지"
+          else
+            sourceText="$pr_title"
+            baseTitle="🆕 새 Pull Request!"
+            color=3447003
+            extra="**유형-** PR 생성(opened)\n**기준-** PR 제목"
+          fi
+
+          type=$(echo "$sourceText" | sed -nE 's/^([a-z]+)(\([^)]+\))?:.*/\1/p' | head -n 1)
+          if [ -z "${type:-}" ]; then type="unknown"; fi
+
+          emoji="✔️"
+          case "$type" in
+            feat) emoji="✨" ;;
+            fix) emoji="🐛" ;;
+            docs) emoji="📚" ;;
+            refactor) emoji="🛠️" ;;
+            test) emoji="🧪" ;;
+            chore) emoji="🔧" ;;
+          esac
+
+          echo "emoji=$emoji" >> $GITHUB_ENV
+          echo "color=$color" >> $GITHUB_ENV
+          echo "baseTitle=$baseTitle" >> $GITHUB_ENV
+          echo "extra=$extra" >> $GITHUB_ENV
+          echo "type=$type" >> $GITHUB_ENV
+          echo "sourceText=$sourceText" >> $GITHUB_ENV
+          echo "title=$pr_title" >> $GITHUB_ENV
+          echo "url=$url" >> $GITHUB_ENV
+          echo "actor=$actor" >> $GITHUB_ENV
+
+      - name: Notify Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          set -euo pipefail
+
+          payload=$(jq -n \
+            --arg emoji "$emoji" \
+            --arg baseTitle "$baseTitle" \
+            --arg actor "$actor" \
+            --arg extra "$extra" \
+            --arg type "$type" \
+            --arg sourceText "$sourceText" \
+            --arg title "$title" \
+            --arg url "$url" \
+            --argjson color "$color" \
+            '{
+              "embeds": [
+                {
+                  "title": "\($emoji) \($baseTitle)",
+                  "description": "**작성자-** \($actor)\n\($extra)\n**타입-** \($type)\n**파싱 대상-** \($sourceText)\n**PR Title-** \($title)\n🔗 [PR 보러가기](\($url))",
+                  "color": $color,
+                  "timestamp": now | todateiso8601
+                }
+              ]
+            }')
+
+          curl -H "Content-Type: application/json" -X POST -d "$payload" "$DISCORD_WEBHOOK"
