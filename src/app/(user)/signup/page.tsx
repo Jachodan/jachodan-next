@@ -1,6 +1,6 @@
 "use client";
 
-import { joinSchema, JoinValues } from "@/app/containers/auth/schemas/join.schema";
+import { joinSchema, JoinValues } from "@/lib/schemas/auth/signup.schema";
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,15 @@ export default function JoinPage() {
     formState: { errors },
   } = useForm<JoinValues>({
     resolver: zodResolver(joinSchema),
+    defaultValues: {
+      email: "",
+      userName: "",
+      userPhone: "",
+      storeName: "",
+      storeCall: "",
+      storeAdd: "",
+      storeDetailAdd: "",
+    },
   });
 
   const onSubmit = (values: JoinValues) => {
@@ -31,11 +40,11 @@ export default function JoinPage() {
   }, [setHeaderTitle]);
 
   return (
-    <main className="flex items-center justify-center p-6 min-h-dvh">
-      <section className="flex flex-col items-center w-full max-w-sm gap-4 p-8">
+    <div className="flex items-center justify-center p-6 pt-20">
+      <div className="flex flex-col items-center w-full max-w-sm gap-4 p-8">
         <h1 className="text-2xl font-bold">회원가입</h1>
 
-        <form className="flex flex-col w-full gap-4 mt-6" onSubmit={handleSubmit(onSubmit)}>
+        <form className="flex flex-col w-full gap-4" onSubmit={handleSubmit(onSubmit)}>
           {/* 메일 */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">메일</label>
@@ -63,7 +72,7 @@ export default function JoinPage() {
             </div>
           </div>
 
-          <Separator className="my-3"></Separator>
+          <Separator />
 
           {/* 상호 */}
           <div className="flex flex-col gap-1">
@@ -93,9 +102,7 @@ export default function JoinPage() {
             <div>
               <Input type="text" {...register("storeDetailAdd")} />
             </div>
-            {(errors.storeAdd || errors.storeDetailAdd) && (
-              <p className="text-sm text-destructive">{errors.storeAdd?.message ?? errors.storeDetailAdd?.message}</p>
-            )}
+            {errors.storeAdd && <p className="text-sm text-destructive">{errors.storeAdd?.message}</p>}
           </div>
 
           <Button size="lg" className="w-full">
@@ -103,10 +110,10 @@ export default function JoinPage() {
           </Button>
         </form>
 
-        <Link href="/login" className="mt-3 text-sm text-muted-foreground">
-          로그인으로
+        <Link href="/login" className="pt-3 text-sm text-muted-foreground">
+          로그인
         </Link>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }
