@@ -19,14 +19,15 @@ export default function JoinPage() {
     formState: { errors },
   } = useForm<JoinValues>({
     resolver: zodResolver(joinSchema),
+    shouldFocusError: true,
     defaultValues: {
-      email: "",
-      userName: "",
-      userPhone: "",
-      storeName: "",
-      storeCall: "",
-      storeAdd: "",
-      storeDetailAdd: "",
+      signupEmail: "",
+      signupUserName: "",
+      signupUserPhone: "",
+      signupStoreName: "",
+      signupStoreCall: "",
+      signupStoreAdd: "",
+      signupStoreDetailAdd: "",
     },
   });
 
@@ -47,10 +48,10 @@ export default function JoinPage() {
         <form className="flex flex-col w-full gap-4" onSubmit={handleSubmit(onSubmit)}>
           {/* 메일 */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">메일</label>
+            <label className="text-sm font-medium">이메일</label>
             <div className="flex flex-col gap-1">
-              <Input type="email" {...register("email")} />
-              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+              <Input type="email" {...register("signupEmail")} placeholder="email@mail.com" />
+              {errors.signupEmail && <p className="text-sm text-destructive">{errors.signupEmail.message}</p>}
             </div>
           </div>
 
@@ -58,8 +59,8 @@ export default function JoinPage() {
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">이름</label>
             <div className="flex flex-col gap-1">
-              <Input type="text" {...register("userName")} />
-              {errors.userName && <p className="text-sm text-destructive">{errors.userName.message}</p>}
+              <Input type="text" {...register("signupUserName")} placeholder="홍길동" />
+              {errors.signupUserName && <p className="text-sm text-destructive">{errors.signupUserName.message}</p>}
             </div>
           </div>
 
@@ -67,8 +68,8 @@ export default function JoinPage() {
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">개인번호</label>
             <div className="flex flex-col gap-1">
-              <Input type="tel" {...register("userPhone")} />
-              {errors.userPhone && <p className="text-sm text-destructive">{errors.userPhone.message}</p>}
+              <Input type="tel" {...register("signupUserPhone")} placeholder="010-0000-0000" />
+              {errors.signupUserPhone && <p className="text-sm text-destructive">{errors.signupUserPhone.message}</p>}
             </div>
           </div>
 
@@ -78,8 +79,8 @@ export default function JoinPage() {
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">매장명</label>
             <div className="flex flex-col gap-1">
-              <Input type="text" {...register("storeName")} />
-              {errors.storeName && <p className="text-sm text-destructive">{errors.storeName.message}</p>}
+              <Input type="text" {...register("signupStoreName")} placeholder="피자스쿨 OO점" />
+              {errors.signupStoreName && <p className="text-sm text-destructive">{errors.signupStoreName.message}</p>}
             </div>
           </div>
 
@@ -87,8 +88,8 @@ export default function JoinPage() {
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">매장 연락처</label>
             <div className="flex flex-col gap-1">
-              <Input type="tel" {...register("storeCall")} />
-              {errors.storeCall && <p className="text-sm text-destructive">{errors.storeCall.message}</p>}
+              <Input type="tel" {...register("signupStoreCall")} placeholder="02-0000-0000" />
+              {errors.signupStoreCall && <p className="text-sm text-destructive">{errors.signupStoreCall.message}</p>}
             </div>
           </div>
 
@@ -96,16 +97,16 @@ export default function JoinPage() {
           <div className="flex flex-col gap-1">
             <label className="pt-2 text-sm font-medium">주소</label>
             <div className="flex flex-col gap-2">
-              <Input type="text" {...register("storeAdd")} />
+              <Input type="text" {...register("signupStoreAdd")} placeholder="서울특별시 강서구00길 00" />
             </div>
             <label className="pt-2 text-sm font-medium">상세 주소</label>
             <div>
-              <Input type="text" {...register("storeDetailAdd")} />
+              <Input type="text" {...register("signupStoreDetailAdd")} placeholder="0층 0호" />
             </div>
-            {errors.storeAdd && <p className="text-sm text-destructive">{errors.storeAdd?.message}</p>}
+            {errors.signupStoreAdd && <p className="text-sm text-destructive">{errors.signupStoreAdd?.message}</p>}
           </div>
 
-          <Button size="lg" className="w-full">
+          <Button type="submit" size="lg" className="w-full">
             회원가입
           </Button>
         </form>

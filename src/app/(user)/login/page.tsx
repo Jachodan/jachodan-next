@@ -4,7 +4,7 @@ import { useLayout } from "@/components/layouts/provider/LayoutProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { signinSchema, SigninValues } from "@/lib/schemas/auth/login.schema";
+import { loginSchema, LoginValues } from "@/lib/schemas/auth/login.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,16 +18,17 @@ export default function Login() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SigninValues>({
-    resolver: zodResolver(signinSchema),
+  } = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+    shouldFocusError: true,
     defaultValues: {
-      email: "",
-      userName: "",
-      storeName: "",
+      loginEmail: "",
+      loginUserName: "",
+      loginStoreName: "",
     },
   });
 
-  const onSubmit = (values: SigninValues) => {
+  const onSubmit = (values: LoginValues) => {
     console.log("로그인 제출");
     console.log(values);
   };
@@ -46,24 +47,24 @@ export default function Login() {
           {/* 메일 */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">이메일</label>
-            <Input type="email" {...register("email")} />
-            {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+            <Input type="email" {...register("loginEmail")} placeholder="email@mail.com" />
+            {errors.loginEmail && <p className="text-sm text-destructive">{errors.loginEmail.message}</p>}
           </div>
 
           {/* 이름 */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-md">사용자 이름</label>
-            <Input type="text" {...register("userName")} />
-            {errors.userName && <p className="text-sm text-destructive">{errors.userName.message}</p>}
+            <label className="text-sm font-medium">사용자 이름</label>
+            <Input type="text" {...register("loginUserName")} placeholder="홍길동" />
+            {errors.loginUserName && <p className="text-sm text-destructive">{errors.loginUserName.message}</p>}
           </div>
 
           {/* 상호 */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">상호명</label>
-            <Input type="text" {...register("storeName")} />
-            {errors.storeName && <p className="text-sm text-destructive">{errors.storeName.message}</p>}
+            <Input type="text" {...register("loginStoreName")} placeholder="피자스쿨 OO점" />
+            {errors.loginStoreName && <p className="text-sm text-destructive">{errors.loginStoreName.message}</p>}
           </div>
-          <Button size="lg" className="w-full">
+          <Button type="submit" size="lg" className="w-full">
             로그인
           </Button>
         </form>
@@ -72,17 +73,17 @@ export default function Login() {
           회원가입
         </Link>
 
-        <Separator></Separator>
+        <Separator />
 
-        <Button size="lg" disabled className="w-full">
+        <Button type="submit" size="lg" disabled className="w-full">
           네이버
         </Button>
 
-        <Button size="lg" disabled className="w-full">
+        <Button type="submit" size="lg" disabled className="w-full">
           구글
         </Button>
 
-        <Button size="lg" disabled className="w-full">
+        <Button type="submit" size="lg" disabled className="w-full">
           카카오
         </Button>
       </div>
