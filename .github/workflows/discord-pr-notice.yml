@@ -38,12 +38,14 @@ jobs:
               sourceText="$last_commit_msg"
             fi
 
-            baseTitle="🔄 커밋 추가됨! PR 업데이트"
+            baseTitle="🔄 PR 업데이트"
             color=10181046
+            extra="**유형-** 커밋 추가"
           else
             sourceText="$pr_title"
-            baseTitle="🆕 새 Pull Request!"
+            baseTitle="🆕 PR 생성"
             color=3447003
+            extra="**유형-** PR 생성"
           fi
 
           type=$(echo "$sourceText" | sed -nE 's/^([a-z]+)(\([^)]+\))?:.*/\1/p' | head -n 1)
