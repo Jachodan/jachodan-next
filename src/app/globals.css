@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Tiptap Editor Styles */
+@import "../components/Tiptap/tiptap.scss";
+@import "../components/Tiptap/extensions/node.scss";
+@import "../components/Tiptap/extensions/mark.scss";
+@import "../components/Tiptap/extensions/nodes/image-upload-node/image-upload-node.scss";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
