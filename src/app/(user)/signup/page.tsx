@@ -3,7 +3,7 @@
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { signupSchema, SignupValues } from "@/lib/schemas/auth/signup.schema";
+import { signupSchema, SignupValues } from "@/lib/schemas/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,13 +24,13 @@ export default function JoinPage() {
     resolver: zodResolver(signupSchema),
     shouldFocusError: true,
     defaultValues: {
-      signupEmail: "",
-      signupUserName: "",
-      signupUserPhone: "",
-      signupStoreName: "",
-      signupStoreCall: "",
-      signupStoreAdd: "",
-      signupStoreDetailAdd: "",
+      email: "",
+      userName: "",
+      userPhone: "",
+      storeName: "",
+      storeCall: "",
+      storeAdd: "",
+      storeDetailAdd: "",
     },
   });
 
@@ -71,16 +71,16 @@ export default function JoinPage() {
         <div className="text-2xl font-bold">회원가입</div>
 
         <form className="flex flex-col w-full gap-4" onSubmit={handleSubmit(onSubmit, onError)}>
-          <UserFormField label="이메일" type="email" register={register("signupEmail")} placeholder="email@mail.com" error={errors.signupEmail?.message} required />
-          <UserFormField label="이름" type="text" register={register("signupUserName")} placeholder="홍길동" error={errors.signupUserName?.message} required />
-          <UserFormField label="개인번호" type="tel" register={register("signupUserPhone")} placeholder="010-0000-0000" error={errors.signupUserPhone?.message} required />
+          <UserFormField label="이메일" type="email" register={register("email")} placeholder="email@mail.com" error={errors.email?.message} required />
+          <UserFormField label="이름" type="text" register={register("userName")} placeholder="홍길동" error={errors.userName?.message} required />
+          <UserFormField label="개인번호" type="tel" register={register("userPhone")} placeholder="010-0000-0000" error={errors.userPhone?.message} required />
 
           <Separator />
 
-          <UserFormField label="상호" type="text" register={register("signupStoreName")} placeholder="OO치킨 OO점" error={errors.signupStoreName?.message} required />
-          <UserFormField label="매장 연락처" type="tel" register={register("signupStoreCall")} placeholder="02-0000-0000" error={errors.signupStoreCall?.message} required />
-          <UserFormField label="주소" type="text" register={register("signupStoreAdd")} placeholder="서울특별시 강서구00길 00" error={errors.signupStoreAdd?.message} />
-          <UserFormField label="상세 주소" type="text" register={register("signupStoreDetailAdd")} placeholder="0층 0호" />
+          <UserFormField label="상호" type="text" register={register("storeName")} placeholder="OO치킨 OO점" error={errors.storeName?.message} required />
+          <UserFormField label="매장 연락처" type="tel" register={register("storeCall")} placeholder="02-0000-0000" error={errors.storeCall?.message} required />
+          <UserFormField label="주소" type="text" register={register("storeAdd")} placeholder="서울특별시 강서구00길 00" error={errors.storeAdd?.message} />
+          <UserFormField label="상세 주소" type="text" register={register("storeDetailAdd")} placeholder="0층 0호" />
 
           <Button type="submit" size="lg" className="w-full">
             회원가입

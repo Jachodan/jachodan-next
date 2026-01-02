@@ -1,9 +1,0 @@
-import * as z from "zod";
-
-export const loginSchema = z.object({
-  loginEmail: z.string().email("이메일 형식을 확인해주세요."),
-  loginUserName: z.string().min(2, "이름을 2글자 이상 작성해주세요.").max(10, "이름은 10글자 미만입니다."),
-  loginStoreName: z.string().min(1, "상호를 작성해주세요.").max(20, "상호는 20글자 미만입니다."),
-});
-
-export type LoginValues = z.infer<typeof loginSchema>;
