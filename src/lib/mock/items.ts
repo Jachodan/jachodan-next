@@ -1,4 +1,4 @@
-import { Item, ItemWithStock, SafeStock, Stock } from "@/types/item";
+import { Item, ItemWithStock, Buffer, Stock } from "@/types/item";
 
 const sampleItemNames = [
   "영주별사과",
@@ -29,8 +29,9 @@ export const generateMockItems = (count: number = 50, storeId: number = 1): Item
   return Array.from({ length: count }, (_, index) => {
     const itemId = index + 1;
     const stockId = index + 1;
-    const quantity = Math.floor(Math.random() * 200);
-    const safeQuantity = Math.floor(Math.random() * 50) + 20; // 20 ~ 69
+    const bufferId = index + 1;
+    const stockAmount = Math.floor(Math.random() * 200);
+    const bufferAmount = Math.floor(Math.random() * 50) + 20; // 20 ~ 69
     const hasImage = Math.random() > 0.3; // 70% 확률로 이미지 있음
 
     const item: Item = {
@@ -39,29 +40,31 @@ export const generateMockItems = (count: number = 50, storeId: number = 1): Item
       imageId: hasImage ? itemId : undefined,
       itemName: sampleItemNames[index % sampleItemNames.length],
       createdAt: now,
-      isDel: false,
+      updatedAt: now,
+      isActive: true,
+      isPin: Math.random() > 0.7, // 30% 확률로 즐겨찾기
     };
 
     const stock: Stock = {
       itemId,
-      storeId,
       stockId,
-      quantity,
-      isFavorite: Math.random() > 0.7, // 30% 확률로 즐겨찾기
+      stockAmount,
+      createdAt: now,
+      updatedAt: now,
     };
 
-    const safeStock: SafeStock = {
-      stockId,
-      safeQuantity,
+    const buffer: Buffer = {
+      itemId,
+      bufferId,
+      bufferAmount,
+      createdAt: now,
+      updatedAt: now,
     };
 
     const itemWithStock: ItemWithStock = {
       ...item,
       stock,
-      safeStock,
-      isLowStock: quantity < safeQuantity,
-      isDeadStock: false,
-      hasRequest: Math.random() > 0.8, // 20% 확률로 입고요청 있음
+      buffer,
     };
 
     return itemWithStock;
