@@ -7,15 +7,15 @@ export const REQUEST_STATUS = ["확인중", "대기", "반려", "승인", "완�
 export type RequestStatus = (typeof REQUEST_STATUS)[number];
 
 // 요청 게시판
-export interface Request {
+export interface ItemRequest {
     requestId: number;
-    stockId: number;
+    itemId: number;
     albaId: number;
-    imageId?: number;
     requestAmount?: number;
     requestDate: string;
     requestType: RequestType;
     requestStatus: RequestStatus;
     createdAt: string;
     updatedAt?: string;
+    isActive: boolean;
 }
