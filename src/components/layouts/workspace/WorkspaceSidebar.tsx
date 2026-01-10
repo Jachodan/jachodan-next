@@ -2,66 +2,61 @@
 
 import * as React from "react";
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarGroup,
-    SidebarGroupContent,
-    useSidebar,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarGroup,
+  SidebarGroupContent,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Settings } from "lucide-react";
+import { Home, Settings, ShoppingBasket } from "lucide-react";
 
 const navItems = [
-    { title: "홈", url: "/", icon: Home },
-    { title: "설정", url: "/settings", icon: Settings },
+  { title: "대시보드", url: "/", icon: Home },
+  { title: "상품관리", url: "/items", icon: ShoppingBasket },
+  { title: "설정", url: "/settings", icon: Settings },
 ];
 
 export default function WorkspaceSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { state } = useSidebar();
-    const pathname = usePathname();
+  const { state } = useSidebar();
+  const pathname = usePathname();
 
-    return (
-        <Sidebar collapsible="icon" {...props}>
-            <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:p-1.5!">
-                            <Link href="/">
-                                {state === "expanded" ? (
-                                    <span className="font-bold text-lg">Logo</span>
-                                ) : (
-                                    <span className="font-bold text-lg">L</span>
-                                )}
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarHeader>
-            <SidebarContent>
-                <SidebarGroup>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {navItems.map((item) => (
-                                <SidebarMenuItem key={item.url}>
-                                    <SidebarMenuButton asChild isActive={pathname === item.url}>
-                                        <Link href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-            </SidebarContent>
-            <SidebarFooter>{/* Footer content goes here */}</SidebarFooter>
-        </Sidebar>
-    );
+  return (
+    <Sidebar collapsible="icon" {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:p-1.5!">
+              <Link href="/">{state === "expanded" ? <span className="font-bold text-lg">Logo</span> : <span className="font-bold text-lg">L</span>}</Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map((item) => (
+                <SidebarMenuItem key={item.url}>
+                  <SidebarMenuButton asChild isActive={pathname === item.url}>
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>{/* Footer content goes here */}</SidebarFooter>
+    </Sidebar>
+  );
 }
