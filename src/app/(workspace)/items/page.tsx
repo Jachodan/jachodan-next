@@ -11,6 +11,7 @@ import CustomPagination from "@/components/common/CustomPagination";
 import { hasRequest, isLowStock } from "@/lib/utils/item";
 import { generateMockRequests } from "@/lib/mock/itemRequests";
 import { ItemRequest } from "@/types/itemRequest";
+import { cn } from "@/lib/utils";
 
 const LIST_ITEMS_PER_PAGE = 8;
 const CARD_ITEMS_PER_PAGE = 15;
@@ -136,19 +137,17 @@ export default function ItemList() {
             </div>
 
             <div
-                className={
-                    viewMode === "card"
-                        ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
-                        : "space-y-3"
-                }
+                className={cn(
+                    "border rounded-lg p-4 transition-shadow cursor-pointer",
+                    viewMode === "card" ? "hover:shadow-md" : "hover:shadow-sm flex items-center gap-4"
+                )}
             >
                 {paginatedItems.length === 0 ? (
                     <div
-                        className={
-                            viewMode === "card"
-                                ? "col-span-full text-center py-12 text-muted-foreground"
-                                : "text-center py-12 text-muted-foreground"
-                        }
+                        className={cn(
+                            "text-center py-12 text-muted-foreground",
+                            viewMode === "card" && "col-span-full"
+                        )}
                     >
                         {searchQuery || filterType !== "all" || excludeZero
                             ? "검색 결과가 없습니다."
@@ -158,11 +157,10 @@ export default function ItemList() {
                     paginatedItems.map((item) => (
                         <div
                             key={item.itemId}
-                            className={
-                                viewMode === "card"
-                                    ? "border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                                    : "border rounded-lg p-4 hover:shadow-sm transition-shadow cursor-pointer flex items-center gap-4"
-                            }
+                            className={cn(
+                                "border rounded-lg p-4 transition-shadow cursor-pointer",
+                                viewMode === "card" ? "hover:shadow-md" : "hover:shadow-sm flex items-center gap-4"
+                            )}
                         >
                             {/* 리스트/카드 섹션 - 컴포넌트 분리 예정 */}
                             {viewMode === "card" ? (
