@@ -45,21 +45,24 @@ export default function ItemListHeader() {
                     <label htmlFor="search" className="whitespace-nowrap">
                         검색
                     </label>
-                    <Input
-                        id="search"
-                        placeholder="상품명 검색"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    {searchQuery && (
-                        <button
-                            onClick={() => setSearchQuery("")}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                            aria-label="검색어 지우기"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                    )}
+                    <div className="relative">
+                        <Input
+                            id="search"
+                            placeholder="상품명 검색"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pr-8"
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery("")}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                aria-label="검색어 지우기"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        )}
+                    </div>
                 </div>
                 <div className="flex gap-2 items-center">
                     <Checkbox
