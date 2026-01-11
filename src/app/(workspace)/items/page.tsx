@@ -12,6 +12,7 @@ import { hasRequest, isLowStock } from "@/lib/utils/item";
 import { generateMockRequests } from "@/lib/mock/itemRequests";
 import { ItemRequest } from "@/types/itemRequest";
 import { cn } from "@/lib/utils";
+import FavoriteButton from "@/components/common/FavoriteButton";
 
 const LIST_ITEMS_PER_PAGE = 8;
 const CARD_ITEMS_PER_PAGE = 15;
@@ -138,8 +139,8 @@ export default function ItemList() {
 
             <div
                 className={cn(
-                    "border rounded-lg p-4 transition-shadow cursor-pointer",
-                    viewMode === "card" ? "hover:shadow-md" : "hover:shadow-sm flex items-center gap-4"
+                    "grid gap-4",
+                    viewMode === "card" ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5" : "grid-cols-1"
                 )}
             >
                 {paginatedItems.length === 0 ? (
@@ -170,16 +171,11 @@ export default function ItemList() {
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <p className="font-medium text-sm truncate flex-1">{item.itemName}</p>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleToggleFavorite(item.itemId);
-                                            }}
-                                            className="text-yellow-400 hover:scale-110 transition-transform"
-                                            aria-label="즐겨찾기"
-                                        >
-                                            {item.isPin ? "⭐" : "☆"}
-                                        </button>
+                                        <FavoriteButton
+                                            isPin={item.isPin}
+                                            onToggle={() => handleToggleFavorite(item.itemId)}
+                                            size={16}
+                                        />
                                     </div>
                                     <p className="text-xs text-muted-foreground">
                                         재고: {item.stock.stockAmount ?? 0}개
@@ -194,15 +190,11 @@ export default function ItemList() {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
                                             <p className="font-medium truncate">{item.itemName}</p>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleToggleFavorite(item.itemId);
-                                                }}
-                                                className="text-yellow-400"
-                                            >
-                                                {item.isPin ? "⭐" : "☆"}
-                                            </button>
+                                            <FavoriteButton
+                                                isPin={item.isPin}
+                                                onToggle={() => handleToggleFavorite(item.itemId)}
+                                                size={18}
+                                            />
                                         </div>
                                         <p className="text-sm">
                                             재고: {item.stock.stockAmount ?? 0}개
