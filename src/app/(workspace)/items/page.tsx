@@ -86,8 +86,11 @@ export default function ItemList() {
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
-        // 페이지 최상단으로 스크롤
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        // ScrollArea 컨테이너를 찾아서 스크롤
+        const scrollContainer = document.querySelector('[data-radix-scroll-area-viewport]');
+        if (scrollContainer) {
+            scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+        }
     };
 
     useEffect(() => {
