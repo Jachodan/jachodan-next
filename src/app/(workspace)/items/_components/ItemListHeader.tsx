@@ -19,6 +19,11 @@ export default function ItemListHeader() {
         setViewMode,
     } = useItemListStore();
 
+    const viewModes = [
+        { mode: "list" as const, icon: LayoutList, label: "리스트 보기" },
+        { mode: "card" as const, icon: LayoutGrid, label: "카드 보기" },
+    ] as const;
+
     return (
         <div className="flex item-center justify-between gap-4 pb-6">
             <div className="flex flex-wrap gap-4">
@@ -65,11 +70,7 @@ export default function ItemListHeader() {
                     </div>
                 </div>
                 <div className="flex gap-2 items-center">
-                    <Checkbox
-                        id="excludeZero"
-                        checked={excludeZero}
-                        onCheckedChange={setExcludeZero}
-                    />
+                    <Checkbox id="excludeZero" checked={excludeZero} onCheckedChange={setExcludeZero} />
                     <label
                         htmlFor="excludeZero"
                         className="text-sm text-muted-foreground cursor-pointer select-none whitespace-nowrap"
@@ -80,24 +81,18 @@ export default function ItemListHeader() {
             </div>
 
             <div className="flex gap-2">
-                <Button
-                    variant={viewMode === "list" ? "default" : "outline"}
-                    size="icon"
-                    onClick={() => setViewMode("list")}
-                    aria-label="리스트 보기"
-                    className="shrink-0"
-                >
-                    <LayoutList className="w-4 h-4" />
-                </Button>
-                <Button
-                    variant={viewMode === "card" ? "default" : "outline"}
-                    size="icon"
-                    onClick={() => setViewMode("card")}
-                    aria-label="카드 보기"
-                    className="shrink-0"
-                >
-                    <LayoutGrid className="w-4 h-4" />
-                </Button>
+                {viewModes.map(({ mode, icon: Icon, label }) => (
+                    <Button
+                        key={mode}
+                        variant={viewMode === mode ? "default" : "outline"}
+                        size="icon"
+                        onClick={() => setViewMode(mode)}
+                        aria-label={label}
+                        className="shrink-0"
+                    >
+                        <Icon className="w-4 h-4" />
+                    </Button>
+                ))}
             </div>
         </div>
     );
