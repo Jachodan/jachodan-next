@@ -13,6 +13,7 @@ import { generateMockRequests } from "@/lib/mock/itemRequests";
 import { ItemRequest } from "@/types/itemRequest";
 import { cn } from "@/lib/utils";
 import FavoriteButton from "@/components/common/FavoriteButton";
+import ItemRequestIndicator from "@/app/(workspace)/items/_components/ItemRequestIndicator";
 
 const LIST_ITEMS_PER_PAGE = 8;
 const CARD_ITEMS_PER_PAGE = 10;
@@ -104,6 +105,11 @@ export default function ItemList() {
         );
     };
 
+    // 특정 아이템의 요청사항 가져오기
+    const getItemRequests = (itemId: number) => {
+        return requests.filter((request) => request.itemId === itemId && request.isActive);
+    };
+
     // 빈 상태 메시지
     const getEmptyMessage = () => {
         if (searchQuery) return `"${searchQuery}"에 대한 검색 결과가 없습니다.`;
@@ -171,8 +177,9 @@ export default function ItemList() {
                             {/* 리스트/카드 섹션 - 컴포넌트 분리 예정 */}
                             {viewMode === "card" ? (
                                 <div className="space-y-2">
-                                    <div className="aspect-square bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
+                                    <div className="relative aspect-square bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
                                         {item.imageId ? "이미지" : "No Image"}
+                                        <ItemRequestIndicator requests={getItemRequests(item.itemId)} variant="card" />
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <p className="font-medium text-sm truncate flex-1">{item.itemName}</p>
@@ -189,23 +196,34 @@ export default function ItemList() {
                                 </div>
                             ) : (
                                 <>
-                                    <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground shrink-0">
-                                        {item.imageId ? "이미지" : "No"}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2">
-                                            <p className="font-medium truncate">{item.itemName}</p>
-                                            <FavoriteButton
-                                                isPin={item.isPin}
-                                                onToggle={() => handleToggleFavorite(item.itemId)}
-                                                size={18}
-                                            />
+                                    {/* 왼쪽 섹션: 이미지 + 아이템명 */}
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground shrink-0">
+                                            {item.imageId ? "이미지" : "No"}
                                         </div>
-                                        <p className="text-sm">
-                                            재고: {item.stock.stockAmount ?? 0}개
-                                            {item.buffer && ` / 적정재고: ${item.buffer.bufferAmount}개`}
-                                        </p>
+                                        <div className="flex flex-col gap-1 min-w-0">
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-medium truncate">{item.itemName}</p>
+                                                <FavoriteButton
+                                                    isPin={item.isPin}
+                                                    onToggle={() => handleToggleFavorite(item.itemId)}
+                                                    size={18}
+                                                />
+                                            </div>
+                                            <p className="text-sm text-muted-foreground">
+                                                재고: {item.stock.stockAmount ?? 0}개
+                                                {item.buffer && ` / 적정재고: ${item.buffer.bufferAmount}개`}
+                                            </p>
+                                        </div>
                                     </div>
+
+                                    {/* 중간 섹션: 입고요청 메시지 */}
+                                    <div className="flex-1 flex items-center justify-center">
+                                        <ItemRequestIndicator requests={getItemRequests(item.itemId)} variant="list" />
+                                    </div>
+
+                                    {/* 오른쪽 섹션: 재고 수량 조절 기능 추가 예정 */}
+                                    <div className="flex-1 flex items-center justify-end"></div>
                                 </>
                             )}
                         </div>
