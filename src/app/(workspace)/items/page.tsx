@@ -130,16 +130,18 @@ export default function ItemList() {
             <ItemListHeader />
 
             {/* 상품 개수 및 페이지 알림 */}
-            <div className="flex items-center justify-between">
-                <div className="py-2 text-sm text-muted-foreground">
+            <div className="flex items-center justify-between py-2 mb-4">
+                <p className="text-sm text-muted-foreground">
                     {filterType === "all" ? "전체" : "필터링된"} {filteredItems.length}개 상품
                     {filteredItems.length !== items.length && (
                         <span className="text-muted-foreground/70"> (전체: {items.length}개)</span>
                     )}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                    {totalPages > 0 && `${currentPage} / ${totalPages} 페이지`}
-                </div>
+                </p>
+                {totalPages > 0 && (
+                    <p className="text-sm text-muted-foreground">
+                        {currentPage} / {totalPages} 페이지
+                    </p>
+                )}
             </div>
 
             <div
@@ -222,7 +224,7 @@ export default function ItemList() {
                     )}
                 </div>
                 <Button variant="outline" className="hover:text-white hover:bg-black">
-                    상품등록
+                    + 상품등록
                 </Button>
             </div>
         </div>
