@@ -211,16 +211,16 @@ export default function ItemList() {
                 )}
             </div>
 
-            <div className="flex justify-center items-center py-6">
-                {totalPages > 0 && (
-                    <div className="flex pt-4">
+            <div className="flex justify-between items-center py-6">
+                <div className="flex-1 flex justify-center">
+                    {totalPages > 0 && (
                         <CustomPagination
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={handlePageChange}
                         />
-                    </div>
-                )}
+                    )}
+                </div>
                 <Button variant="outline" className="hover:text-white hover:bg-black">
                     상품등록
                 </Button>
