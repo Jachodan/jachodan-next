@@ -113,6 +113,17 @@ export default function ItemList() {
         );
     };
 
+    // 빈 상태 메시지
+    const getEmptyMessage = () => {
+        if (searchQuery) return `"${searchQuery}"에 대한 검색 결과가 없습니다.`;
+        if (filterType === "request") return "요청사항이 있는 상품이 없습니다.";
+        if (filterType === "lowStock") return "재고가 부족한 상품이 없습니다.";
+        if (filterType === "favorite") return "즐겨찾기한 상품이 없습니다.";
+        if (filterType === "deadStock") return "악성재고 상품이 없습니다.";
+        if (excludeZero) return "표시할 상품이 없습니다.";
+        return "등록된 상품이 없습니다.";
+    };
+
     if (isLoading) {
         return (
             <div className="p-10">
@@ -153,9 +164,7 @@ export default function ItemList() {
                             viewMode === "card" && "col-span-full"
                         )}
                     >
-                        {searchQuery || filterType !== "all" || excludeZero
-                            ? "검색 결과가 없습니다."
-                            : "등록된 상품이 없습니다."}
+                        {getEmptyMessage()}
                     </div>
                 ) : (
                     paginatedItems.map((item) => (
