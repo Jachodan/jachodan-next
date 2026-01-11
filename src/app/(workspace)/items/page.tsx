@@ -103,7 +103,7 @@ export default function ItemList() {
                 item.itemId === itemId
                     ? {
                           ...item,
-                          stock: { ...item.stock, isPin: !item.isPin },
+                          isPin: !item.isPin,
                       }
                     : item
             )
