@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import FavoriteButton from "@/components/common/FavoriteButton";
 
 const LIST_ITEMS_PER_PAGE = 8;
-const CARD_ITEMS_PER_PAGE = 15;
+const CARD_ITEMS_PER_PAGE = 10;
 
 export default function ItemList() {
     const { setHeaderTitle } = useLayout();
@@ -87,7 +87,7 @@ export default function ItemList() {
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
         // ScrollArea 컨테이너를 찾아서 스크롤
-        const scrollContainer = document.querySelector('[data-radix-scroll-area-viewport]');
+        const scrollContainer = document.querySelector("[data-radix-scroll-area-viewport]");
         if (scrollContainer) {
             scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
         }
