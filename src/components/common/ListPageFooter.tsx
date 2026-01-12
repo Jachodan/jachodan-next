@@ -22,7 +22,7 @@ export default function ListPageFooter({ currentPage, totalPages, onPageChange, 
     const showPagination = currentPage !== undefined && totalPages !== undefined && totalPages > 0 && onPageChange;
 
     return (
-        <div className="flex justify-between items-center py-6">
+        <div className="flex justify-between items-center pt-6">
             <div className="flex-1 flex justify-center">
                 {showPagination && (
                     <CustomPagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
