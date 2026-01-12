@@ -1,13 +1,12 @@
 "use client";
 
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
-import { Button } from "@/components/ui/button";
 import { ItemWithStock } from "@/types/item";
 import { useEffect, useState } from "react";
 import ItemListHeader from "./_components/ItemListHeader";
 import { mockItems } from "@/lib/mock/items";
 import { useItemListStore } from "@/stores/itemListStore";
-import CustomPagination from "@/components/common/CustomPagination";
+import ListPageFooter from "@/components/common/ListPageFooter";
 import { generateMockRequests } from "@/lib/mock/itemRequests";
 import { ItemRequest } from "@/types/itemRequest";
 import { cn } from "@/lib/utils";
@@ -154,20 +153,17 @@ export default function ItemList() {
                 )}
             </div>
 
-            <div className="flex justify-between items-center py-6">
-                <div className="flex-1 flex justify-center">
-                    {totalPages > 0 && (
-                        <CustomPagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    )}
-                </div>
-                <Button variant="outline" className="hover:text-white hover:bg-black">
-                    + 상품등록
-                </Button>
-            </div>
+            <ListPageFooter
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                actionButton={{
+                    label: "+ 상품등록",
+                    onClick: () => {
+                        // TODO: 상품등록 핸들러 추가
+                    },
+                }}
+            />
         </div>
     );
 }
