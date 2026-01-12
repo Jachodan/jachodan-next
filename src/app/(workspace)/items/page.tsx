@@ -8,7 +8,7 @@ import ItemListHeader from "./_components/ItemListHeader";
 import { mockItems } from "@/lib/mock/items";
 import { useItemListStore } from "@/stores/itemListStore";
 import CustomPagination from "@/components/common/CustomPagination";
-import { hasRequest, isLowStock } from "@/lib/utils/item";
+import { hasRequest, isLowStock, formatStockInfo } from "@/lib/utils/item";
 import { generateMockRequests } from "@/lib/mock/itemRequests";
 import { ItemRequest } from "@/types/itemRequest";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,10 @@ import ItemRequestIndicator from "@/app/(workspace)/items/_components/ItemReques
 
 const LIST_ITEMS_PER_PAGE = 8;
 const CARD_ITEMS_PER_PAGE = 10;
+
+const StockInfo = ({ item }: { item: ItemWithStock }) => (
+    <p className="text-sm text-muted-foreground">{formatStockInfo(item)}</p>
+);
 
 export default function ItemList() {
     const { setHeaderTitle } = useLayout();
@@ -182,17 +186,14 @@ export default function ItemList() {
                                         <ItemRequestIndicator requests={getItemRequests(item.itemId)} variant="card" />
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <p className="font-medium text-sm truncate flex-1">{item.itemName}</p>
+                                        <p className="font-medium text-lg truncate flex-1">{item.itemName}</p>
                                         <FavoriteButton
                                             isPin={item.isPin}
                                             onToggle={() => handleToggleFavorite(item.itemId)}
                                             size={16}
                                         />
                                     </div>
-                                    <p className="text-xs text-muted-foreground">
-                                        재고: {item.stock.stockAmount ?? 0}개
-                                        {item.buffer && ` / 적정재고: ${item.buffer.bufferAmount}개`}
-                                    </p>
+                                    <StockInfo item={item} />
                                 </div>
                             ) : (
                                 <>
@@ -210,10 +211,7 @@ export default function ItemList() {
                                                     size={18}
                                                 />
                                             </div>
-                                            <p className="text-sm text-muted-foreground">
-                                                재고: {item.stock.stockAmount ?? 0}개
-                                                {item.buffer && ` / 적정재고: ${item.buffer.bufferAmount}개`}
-                                            </p>
+                                            <StockInfo item={item} />
                                         </div>
                                     </div>
 
