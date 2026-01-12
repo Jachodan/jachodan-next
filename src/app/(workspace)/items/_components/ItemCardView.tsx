@@ -16,7 +16,7 @@ const StockInfo = ({ item }: { item: ItemWithStock }) => (
 
 export default function ItemCardView({ item, requests, onToggleFavorite }: ItemCardViewProps) {
     return (
-        <div className="space-y-2">
+        <div>
             <div className="relative aspect-square bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
                 {item.imageId ? "이미지" : "No Image"}
                 <ItemRequestIndicator requests={requests} variant="card" />
