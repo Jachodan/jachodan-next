@@ -1,18 +1,14 @@
 import { ItemWithStock } from "@/types/item";
 import { ItemRequest } from "@/types/itemRequest";
 import FavoriteButton from "@/components/common/FavoriteButton";
+import StockInfo from "@/components/common/StockInfo";
 import ItemRequestIndicator from "./ItemRequestIndicator";
-import { formatStockInfo } from "@/lib/utils/item";
 
 interface ItemListViewProps {
     item: ItemWithStock;
     requests: ItemRequest[];
     onToggleFavorite: (itemId: number) => void;
 }
-
-const StockInfo = ({ item }: { item: ItemWithStock }) => (
-    <p className="text-sm text-muted-foreground">{formatStockInfo(item)}</p>
-);
 
 export default function ItemListView({ item, requests, onToggleFavorite }: ItemListViewProps) {
     return (
