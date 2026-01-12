@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LayoutList, LayoutGrid, X } from "lucide-react";
+import { LayoutList, X } from "lucide-react";
 
 export interface FilterOption<T = string> {
     value: T;
@@ -117,11 +117,7 @@ export default function ListPageHeader<FilterType = string, ViewModeType = strin
                 {/* 체크박스 옵션들 */}
                 {checkboxOptions?.map((option) => (
                     <div key={option.id} className="flex gap-2 items-center">
-                        <Checkbox
-                            id={option.id}
-                            checked={option.checked}
-                            onCheckedChange={option.onCheckedChange}
-                        />
+                        <Checkbox id={option.id} checked={option.checked} onCheckedChange={option.onCheckedChange} />
                         <label
                             htmlFor={option.id}
                             className="text-sm text-muted-foreground cursor-pointer select-none whitespace-nowrap"
