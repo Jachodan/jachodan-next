@@ -12,6 +12,7 @@ import { generateMockRequests } from "@/lib/mock/itemRequests";
 import { ItemRequest } from "@/types/itemRequest";
 import { cn } from "@/lib/utils";
 import { useFilteredItems } from "@/hooks/useFilteredItems";
+import { usePagination } from "@/hooks/usePagination";
 import ItemCardView from "./_components/ItemCardView";
 import ItemListView from "./_components/ItemListView";
 
@@ -55,27 +56,12 @@ export default function ItemList() {
         excludeZero,
     });
 
-    // 페이지네이션
-    const itemsPerPage = viewMode === "list" ? LIST_ITEMS_PER_PAGE : CARD_ITEMS_PER_PAGE;
-    const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedItems = filteredItems.slice(startIndex, endIndex);
-
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-        // ScrollArea 컨테이너를 찾아서 스크롤
-        const scrollContainer = document.querySelector("[data-radix-scroll-area-viewport]");
-        if (scrollContainer) {
-            scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
-        }
-    };
-
-    useEffect(() => {
-        if (currentPage > totalPages && totalPages > 0) {
-            setCurrentPage(1);
-        }
-    }, [currentPage, totalPages, setCurrentPage]);
+    const { paginatedItems, totalPages, handlePageChange } = usePagination({
+        items: filteredItems,
+        itemsPerPage: viewMode === "list" ? LIST_ITEMS_PER_PAGE : CARD_ITEMS_PER_PAGE,
+        currentPage,
+        setCurrentPage,
+    });
 
     // 즐겨찾기
     const handleToggleFavorite = (itemId: number) => {
