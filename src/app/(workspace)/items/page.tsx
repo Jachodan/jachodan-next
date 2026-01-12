@@ -3,17 +3,18 @@
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
 import { Button } from "@/components/ui/button";
 import { ItemWithStock } from "@/types/item";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import ItemListHeader from "./_components/ItemListHeader";
 import { mockItems } from "@/lib/mock/items";
 import { useItemListStore } from "@/stores/itemListStore";
 import CustomPagination from "@/components/common/CustomPagination";
-import { hasRequest, isLowStock, formatStockInfo } from "@/lib/utils/item";
+import { formatStockInfo } from "@/lib/utils/item";
 import { generateMockRequests } from "@/lib/mock/itemRequests";
 import { ItemRequest } from "@/types/itemRequest";
 import { cn } from "@/lib/utils";
 import FavoriteButton from "@/components/common/FavoriteButton";
 import ItemRequestIndicator from "@/app/(workspace)/items/_components/ItemRequestIndicator";
+import { useFilteredItems } from "@/hooks/useFilteredItems";
 
 const LIST_ITEMS_PER_PAGE = 8;
 const CARD_ITEMS_PER_PAGE = 10;
@@ -51,27 +52,13 @@ export default function ItemList() {
         loadItems();
     }, []);
 
-    const filteredItems = useMemo(() => {
-        return items.filter((item) => {
-            // 필터 타입 체크
-            if (filterType === "request" && !hasRequest(item, requests)) return false;
-            if (filterType === "lowStock" && !isLowStock(item)) return false;
-            if (filterType === "favorite" && !item.isPin) return false;
-            // deadStock은 현재 동작하지 않도록 구현 - 백엔드와 협의 후 추가 예정
-
-            // 검색어 체크
-            if (searchQuery && !item.itemName.toLowerCase().includes(searchQuery.toLowerCase())) {
-                return false;
-            }
-
-            // 재고 0건 제외 체크
-            if (excludeZero && (item.stock.stockAmount === undefined || item.stock.stockAmount === 0)) {
-                return false;
-            }
-
-            return true;
-        });
-    }, [items, requests, filterType, searchQuery, excludeZero]);
+    const filteredItems = useFilteredItems({
+        items,
+        requests,
+        filterType,
+        searchQuery,
+        excludeZero,
+    });
 
     // 페이지네이션
     const itemsPerPage = viewMode === "list" ? LIST_ITEMS_PER_PAGE : CARD_ITEMS_PER_PAGE;
