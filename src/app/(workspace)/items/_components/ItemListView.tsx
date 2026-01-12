@@ -2,15 +2,17 @@ import { ItemWithStock } from "@/types/item";
 import { ItemRequest } from "@/types/itemRequest";
 import FavoriteButton from "@/components/common/FavoriteButton";
 import StockInfo from "@/components/common/StockInfo";
+import StockControl from "@/components/common/StockControl";
 import ItemRequestIndicator from "./ItemRequestIndicator";
 
 interface ItemListViewProps {
     item: ItemWithStock;
     requests: ItemRequest[];
     onToggleFavorite: (itemId: number) => void;
+    onStockChange: (itemId: number, newStock: number) => void;
 }
 
-export default function ItemListView({ item, requests, onToggleFavorite }: ItemListViewProps) {
+export default function ItemListView({ item, requests, onToggleFavorite, onStockChange }: ItemListViewProps) {
     return (
         <>
             {/* 왼쪽 섹션: 이미지 + 아이템명 */}
@@ -32,8 +34,14 @@ export default function ItemListView({ item, requests, onToggleFavorite }: ItemL
                 <ItemRequestIndicator requests={requests} variant="list" />
             </div>
 
-            {/* 오른쪽 섹션: 재고 수량 조절 기능 추가 예정 */}
-            <div className="flex-1 flex items-center justify-end"></div>
+            {/* 오른쪽 섹션: 재고 수량 조절 */}
+            <div className="flex-1 flex items-center justify-end">
+                <StockControl
+                    currentStock={item.stock.stockAmount ?? 0}
+                    onStockChange={(newStock) => onStockChange(item.itemId, newStock)}
+                    variant="list"
+                />
+            </div>
         </>
     );
 }
