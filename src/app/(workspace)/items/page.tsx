@@ -79,7 +79,7 @@ export default function ItemList() {
             <ItemListHeader />
 
             {/* 상품 개수 및 페이지 알림 */}
-            <div className="flex items-center justify-between py-2 mb-4">
+            <div className="flex items-center justify-between py-2">
                 <p className="text-sm text-muted-foreground">
                     {filterType === "all" ? "전체" : "필터링된"} {filteredItems.length}개 상품
                     {filteredItems.length !== items.length && (
