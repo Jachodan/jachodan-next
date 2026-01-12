@@ -8,20 +8,15 @@ import ItemListHeader from "./_components/ItemListHeader";
 import { mockItems } from "@/lib/mock/items";
 import { useItemListStore } from "@/stores/itemListStore";
 import CustomPagination from "@/components/common/CustomPagination";
-import { formatStockInfo } from "@/lib/utils/item";
 import { generateMockRequests } from "@/lib/mock/itemRequests";
 import { ItemRequest } from "@/types/itemRequest";
 import { cn } from "@/lib/utils";
-import FavoriteButton from "@/components/common/FavoriteButton";
-import ItemRequestIndicator from "@/app/(workspace)/items/_components/ItemRequestIndicator";
 import { useFilteredItems } from "@/hooks/useFilteredItems";
+import ItemCardView from "./_components/ItemCardView";
+import ItemListView from "./_components/ItemListView";
 
 const LIST_ITEMS_PER_PAGE = 8;
 const CARD_ITEMS_PER_PAGE = 10;
-
-const StockInfo = ({ item }: { item: ItemWithStock }) => (
-    <p className="text-sm text-muted-foreground">{formatStockInfo(item)}</p>
-);
 
 export default function ItemList() {
     const { setHeaderTitle } = useLayout();
@@ -165,51 +160,18 @@ export default function ItemList() {
                                 viewMode === "card" ? "hover:shadow-md" : "hover:shadow-sm flex items-center gap-4"
                             )}
                         >
-                            {/* 리스트/카드 섹션 - 컴포넌트 분리 예정 */}
                             {viewMode === "card" ? (
-                                <div className="space-y-2">
-                                    <div className="relative aspect-square bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
-                                        {item.imageId ? "이미지" : "No Image"}
-                                        <ItemRequestIndicator requests={getItemRequests(item.itemId)} variant="card" />
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <p className="font-medium text-lg truncate flex-1">{item.itemName}</p>
-                                        <FavoriteButton
-                                            isPin={item.isPin}
-                                            onToggle={() => handleToggleFavorite(item.itemId)}
-                                            size={16}
-                                        />
-                                    </div>
-                                    <StockInfo item={item} />
-                                </div>
+                                <ItemCardView
+                                    item={item}
+                                    requests={getItemRequests(item.itemId)}
+                                    onToggleFavorite={handleToggleFavorite}
+                                />
                             ) : (
-                                <>
-                                    {/* 왼쪽 섹션: 이미지 + 아이템명 */}
-                                    <div className="flex items-center gap-4 flex-1">
-                                        <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground shrink-0">
-                                            {item.imageId ? "이미지" : "No"}
-                                        </div>
-                                        <div className="flex flex-col gap-1 min-w-0">
-                                            <div className="flex items-center gap-2">
-                                                <p className="font-medium truncate">{item.itemName}</p>
-                                                <FavoriteButton
-                                                    isPin={item.isPin}
-                                                    onToggle={() => handleToggleFavorite(item.itemId)}
-                                                    size={18}
-                                                />
-                                            </div>
-                                            <StockInfo item={item} />
-                                        </div>
-                                    </div>
-
-                                    {/* 중간 섹션: 입고요청 메시지 */}
-                                    <div className="flex-1 flex items-center justify-center">
-                                        <ItemRequestIndicator requests={getItemRequests(item.itemId)} variant="list" />
-                                    </div>
-
-                                    {/* 오른쪽 섹션: 재고 수량 조절 기능 추가 예정 */}
-                                    <div className="flex-1 flex items-center justify-end"></div>
-                                </>
+                                <ItemListView
+                                    item={item}
+                                    requests={getItemRequests(item.itemId)}
+                                    onToggleFavorite={handleToggleFavorite}
+                                />
                             )}
                         </div>
                     ))
