@@ -1,18 +1,15 @@
 "use client";
 
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
-import { ItemWithStock } from "@/types/item";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import ItemListHeader from "./_components/ItemListHeader";
-import { mockItems } from "@/lib/mock/items";
 import { useItemListStore } from "@/stores/itemListStore";
 import ListPageFooter from "@/components/common/ListPageFooter";
-import { generateMockRequests } from "@/lib/mock/itemRequests";
-import { ItemRequest } from "@/types/itemRequest";
 import { cn } from "@/lib/utils";
 import { getItemListEmptyMessage } from "@/lib/utils/item";
 import { useFilteredItems } from "@/hooks/useFilteredItems";
 import { usePagination } from "@/hooks/usePagination";
+import { useItemData } from "@/hooks/useItemData";
 import ItemCardView from "./_components/ItemCardView";
 import ItemListView from "./_components/ItemListView";
 
@@ -21,32 +18,13 @@ const CARD_ITEMS_PER_PAGE = 10;
 
 export default function ItemList() {
     const { setHeaderTitle } = useLayout();
-    const [items, setItems] = useState<ItemWithStock[]>([]);
-    const [requests, setRequests] = useState<ItemRequest[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
     const { filterType, searchQuery, excludeZero, viewMode, currentPage, setCurrentPage } = useItemListStore();
+
+    const { items, requests, isLoading, updateItem } = useItemData();
 
     useEffect(() => {
         setHeaderTitle("상품관리");
     }, [setHeaderTitle]);
-
-    // mock 데이터 로딩
-    useEffect(() => {
-        const loadItems = async () => {
-            setIsLoading(true);
-            await new Promise((resolve) => setTimeout(resolve, 500));
-
-            const loadedItems = mockItems;
-            const loadedRequests = generateMockRequests(loadedItems.map((item) => ({ itemId: item.itemId })));
-
-            setItems(mockItems);
-            setRequests(loadedRequests);
-            setIsLoading(false);
-        };
-
-        loadItems();
-    }, []);
 
     const filteredItems = useFilteredItems({
         items,
@@ -65,16 +43,10 @@ export default function ItemList() {
 
     // 즐겨찾기
     const handleToggleFavorite = (itemId: number) => {
-        setItems((prev) =>
-            prev.map((item) =>
-                item.itemId === itemId
-                    ? {
-                          ...item,
-                          isPin: !item.isPin,
-                      }
-                    : item
-            )
-        );
+        const item = items.find((item) => item.itemId === itemId);
+        if (item) {
+            updateItem(itemId, { isPin: !item.isPin });
+        }
     };
 
     // 특정 아이템의 요청사항 가져오기
