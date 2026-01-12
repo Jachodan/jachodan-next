@@ -22,3 +22,9 @@ export function getItemStatus(item: ItemWithStock, requests: ItemRequest[]) {
         hasRequest: hasRequest(item, requests),
     };
 }
+
+export function formatStockInfo(item: ItemWithStock): string {
+    const stockText = `재고: ${item.stock.stockAmount ?? 0}개`;
+    const bufferText = item.buffer ? ` / 적정재고: ${item.buffer.bufferAmount}개` : "";
+    return stockText + bufferText;
+}
