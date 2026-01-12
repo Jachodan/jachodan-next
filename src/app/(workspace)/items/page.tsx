@@ -49,6 +49,16 @@ export default function ItemList() {
         }
     };
 
+    // 재고 수량 변경
+    const handleStockChange = (itemId: number, newStock: number) => {
+        updateItem(itemId, {
+            stock: {
+                ...items.find((item) => item.itemId === itemId)!.stock,
+                stockAmount: newStock,
+            },
+        });
+    };
+
     // 특정 아이템의 요청사항 가져오기
     const getItemRequests = (itemId: number) => {
         return requests.filter((request) => request.itemId === itemId && request.isActive);
@@ -112,12 +122,14 @@ export default function ItemList() {
                                     item={item}
                                     requests={getItemRequests(item.itemId)}
                                     onToggleFavorite={handleToggleFavorite}
+                                    onStockChange={handleStockChange}
                                 />
                             ) : (
                                 <ItemListView
                                     item={item}
                                     requests={getItemRequests(item.itemId)}
                                     onToggleFavorite={handleToggleFavorite}
+                                    onStockChange={handleStockChange}
                                 />
                             )}
                         </div>
