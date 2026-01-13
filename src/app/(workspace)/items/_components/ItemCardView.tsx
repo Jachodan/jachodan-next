@@ -25,6 +25,7 @@ export default function ItemCardView({ item, requests, onToggleFavorite, onStock
             </div>
             <StockInfo item={item} />
             <StockControl
+                itemName={item.itemName}
                 currentStock={item.stock.stockAmount ?? 0}
                 onStockChange={(newStock) => onStockChange(item.itemId, newStock)}
                 variant="card"
