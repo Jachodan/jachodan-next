@@ -37,6 +37,7 @@ export default function ItemListView({ item, requests, onToggleFavorite, onStock
             {/* 오른쪽 섹션: 재고 수량 조절 */}
             <div className="flex-1 flex items-center justify-end">
                 <StockControl
+                    itemName={item.itemName}
                     currentStock={item.stock.stockAmount ?? 0}
                     onStockChange={(newStock) => onStockChange(item.itemId, newStock)}
                     variant="list"
