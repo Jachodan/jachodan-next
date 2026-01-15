@@ -98,7 +98,8 @@ export default function StockControl({ itemName, currentStock, onStockChange, va
     };
 
     // AlertDialog에서 확인 버튼 클릭
-    const handleConfirmDialogAccept = () => {
+    const handleConfirmDialogAccept = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
         onStockChange(pendingNewStock);
         setShowConfirmDialog(false);
         setActionType(null);
@@ -106,11 +107,12 @@ export default function StockControl({ itemName, currentStock, onStockChange, va
     };
 
     // AlertDialog에서 취소 버튼 클릭
-    const handleConfirmDialogCancel = () => {
+    const handleConfirmDialogCancel = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
         setShowConfirmDialog(false);
     };
 
-    // 입고/출고 취소
+    // 입고/출고 취소 버튼 클릭
     const handleActionCancel = () => {
         setActionType(null);
         setActionValue("");
@@ -128,7 +130,7 @@ export default function StockControl({ itemName, currentStock, onStockChange, va
     return (
         <>
             {variant === "card" ? (
-                <div className="flex flex-col gap-2 mt-2">
+                <div className="flex flex-col gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
                     {/* 입고/수량/출고 */}
                     <div className="flex items-center gap-2 justify-between">
                         <Button variant="outline" size="sm" className="h-8 w-16" onClick={() => handleActionClick("in")}>
@@ -200,7 +202,7 @@ export default function StockControl({ itemName, currentStock, onStockChange, va
                 </div>
             ) : (
                 // List variant
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center gap-2">
                         {/* 입고/수량/출고 */}
                         {!actionType && (
@@ -279,8 +281,8 @@ export default function StockControl({ itemName, currentStock, onStockChange, va
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={handleConfirmDialogCancel}>취소</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleConfirmDialogAccept}>확인</AlertDialogAction>
+                        <AlertDialogCancel onClick={(e) => handleConfirmDialogCancel(e)}>취소</AlertDialogCancel>
+                        <AlertDialogAction onClick={(e) => handleConfirmDialogAccept(e)}>확인</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
