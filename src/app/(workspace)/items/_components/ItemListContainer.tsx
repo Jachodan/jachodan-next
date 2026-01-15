@@ -1,0 +1,71 @@
+import { cn } from "@/lib/utils";
+import { getItemListEmptyMessage } from "@/lib/utils/item";
+import { ItemWithStock, Request, FilterType, ViewMode } from "@/types/item";
+import ItemCardView from "./ItemCardView";
+import ItemListView from "./ItemListView";
+
+interface ItemListContainerProps {
+    items: ItemWithStock[];
+    viewMode: ViewMode;
+    filterType: FilterType;
+    searchQuery: string;
+    excludeZero: boolean;
+    onItemClick: (item: ItemWithStock) => void;
+    onToggleFavorite: (itemId: number) => void;
+    onStockChange: (itemId: number, newStock: number) => void;
+    getItemRequests: (itemId: number) => Request[];
+}
+
+export default function ItemListContainer({
+    items,
+    viewMode,
+    filterType,
+    searchQuery,
+    excludeZero,
+    onItemClick,
+    onToggleFavorite,
+    onStockChange,
+    getItemRequests,
+}: ItemListContainerProps) {
+    return (
+        <div
+            className={cn(
+                "grid gap-4",
+                viewMode === "card" ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5" : "grid-cols-1"
+            )}
+        >
+            {items.length === 0 ? (
+                <div className={cn("text-center py-12 text-muted-foreground", viewMode === "card" && "col-span-full")}>
+                    {getItemListEmptyMessage(filterType, searchQuery, excludeZero)}
+                </div>
+            ) : (
+                items.map((item) => (
+                    <div
+                        key={item.itemId}
+                        className={cn(
+                            "border rounded-lg p-4 transition-shadow cursor-pointer",
+                            viewMode === "card" ? "hover:shadow-md" : "hover:shadow-sm flex items-center gap-4"
+                        )}
+                        onClick={() => onItemClick(item)}
+                    >
+                        {viewMode === "card" ? (
+                            <ItemCardView
+                                item={item}
+                                requests={getItemRequests(item.itemId)}
+                                onToggleFavorite={onToggleFavorite}
+                                onStockChange={onStockChange}
+                            />
+                        ) : (
+                            <ItemListView
+                                item={item}
+                                requests={getItemRequests(item.itemId)}
+                                onToggleFavorite={onToggleFavorite}
+                                onStockChange={onStockChange}
+                            />
+                        )}
+                    </div>
+                ))
+            )}
+        </div>
+    );
+}
