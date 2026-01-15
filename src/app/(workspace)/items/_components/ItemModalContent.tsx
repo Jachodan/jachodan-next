@@ -35,7 +35,6 @@ export default function ItemModalContent({
     onFormChange,
     onToggleFavorite,
     onDelete,
-    onSave,
 }: ItemModalContentProps) {
     // 초기 데이터를 계산
     const getInitialData = (): ItemFormData => {
