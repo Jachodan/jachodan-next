@@ -50,15 +50,20 @@ export default function StockControl({ itemName, currentStock, onStockChange, va
     const handleEditComplete = () => {
         const newStock = editValue === "" ? 0 : Number(editValue);
         if (newStock !== currentStock) {
-            onStockChange(newStock);
+            // AlertDialog 표시를 위해 pending 상태 저장
+            setPendingNewStock(newStock);
+            setShowConfirmDialog(true);
+        } else {
+            setIsEditing(false);
+            setEditValue("");
         }
-        setIsEditing(false);
-        setEditValue("");
     };
 
     // Enter/Escape 키 처리
     const handleEditKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
             handleEditComplete();
         } else if (e.key === "Escape") {
             setIsEditing(false);
@@ -104,12 +109,16 @@ export default function StockControl({ itemName, currentStock, onStockChange, va
         setShowConfirmDialog(false);
         setActionType(null);
         setActionValue("");
+        setIsEditing(false);
+        setEditValue("");
     };
 
     // AlertDialog에서 취소 버튼 클릭
     const handleConfirmDialogCancel = (e?: React.MouseEvent) => {
         e?.stopPropagation();
         setShowConfirmDialog(false);
+        setIsEditing(false);
+        setEditValue("");
     };
 
     // 입고/출고 취소 버튼 클릭
@@ -273,7 +282,7 @@ export default function StockControl({ itemName, currentStock, onStockChange, va
 
             {/* 재고 변경 확인 AlertDialog */}
             <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-                <AlertDialogContent>
+                <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                     <AlertDialogHeader>
                         <AlertDialogTitle>재고 수량 변경</AlertDialogTitle>
                         <AlertDialogDescription>
