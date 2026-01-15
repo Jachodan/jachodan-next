@@ -49,26 +49,32 @@ export function useItemModal({ updateItem, addItem, deleteItem }: UseItemModalPr
             setShowSaveAlert(true);
         } else if (modalMode === "create") {
             // TODO: 실제 API 호출로 변경
+            const timestamp = Date.now();
+            const itemId = timestamp;
+            const stockId = timestamp + 1;
+            const bufferId = timestamp + 2;
+            const createdAt = new Date().toISOString();
+
             addItem({
-                itemId: Date.now(),
+                itemId,
                 itemName: formData.itemName,
                 storeId: 1,
-                createdAt: new Date().toISOString(),
+                createdAt,
                 isActive: true,
                 isPin: false,
                 imageId: formData.imageId,
                 stock: {
-                    itemId: Date.now(),
-                    stockId: Date.now(),
+                    itemId,
+                    stockId,
                     stockAmount: formData.stockAmount,
-                    createdAt: new Date().toISOString(),
+                    createdAt,
                 },
                 buffer: formData.bufferAmount
                     ? {
-                          itemId: Date.now(),
-                          bufferId: Date.now(),
+                          itemId,
+                          bufferId,
                           bufferAmount: formData.bufferAmount,
-                          createdAt: new Date().toISOString(),
+                          createdAt,
                       }
                     : undefined,
             });
