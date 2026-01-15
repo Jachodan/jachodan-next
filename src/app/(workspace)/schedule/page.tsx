@@ -1,11 +1,25 @@
 "use client";
 
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+interface CardState {
+    status: "none" | "checkedIn" | "checkedOut";
+    startTime: string;
+    endTime: string;
+}
 
 export default function SchedulePage() {
     const { setHeaderTitle } = useLayout();
     const today = new Date();
+    const [cardStates, setCardStates] = useState<CardState[]>(
+        Array.from({ length: 6 }).map(() => ({
+            status: "none",
+            startTime: "00:00",
+            endTime: "00:00",
+        }))
+    );
+
     const formatDate = (date: Date) => {
         return date.toLocaleDateString("ko-KR", {
             year: "numeric",
@@ -28,6 +42,41 @@ export default function SchedulePage() {
         // "02:33:33 AM" 형식을 "am 02:33:33" 형식으로 변환
         const [time, period] = timeString.split(" ");
         return `${period.toLowerCase()} ${time}`;
+    };
+
+    const formatShortTime = (date: Date) => {
+        const timeString = date.toLocaleTimeString("en-US", {
+            hour12: true,
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+        const [time, period] = timeString.split(" ");
+        return `${period.toLowerCase()} ${time}`;
+    };
+
+    const handleCardClick = (index: number) => {
+        setCardStates((prev) => {
+            const newStates = [...prev];
+            const currentState = newStates[index];
+            const now = new Date();
+
+            if (currentState.status === "none") {
+                // 출석 처리
+                newStates[index] = {
+                    ...currentState,
+                    status: "checkedIn",
+                    startTime: formatShortTime(now),
+                };
+            } else if (currentState.status === "checkedIn") {
+                // 퇴근 처리
+                newStates[index] = {
+                    ...currentState,
+                    status: "checkedOut",
+                    endTime: formatShortTime(now),
+                };
+            }
+            return newStates;
+        });
     };
 
     return (
@@ -59,13 +108,28 @@ export default function SchedulePage() {
                             {Array.from({ length: 6 }).map((_, index) => (
                                 <div
                                     key={index}
-                                    className="aspect-4/5 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col"
+                                    onClick={() => handleCardClick(index)}
+                                    className="aspect-4/5 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col cursor-pointer hover:bg-gray-100 transition-colors relative"
                                 >
-                                    <div className="flex-1 flex items-center justify-center">
+                                    <div className="flex-1 flex items-center justify-center relative">
+                                        {cardStates[index].status === "checkedIn" && (
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <div className="bg-transparent text-red-600 px-8 py-4 rounded-full text-2xl font-bold shadow-lg transform rotate-12 border-4 border-red-600">
+                                                    출석
+                                                </div>
+                                            </div>
+                                        )}
+                                        {cardStates[index].status === "checkedOut" && (
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <div className="bg-transparent text-purple-600 px-8 py-4 rounded-full text-2xl font-bold shadow-lg transform rotate-12 border-4 border-purple-600">
+                                                    퇴근
+                                                </div>
+                                            </div>
+                                        )}
                                         <p className="text-gray-400">직원 카드 {index + 1}</p>
                                     </div>
                                     <div className="bg-gray-200 px-3 py-2 rounded-b-lg text-center text-sm text-gray-700">
-                                        am 00:00 - am 00:00
+                                        {cardStates[index].startTime} - {cardStates[index].endTime}
                                     </div>
                                 </div>
                             ))}
