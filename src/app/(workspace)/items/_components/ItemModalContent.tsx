@@ -203,7 +203,7 @@ export default function ItemModalContent({
             )}
 
             {/* 버튼들 */}
-            {mode === "detail" ? (
+            {mode === "detail" && (
                 <div className="flex gap-2 pt-4">
                     <Button variant="outline" className="flex-1" onClick={() => onModeChange?.("edit")}>
                         <Edit className="h-4 w-4 mr-2" />
@@ -212,17 +212,6 @@ export default function ItemModalContent({
                     <Button variant="destructive" className="flex-1" onClick={onDelete}>
                         <Trash2 className="h-4 w-4 mr-2" />
                         삭제
-                    </Button>
-                </div>
-            ) : (
-                <div className="flex gap-2 pt-4">
-                    {mode === "edit" && (
-                        <Button variant="outline" className="flex-1" onClick={() => onModeChange?.("detail")}>
-                            취소
-                        </Button>
-                    )}
-                    <Button className="flex-1" onClick={onSave}>
-                        {mode === "create" ? "등록" : "저장"}
                     </Button>
                 </div>
             )}
