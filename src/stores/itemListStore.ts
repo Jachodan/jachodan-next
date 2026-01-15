@@ -1,8 +1,6 @@
 import { create } from "zustand";
 import { ViewMode } from "@/types/item";
-
-// 필터 타입
-export type FilterType = "all" | "request" | "lowStock" | "favorite" | "deadStock";
+import { FilterType } from "@/lib/utils/item";
 
 // Store 상태 타입
 interface ItemListState {

@@ -1,9 +1,7 @@
 import { useMemo } from "react";
 import { ItemWithStock } from "@/types/item";
 import { ItemRequest } from "@/types/itemRequest";
-import { hasRequest, isLowStock } from "@/lib/utils/item";
-
-type FilterType = "all" | "request" | "lowStock" | "favorite" | "deadStock";
+import { FilterType, hasRequest, isLowStock } from "@/lib/utils/item";
 
 interface UseFilteredItemsParams {
     items: ItemWithStock[];
@@ -13,13 +11,7 @@ interface UseFilteredItemsParams {
     excludeZero: boolean;
 }
 
-export function useFilteredItems({
-    items,
-    requests,
-    filterType,
-    searchQuery,
-    excludeZero,
-}: UseFilteredItemsParams) {
+export function useFilteredItems({ items, requests, filterType, searchQuery, excludeZero }: UseFilteredItemsParams) {
     return useMemo(() => {
         return items.filter((item) => {
             // 필터 타입 체크
