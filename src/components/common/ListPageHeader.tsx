@@ -63,7 +63,7 @@ export default function ListPageHeader<FilterType = string, ViewModeType = strin
     onViewModeChange,
 }: ListPageHeaderProps<FilterType, ViewModeType>) {
     return (
-        <div className="flex item-center justify-between gap-4 pb-6">
+        <div className="flex items-center justify-between gap-4 pb-6">
             <div className="flex flex-wrap gap-4">
                 {/* 필터 Select */}
                 <div className="flex gap-2 items-center">
