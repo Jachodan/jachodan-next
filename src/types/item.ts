@@ -28,8 +28,8 @@ export interface Buffer {
 }
 
 // 재고 수량 수정 내역
-export const Stock_Log_Type = ["입고", "출고"] as const;
-export type StockLogType = (typeof Stock_Log_Type)[number];
+export const STOCKLOG_TYPE = ["입고", "출고"] as const;
+export type StockLogType = (typeof STOCKLOG_TYPE)[number];
 export interface StockLog {
     itemId: number;
     stockLogId: number;
