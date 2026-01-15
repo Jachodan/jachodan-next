@@ -29,13 +29,9 @@ export function formatStockInfo(item: ItemWithStock): string {
     return stockText + bufferText;
 }
 
-type FilterType = "all" | "request" | "lowStock" | "favorite" | "deadStock";
+export type FilterType = "all" | "request" | "lowStock" | "favorite" | "deadStock";
 
-export function getItemListEmptyMessage(
-    filterType: FilterType,
-    searchQuery: string,
-    excludeZero: boolean
-): string {
+export function getItemListEmptyMessage(filterType: FilterType, searchQuery: string, excludeZero: boolean): string {
     if (searchQuery) return `"${searchQuery}"에 대한 검색 결과가 없습니다.`;
     if (filterType === "request") return "요청사항이 있는 상품이 없습니다.";
     if (filterType === "lowStock") return "재고가 부족한 상품이 없습니다.";
