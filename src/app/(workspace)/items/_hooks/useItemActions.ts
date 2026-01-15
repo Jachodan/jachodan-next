@@ -25,9 +25,11 @@ export function useItemActions({ items, requests, updateItem }: UseItemActionsPr
         });
     };
 
-    // 특정 아이템의 요청사항 가져오기
+    // 특정 아이템의 입고요청만 가져오기
     const getItemRequests = (itemId: number) => {
-        return requests.filter((request) => request.itemId === itemId && request.isActive);
+        return requests.filter(
+            (request) => request.itemId === itemId && request.isActive && request.requestType === "입고요청"
+        );
     };
 
     return {
