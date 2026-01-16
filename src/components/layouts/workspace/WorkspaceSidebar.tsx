@@ -18,7 +18,7 @@ import { usePathname } from "next/navigation";
 import { Home, Settings, ShoppingBasket } from "lucide-react";
 
 const navItems = [
-  { title: "대시보드", url: "/", icon: Home },
+  { title: "대시보드", url: "/home", icon: Home },
   { title: "상품관리", url: "/items", icon: ShoppingBasket },
   { title: "설정", url: "/settings", icon: Settings },
 ];
@@ -33,7 +33,7 @@ export default function WorkspaceSidebar({ ...props }: React.ComponentProps<type
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:p-1.5!">
-              <Link href="/">{state === "expanded" ? <span className="font-bold text-lg">Logo</span> : <span className="font-bold text-lg">L</span>}</Link>
+              <Link href="/home">{state === "expanded" ? <span className="font-bold text-lg">Logo</span> : <span className="font-bold text-lg">L</span>}</Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
