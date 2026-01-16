@@ -7,7 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { SCHEDULE_DAYS, type WorkStatus } from "@/types/work";
 import type { AlbaStatus } from "@/types/user";
 import { useEffect, useState } from "react";
-import { mockAlbaList } from "@/lib/mock/alba";
+import { mockAlbaList, type Alba } from "@/lib/mock/alba";
+import AlbaFormModal, { type AlbaFormData } from "./_components/AlbaFormModal";
 
 export default function AlbaPage() {
     const { setHeaderTitle } = useLayout();
@@ -15,28 +16,35 @@ export default function AlbaPage() {
     const [workStatusFilter, setWorkStatusFilter] = useState<WorkStatus | "전체">("전체");
     const [searchValue, setSearchValue] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [albaList, setAlbaList] = useState<Alba[]>(mockAlbaList);
     const itemsPerPage = 10;
 
     useEffect(() => {
         setHeaderTitle("알바관리");
     }, [setHeaderTitle]);
 
-    const albaList = mockAlbaList;
-
     // 필터링 및 검색 로직
-    const filteredAlbaList = albaList.filter((alba) => {
-        // 고용상태 필터
-        const matchesEmployment = employmentFilter === "전체" || alba.albaStatus === employmentFilter;
+    const filteredAlbaList = albaList
+        .filter((alba) => {
+            // 고용상태 필터
+            const matchesEmployment = employmentFilter === "전체" || alba.albaStatus === employmentFilter;
 
-        // 근무상태 필터 (퇴사자는 근무상태가 없으므로 필터링 제외)
-        const matchesWorkStatus =
-            workStatusFilter === "전체" || alba.albaStatus === "퇴사" || alba.workStatus === workStatusFilter;
+            // 근무상태 필터 (퇴사자는 근무상태가 없으므로 필터링 제외)
+            const matchesWorkStatus =
+                workStatusFilter === "전체" || alba.albaStatus === "퇴사" || alba.workStatus === workStatusFilter;
 
-        // 검색어 필터 (이름만)
-        const matchesSearch = searchValue === "" || alba.albaName.toLowerCase().includes(searchValue.toLowerCase());
+            // 검색어 필터 (이름만)
+            const matchesSearch = searchValue === "" || alba.albaName.toLowerCase().includes(searchValue.toLowerCase());
 
-        return matchesEmployment && matchesWorkStatus && matchesSearch;
-    });
+            return matchesEmployment && matchesWorkStatus && matchesSearch;
+        })
+        .sort((a, b) => {
+            // 퇴사자를 마지막으로 정렬
+            if (a.albaStatus === "퇴사" && b.albaStatus !== "퇴사") return 1;
+            if (a.albaStatus !== "퇴사" && b.albaStatus === "퇴사") return -1;
+            return 0;
+        });
 
     // 페이지네이션 계산
     const totalPages = Math.ceil(filteredAlbaList.length / itemsPerPage);
@@ -64,6 +72,26 @@ export default function AlbaPage() {
     const handleSearchChange = (value: string) => {
         setSearchValue(value);
         setCurrentPage(1);
+    };
+
+    const handleAlbaSave = (data: AlbaFormData) => {
+        // 새로운 알바 ID 생성 (현재 최대 ID + 1)
+        const newAlbaId = albaList.length > 0 ? Math.max(...albaList.map((alba) => alba.albaId)) + 1 : 1;
+
+        // 새 알바 객체 생성
+        const newAlba: Alba = {
+            albaId: newAlbaId,
+            albaName: data.albaName,
+            albaStatus: "재직", // 신규 등록은 기본적으로 재직
+            albaPhone: data.albaPhone,
+            workDays: data.workDays,
+            workStatus: "휴무", // 기본 근무상태는 휴무
+        };
+
+        // 알바 리스트에 추가
+        setAlbaList((prev) => [...prev, newAlba]);
+
+        console.log("알바 추가 완료:", newAlba);
     };
 
     // 고용상태 필터 옵션
@@ -189,10 +217,12 @@ export default function AlbaPage() {
                 onPageChange={handlePageChange}
                 actionButton={{
                     label: "알바 추가",
-                    onClick: () => console.log("알바 추가"),
+                    onClick: () => setIsModalOpen(true),
                     variant: "outline",
                 }}
             />
+
+            <AlbaFormModal open={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleAlbaSave} />
         </div>
     );
 }
