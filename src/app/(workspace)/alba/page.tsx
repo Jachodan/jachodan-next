@@ -4,69 +4,24 @@ import { useLayout } from "@/components/layouts/provider/LayoutProvider";
 import ListPageFooter from "@/components/common/ListPageFooter";
 import ListPageHeader from "@/components/common/ListPageHeader";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { SCHEDULE_DAYS, type ScheduleDays, type WorkStatus } from "@/types/work";
+import { SCHEDULE_DAYS, type WorkStatus } from "@/types/work";
 import type { AlbaStatus } from "@/types/user";
 import { useEffect, useState } from "react";
+import { mockAlbaList } from "@/lib/mock/alba";
 
 export default function AlbaPage() {
     const { setHeaderTitle } = useLayout();
     const [employmentFilter, setEmploymentFilter] = useState<AlbaStatus | "전체">("전체");
     const [workStatusFilter, setWorkStatusFilter] = useState<WorkStatus | "전체">("전체");
     const [searchValue, setSearchValue] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         setHeaderTitle("알바관리");
     }, [setHeaderTitle]);
 
-    // 임시 더미 데이터
-    const albaList: Array<{
-        albaId: number;
-        albaName: string;
-        albaStatus: "재직" | "단기" | "퇴사";
-        albaPhone: string;
-        workDays: ScheduleDays[];
-        workStatus?: WorkStatus;
-    }> = [
-        {
-            albaId: 1,
-            albaName: "김철수",
-            albaStatus: "재직",
-            albaPhone: "010-1234-5678",
-            workDays: ["월", "화", "수"],
-            workStatus: "출근",
-        },
-        {
-            albaId: 2,
-            albaName: "김철수",
-            albaStatus: "재직",
-            albaPhone: "010-1234-5678",
-            workDays: ["월", "화", "수"],
-            workStatus: "출근",
-        },
-        {
-            albaId: 3,
-            albaName: "이영희",
-            albaStatus: "단기",
-            albaPhone: "010-2345-6789",
-            workDays: ["목", "금"],
-            workStatus: "휴무",
-        },
-        {
-            albaId: 4,
-            albaName: "이영희",
-            albaStatus: "단기",
-            albaPhone: "010-2345-6789",
-            workDays: ["목", "금"],
-            workStatus: "휴무",
-        },
-        {
-            albaId: 5,
-            albaName: "박민수",
-            albaStatus: "퇴사",
-            albaPhone: "010-3456-7890",
-            workDays: [],
-        },
-    ];
+    const albaList = mockAlbaList;
 
     // 필터링 및 검색 로직
     const filteredAlbaList = albaList.filter((alba) => {
@@ -82,6 +37,34 @@ export default function AlbaPage() {
 
         return matchesEmployment && matchesWorkStatus && matchesSearch;
     });
+
+    // 페이지네이션 계산
+    const totalPages = Math.ceil(filteredAlbaList.length / itemsPerPage);
+    // 현재 페이지가 총 페이지 수를 초과하면 첫 페이지로 조정
+    const validCurrentPage = currentPage > totalPages && totalPages > 0 ? 1 : currentPage;
+    const startIndex = (validCurrentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedAlbaList = filteredAlbaList.slice(startIndex, endIndex);
+
+    // 페이지 변경 핸들러 (필터 변경 시 첫 페이지로 이동)
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    const handleEmploymentFilterChange = (value: AlbaStatus | "전체") => {
+        setEmploymentFilter(value);
+        setCurrentPage(1);
+    };
+
+    const handleWorkStatusFilterChange = (value: WorkStatus | "전체") => {
+        setWorkStatusFilter(value);
+        setCurrentPage(1);
+    };
+
+    const handleSearchChange = (value: string) => {
+        setSearchValue(value);
+        setCurrentPage(1);
+    };
 
     // 고용상태 필터 옵션
     const employmentOptions = [
@@ -110,20 +93,20 @@ export default function AlbaPage() {
                         label: "고용상태",
                         value: employmentFilter,
                         options: employmentOptions,
-                        onChange: (value) => setEmploymentFilter(value as AlbaStatus | "전체"),
+                        onChange: (value) => handleEmploymentFilterChange(value as AlbaStatus | "전체"),
                         placeholder: "고용상태 선택",
                     },
                     {
                         label: "근무상태",
                         value: workStatusFilter,
                         options: workStatusOptions,
-                        onChange: (value) => setWorkStatusFilter(value as WorkStatus | "전체"),
+                        onChange: (value) => handleWorkStatusFilterChange(value as WorkStatus | "전체"),
                         placeholder: "근무상태 선택",
                     },
                 ]}
                 searchLabel="검색"
                 searchValue={searchValue}
-                onSearchChange={setSearchValue}
+                onSearchChange={handleSearchChange}
                 searchPlaceholder="이름으로 검색"
             />
 
@@ -139,10 +122,10 @@ export default function AlbaPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredAlbaList.map((alba) => (
+                        {paginatedAlbaList.map((alba) => (
                             <TableRow key={alba.albaId}>
                                 <TableCell className="py-4 text-center">
-                                    <span
+                                    <div
                                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                             alba.albaStatus === "재직"
                                                 ? "bg-green-100 text-green-800"
@@ -152,7 +135,7 @@ export default function AlbaPage() {
                                         }`}
                                     >
                                         {alba.albaStatus}
-                                    </span>
+                                    </div>
                                 </TableCell>
                                 <TableCell className="py-4 text-center">
                                     {alba.albaStatus !== "퇴사" && alba.workStatus && (
@@ -201,6 +184,9 @@ export default function AlbaPage() {
             </div>
 
             <ListPageFooter
+                currentPage={validCurrentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
                 actionButton={{
                     label: "알바 추가",
                     onClick: () => console.log("알바 추가"),
