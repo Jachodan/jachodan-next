@@ -11,6 +11,14 @@ export interface FilterOption<T = string> {
     label: string;
 }
 
+export interface FilterConfig<T = string> {
+    label?: string;
+    value: T;
+    options: FilterOption<T>[];
+    onChange: (value: T) => void;
+    placeholder?: string;
+}
+
 export interface CheckboxOption {
     id: string;
     label: string;
@@ -25,12 +33,15 @@ export interface ViewModeOption<T = string> {
 }
 
 interface ListPageHeaderProps<FilterType = string, ViewModeType = string> {
-    // 필터
+    // 단일 필터 (하위 호환성을 위해 유지)
     filterLabel?: string;
-    filterValue: FilterType;
-    filterOptions: FilterOption<FilterType>[];
-    onFilterChange: (value: FilterType) => void;
+    filterValue?: FilterType;
+    filterOptions?: FilterOption<FilterType>[];
+    onFilterChange?: (value: FilterType) => void;
     filterPlaceholder?: string;
+
+    // 다중 필터 (새로운 방식)
+    filters?: FilterConfig[];
 
     // 검색
     searchLabel?: string;
@@ -53,6 +64,7 @@ export default function ListPageHeader<FilterType = string, ViewModeType = strin
     filterOptions,
     onFilterChange,
     filterPlaceholder = "필터 선택",
+    filters,
     searchLabel = "검색",
     searchValue,
     onSearchChange,
@@ -62,32 +74,47 @@ export default function ListPageHeader<FilterType = string, ViewModeType = strin
     viewModeOptions,
     onViewModeChange,
 }: ListPageHeaderProps<FilterType, ViewModeType>) {
+    // 다중 필터가 있으면 사용, 없으면 단일 필터 사용 (하위 호환성)
+    const filterConfigs: FilterConfig[] = filters || (filterValue !== undefined && filterOptions && onFilterChange
+        ? [{
+            label: filterLabel,
+            value: filterValue,
+            options: filterOptions,
+            onChange: onFilterChange,
+            placeholder: filterPlaceholder,
+        }]
+        : []);
+
     return (
         <div className="flex items-center justify-between gap-4 pb-6">
             <div className="flex flex-wrap gap-4">
-                {/* 필터 Select */}
-                <div className="flex gap-2 items-center">
-                    <label htmlFor="filter" className="whitespace-nowrap">
-                        {filterLabel}
-                    </label>
-                    <Select
-                        value={filterValue as string}
-                        onValueChange={(value) => onFilterChange(value as FilterType)}
-                    >
-                        <SelectTrigger id="filter">
-                            <SelectValue placeholder={filterPlaceholder} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                {filterOptions.map((option) => (
-                                    <SelectItem key={option.value as string} value={option.value as string}>
-                                        {option.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
-                </div>
+                {/* 필터들 (단일 또는 다중) */}
+                {filterConfigs.map((filter, index) => (
+                    <div key={index} className="flex gap-2 items-center">
+                        {filter.label && (
+                            <label htmlFor={`filter-${index}`} className="whitespace-nowrap">
+                                {filter.label}
+                            </label>
+                        )}
+                        <Select
+                            value={filter.value as string}
+                            onValueChange={(value) => filter.onChange(value as any)}
+                        >
+                            <SelectTrigger id={`filter-${index}`}>
+                                <SelectValue placeholder={filter.placeholder || "선택"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    {filter.options.map((option) => (
+                                        <SelectItem key={option.value as string} value={option.value as string}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                ))}
 
                 {/* 검색 Input */}
                 <div className="flex gap-2 items-center">

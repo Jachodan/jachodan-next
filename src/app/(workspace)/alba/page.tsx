@@ -1,12 +1,18 @@
 "use client";
 
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
+import ListPageFooter from "@/components/common/ListPageFooter";
+import ListPageHeader from "@/components/common/ListPageHeader";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { SCHEDULE_DAYS, type ScheduleDays, type WorkStatus } from "@/types/work";
-import { useEffect } from "react";
+import type { AlbaStatus } from "@/types/user";
+import { useEffect, useState } from "react";
 
 export default function AlbaPage() {
     const { setHeaderTitle } = useLayout();
+    const [employmentFilter, setEmploymentFilter] = useState<AlbaStatus | "전체">("전체");
+    const [workStatusFilter, setWorkStatusFilter] = useState<WorkStatus | "전체">("전체");
+    const [searchValue, setSearchValue] = useState("");
 
     useEffect(() => {
         setHeaderTitle("알바관리");
@@ -62,12 +68,64 @@ export default function AlbaPage() {
         },
     ];
 
+    // 필터링 및 검색 로직
+    const filteredAlbaList = albaList.filter((alba) => {
+        // 고용상태 필터
+        const matchesEmployment = employmentFilter === "전체" || alba.albaStatus === employmentFilter;
+
+        // 근무상태 필터 (퇴사자는 근무상태가 없으므로 필터링 제외)
+        const matchesWorkStatus =
+            workStatusFilter === "전체" || alba.albaStatus === "퇴사" || alba.workStatus === workStatusFilter;
+
+        // 검색어 필터 (이름만)
+        const matchesSearch = searchValue === "" || alba.albaName.toLowerCase().includes(searchValue.toLowerCase());
+
+        return matchesEmployment && matchesWorkStatus && matchesSearch;
+    });
+
+    // 고용상태 필터 옵션
+    const employmentOptions = [
+        { value: "전체" as const, label: "전체" },
+        { value: "재직" as const, label: "재직" },
+        { value: "단기" as const, label: "단기" },
+        { value: "퇴사" as const, label: "퇴사" },
+    ];
+
+    // 근무상태 필터 옵션
+    const workStatusOptions = [
+        { value: "전체" as const, label: "전체" },
+        { value: "출근" as const, label: "출근" },
+        { value: "휴무" as const, label: "휴무" },
+        { value: "대타" as const, label: "대타" },
+        { value: "지각" as const, label: "지각" },
+        { value: "결근" as const, label: "결근" },
+        { value: "퇴근" as const, label: "퇴근" },
+    ];
+
     return (
         <div className="p-10">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold mb-2">알바관리</h1>
-                <p className="text-sm text-muted-foreground">알바생 정보를 관리할 수 있습니다.</p>
-            </div>
+            <ListPageHeader
+                filters={[
+                    {
+                        label: "고용상태",
+                        value: employmentFilter,
+                        options: employmentOptions,
+                        onChange: (value) => setEmploymentFilter(value as AlbaStatus | "전체"),
+                        placeholder: "고용상태 선택",
+                    },
+                    {
+                        label: "근무상태",
+                        value: workStatusFilter,
+                        options: workStatusOptions,
+                        onChange: (value) => setWorkStatusFilter(value as WorkStatus | "전체"),
+                        placeholder: "근무상태 선택",
+                    },
+                ]}
+                searchLabel="검색"
+                searchValue={searchValue}
+                onSearchChange={setSearchValue}
+                searchPlaceholder="이름으로 검색"
+            />
 
             <div className="rounded-md border">
                 <Table>
@@ -81,7 +139,7 @@ export default function AlbaPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {albaList.map((alba) => (
+                        {filteredAlbaList.map((alba) => (
                             <TableRow key={alba.albaId}>
                                 <TableCell className="py-4 text-center">
                                     <span
@@ -141,6 +199,14 @@ export default function AlbaPage() {
                     </TableBody>
                 </Table>
             </div>
+
+            <ListPageFooter
+                actionButton={{
+                    label: "알바 추가",
+                    onClick: () => console.log("알바 추가"),
+                    variant: "outline",
+                }}
+            />
         </div>
     );
 }
