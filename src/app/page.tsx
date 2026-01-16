@@ -11,7 +11,8 @@ export default function LandingPage() {
                         재고 관리를 더 쉽게
                     </h1>
                     <p className="text-lg text-muted-foreground">
-                        간편한 재고 관리 시스템으로 비즈니스를 효율적으로 운영하세요.
+                        간편한 재고 관리 시스템으로 비즈니스를 효율적으로
+                        운영하세요.
                     </p>
                     <div className="flex gap-4 justify-center">
                         <Button asChild size="lg">
@@ -26,7 +27,7 @@ export default function LandingPage() {
 
             {/* Footer */}
             <footer className="py-6 text-center text-sm text-muted-foreground">
-                <p>&copy; 2024 재고관리. All rights reserved.</p>
+                <p>&copy; 2026 재고관리. All rights reserved.</p>
             </footer>
         </div>
     );
