@@ -2,12 +2,12 @@ export type LoginType = "KAKAO" | "NAVER" | "GOOGLE" | "EMAIL";
 // 가게 계정(사장님)
 export interface User {
     userId: number;
-    storeId: number;
-    imageId?: number;
     userName: string;
     userEmail: string;
     userPhone: string;
-    regDate: string;
+    createdAt: string;
+    updatedAt?: string;
+    isActive: boolean;
     loginType: LoginType;
 }
 
@@ -19,6 +19,9 @@ export interface Alba {
     storeId: number;
     imageId?: number;
     albaName: string;
-    albaPhone?: string;
     albaStatus: AlbaStatus;
+    albaPhone?: string;
+    createdAt: string;
+    updatedAt?: string;
+    isActive: boolean;
 }
