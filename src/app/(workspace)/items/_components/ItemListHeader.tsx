@@ -6,17 +6,13 @@ import { LayoutList, LayoutGrid } from "lucide-react";
 import { ViewMode } from "@/types/item";
 import { FilterType } from "@/lib/utils/item";
 
-export default function ItemListHeader() {
-    const {
-        filterType,
-        setFilterType,
-        searchQuery,
-        setSearchQuery,
-        excludeZero,
-        setExcludeZero,
-        viewMode,
-        setViewMode,
-    } = useItemListStore();
+interface ItemListHeaderProps {
+    filterType: FilterType;
+    setFilterType: (filter: FilterType) => void;
+}
+
+export default function ItemListHeader({ filterType, setFilterType }: ItemListHeaderProps) {
+    const { searchQuery, setSearchQuery, excludeZero, setExcludeZero, viewMode, setViewMode } = useItemListStore();
 
     const filterOptions: Array<{ value: FilterType; label: string }> = [
         { value: "all", label: "전체보기" },

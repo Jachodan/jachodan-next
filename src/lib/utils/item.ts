@@ -29,7 +29,12 @@ export function formatStockInfo(item: ItemWithStock): string {
     return stockText + bufferText;
 }
 
-export type FilterType = "all" | "request" | "lowStock" | "favorite" | "deadStock";
+export const FILTER_TYPES = ["all", "request", "lowStock", "favorite", "deadStock"] as const;
+export type FilterType = (typeof FILTER_TYPES)[number];
+
+export function isValidFilterType(value: string | null): value is FilterType {
+    return value !== null && FILTER_TYPES.includes(value as FilterType);
+}
 
 export function getItemListEmptyMessage(filterType: FilterType, searchQuery: string, excludeZero: boolean): string {
     if (searchQuery) return `"${searchQuery}"에 대한 검색 결과가 없습니다.`;
