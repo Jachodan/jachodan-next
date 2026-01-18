@@ -33,6 +33,7 @@ export interface ViewModeOption<T = string> {
 }
 
 interface ListPageHeaderProps<FilterType = string, ViewModeType = string> {
+
     // 단일 필터 (하위 호환성을 위해 유지)
     filterLabel?: string;
     filterValue?: FilterType;
@@ -42,7 +43,6 @@ interface ListPageHeaderProps<FilterType = string, ViewModeType = string> {
 
     // 다중 필터 (새로운 방식)
     filters?: FilterConfig[];
-
     // 검색
     searchLabel?: string;
     searchValue: string;
@@ -64,6 +64,7 @@ export default function ListPageHeader<FilterType = string, ViewModeType = strin
     filterOptions,
     onFilterChange,
     filterPlaceholder = "필터 선택",
+
     filters,
     searchLabel = "검색",
     searchValue,
@@ -115,6 +116,7 @@ export default function ListPageHeader<FilterType = string, ViewModeType = strin
                         </Select>
                     </div>
                 ))}
+
 
                 {/* 검색 Input */}
                 <div className="flex gap-2 items-center">

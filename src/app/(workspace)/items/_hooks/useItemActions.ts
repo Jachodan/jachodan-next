@@ -1,12 +1,18 @@
-import { ItemWithStock, Request } from "@/types/item";
+
+import { ItemWithStock } from "@/types/item";
+import { ItemRequest } from "@/types/itemRequest";
 
 interface UseItemActionsProps {
     items: ItemWithStock[];
-    requests: Request[];
+    requests: ItemRequest[];
     updateItem: (itemId: number, updates: Partial<ItemWithStock>) => void;
 }
 
-export function useItemActions({ items, requests, updateItem }: UseItemActionsProps) {
+export function useItemActions({
+    items,
+    requests,
+    updateItem,
+}: UseItemActionsProps) {
     // 즐겨찾기 토글
     const handleToggleFavorite = (itemId: number) => {
         const item = items.find((item) => item.itemId === itemId);
@@ -28,7 +34,11 @@ export function useItemActions({ items, requests, updateItem }: UseItemActionsPr
     // 특정 아이템의 입고요청만 가져오기
     const getItemRequests = (itemId: number) => {
         return requests.filter(
-            (request) => request.itemId === itemId && request.isActive && request.requestType === "입고요청"
+
+            (request) =>
+                request.itemId === itemId &&
+                request.isActive &&
+                request.requestType === "입고요청"
         );
     };
 

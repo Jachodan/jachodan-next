@@ -19,15 +19,14 @@ const sizeClasses = {
     xl: "sm:max-w-[800px]",
 };
 
-export default function CommonModal({ open, onClose, title, children, footer, size = "md" }: CommonModalProps) {
+
+export default function CommonModal({ open, onClose, children, footer, size = "md" }: CommonModalProps) {
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className={sizeClasses[size]}>
-                {title && (
-                    <DialogHeader>
-                        <DialogTitle>{title}</DialogTitle>
-                    </DialogHeader>
-                )}
+                <DialogHeader>
+                    <DialogTitle></DialogTitle>
+                </DialogHeader>
                 <div className="py-4">{children}</div>
                 {footer && <div className="flex gap-2 justify-end pt-4 border-t">{footer}</div>}
             </DialogContent>

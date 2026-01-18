@@ -1,5 +1,7 @@
 "use client";
 
+
+import { Suspense } from "react";
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
 import { useEffect } from "react";
 import ItemListHeader from "./_components/ItemListHeader";
@@ -14,13 +16,15 @@ import ItemListStats from "./_components/ItemListStats";
 import ItemListContainer from "./_components/ItemListContainer";
 import ItemModalManager from "./_components/ItemModalManager";
 import ItemAlertDialogs from "./_components/ItemAlertDialogs";
-
+import { useUrlFilterSync } from "@/hooks/useUrlFilterSync";
 const LIST_ITEMS_PER_PAGE = 8;
 const CARD_ITEMS_PER_PAGE = 10;
 
-export default function ItemList() {
+
+function ItemListContent() {
     const { setHeaderTitle } = useLayout();
-    const { filterType, searchQuery, excludeZero, viewMode, currentPage, setCurrentPage } = useItemListStore();
+    const { filterType, setFilterType } = useUrlFilterSync();
+    const { searchQuery, excludeZero, viewMode, currentPage, setCurrentPage } = useItemListStore();
 
     const { items, requests, isLoading, updateItem, addItem, deleteItem } = useItemData();
 
@@ -86,7 +90,8 @@ export default function ItemList() {
 
     return (
         <div className="p-10">
-            <ItemListHeader />
+
+            <ItemListHeader filterType={filterType} setFilterType={setFilterType} />
 
             <ItemListStats
                 filterType={filterType}
@@ -141,5 +146,22 @@ export default function ItemList() {
                 onDeleteConfirm={handleDeleteConfirm}
             />
         </div>
+    );
+}
+
+
+export default function ItemList() {
+    return (
+        <Suspense
+            fallback={
+                <div className="p-10">
+                    <div className="flex items-center justify-center h-64">
+                        <p className="text-muted-foreground">상품 목록을 불러오는 중...</p>
+                    </div>
+                </div>
+            }
+        >
+            <ItemListContent />
+        </Suspense>
     );
 }
