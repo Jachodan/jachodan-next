@@ -9,6 +9,7 @@ import type { AlbaStatus } from "@/types/user";
 import { useEffect, useState } from "react";
 import { mockAlbaList, type Alba } from "@/lib/mock/alba";
 import AlbaFormModal, { type AlbaFormData } from "./_components/AlbaFormModal";
+import AlbaDetailModal from "./_components/AlbaDetailModal";
 
 export default function AlbaPage() {
     const { setHeaderTitle } = useLayout();
@@ -17,6 +18,8 @@ export default function AlbaPage() {
     const [searchValue, setSearchValue] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedAlba, setSelectedAlba] = useState<Alba | null>(null);
     const [albaList, setAlbaList] = useState<Alba[]>(mockAlbaList);
     const itemsPerPage = 10;
 
@@ -94,6 +97,16 @@ export default function AlbaPage() {
         console.log("알바 추가 완료:", newAlba);
     };
 
+    const handleRowClick = (alba: Alba) => {
+        setSelectedAlba(alba);
+        setIsDetailModalOpen(true);
+    };
+
+    const handleDetailModalClose = () => {
+        setIsDetailModalOpen(false);
+        setSelectedAlba(null);
+    };
+
     // 고용상태 필터 옵션
     const employmentOptions = [
         { value: "전체" as const, label: "전체" },
@@ -151,7 +164,7 @@ export default function AlbaPage() {
                     </TableHeader>
                     <TableBody>
                         {paginatedAlbaList.map((alba) => (
-                            <TableRow key={alba.albaId}>
+                            <TableRow key={alba.albaId} onClick={() => handleRowClick(alba)} className="cursor-pointer hover:bg-gray-50">
                                 <TableCell className="py-4 text-center">
                                     <div
                                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -167,23 +180,27 @@ export default function AlbaPage() {
                                 </TableCell>
                                 <TableCell className="py-4 text-center">
                                     {alba.albaStatus !== "퇴사" && alba.workStatus && (
-                                        <span
-                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                        <button
+                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors ${
                                                 alba.workStatus === "출근"
-                                                    ? "bg-blue-100 text-blue-800"
+                                                    ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
                                                     : alba.workStatus === "휴무"
-                                                    ? "bg-gray-100 text-gray-800"
+                                                    ? "bg-gray-100 text-gray-800 hover:bg-gray-200"
                                                     : alba.workStatus === "대타"
-                                                    ? "bg-purple-100 text-purple-800"
+                                                    ? "bg-purple-100 text-purple-800 hover:bg-purple-200"
                                                     : alba.workStatus === "지각"
-                                                    ? "bg-yellow-100 text-yellow-800"
+                                                    ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
                                                     : alba.workStatus === "결근"
-                                                    ? "bg-red-100 text-red-800"
-                                                    : "bg-green-100 text-green-800"
+                                                    ? "bg-red-100 text-red-800 hover:bg-red-200"
+                                                    : "bg-green-100 text-green-800 hover:bg-green-200"
                                             }`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                // TODO: 근무상태 변경 모달 또는 드롭다운
+                                            }}
                                         >
                                             {alba.workStatus}
-                                        </span>
+                                        </button>
                                     )}
                                     {alba.albaStatus === "퇴사" && <span className="text-xs text-gray-400">-</span>}
                                 </TableCell>
@@ -223,6 +240,7 @@ export default function AlbaPage() {
             />
 
             <AlbaFormModal open={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleAlbaSave} />
+            <AlbaDetailModal open={isDetailModalOpen} alba={selectedAlba} onClose={handleDetailModalClose} />
         </div>
     );
 }
