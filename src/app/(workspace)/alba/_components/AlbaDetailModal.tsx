@@ -72,7 +72,7 @@ export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDet
         >
             <div className="space-y-6">
                 {/* 상단: 고용상태 (좌) + 근무상태 (우) */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-end gap-2">
                     {/* 좌측: 고용상태 */}
                     <div>
                         <span
@@ -101,7 +101,7 @@ export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDet
                 </div>
 
                 {/* 중앙: 프로필 이미지 */}
-                <div className="flex justify-center">
+                <div className="flex justify-center pb-4">
                     <div className="w-48 h-48 bg-muted rounded-full flex items-center justify-center">
                         <span className="text-3xl font-bold text-muted-foreground">{alba.albaName.charAt(0)}</span>
                     </div>
@@ -112,14 +112,14 @@ export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDet
                     {/* 좌하단: 이름 + 연락처 */}
                     <div className="space-y-3">
                         <div>
-                            <p className="font-semibold text-lg">{alba.albaName}</p>
-                            <p className="font-medium">{alba.albaPhone}</p>
+                            <p className="font-semibold text-2xl">{alba.albaName}</p>
+                            <p className="text-lg">{alba.albaPhone}</p>
                         </div>
                     </div>
 
                     {/* 우하단: 근무요일 */}
                     <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">근무요일</p>
+                        <p className="font-medium">근무요일</p>
 
                         {/* 캐러셀: 3개씩 보여주기 */}
                         <div className="relative flex items-center justify-center gap-2">

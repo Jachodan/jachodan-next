@@ -117,16 +117,44 @@ export default function AlbaPage() {
         if (!selectedAlba) return;
 
         setAlbaList((prev) =>
-            prev.map((alba) =>
-                alba.albaId === selectedAlba.albaId
-                    ? {
-                          ...alba,
-                          albaName: data.albaName,
-                          albaPhone: data.albaPhone,
-                          workDays: data.workDays,
-                      }
-                    : alba
-            )
+            prev.map((alba) => {
+                if (alba.albaId !== selectedAlba.albaId) return alba;
+
+                const hasWorkDays = data.workDays.length > 0;
+                const wasRetired = alba.albaStatus === "퇴사";
+
+                // 근무일이 없으면 퇴사 처리
+                if (!hasWorkDays) {
+                    return {
+                        ...alba,
+                        albaName: data.albaName,
+                        albaPhone: data.albaPhone,
+                        workDays: data.workDays,
+                        albaStatus: "퇴사",
+                        workStatus: undefined,
+                    };
+                }
+
+                // 퇴사자가 근무일이 생기면 재직으로 변경
+                if (wasRetired && hasWorkDays) {
+                    return {
+                        ...alba,
+                        albaName: data.albaName,
+                        albaPhone: data.albaPhone,
+                        workDays: data.workDays,
+                        albaStatus: "재직",
+                        workStatus: "휴무",
+                    };
+                }
+
+                // 일반 수정
+                return {
+                    ...alba,
+                    albaName: data.albaName,
+                    albaPhone: data.albaPhone,
+                    workDays: data.workDays,
+                };
+            })
         );
     };
 
