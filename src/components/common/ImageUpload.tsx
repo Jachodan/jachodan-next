@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { Input } from "@/components/ui/input";
+import { useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 interface ImageUploadProps {
@@ -27,6 +28,18 @@ export default function ImageUpload({
 }: ImageUploadProps) {
     const sizeClass = sizeClasses[size];
     const roundedClass = rounded ? "rounded-full" : "rounded-md";
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [fileName, setFileName] = useState<string | null>(null);
+
+    const handleButtonClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        setFileName(file ? file.name : null);
+        onImageChange(e);
+    };
 
     return (
         <div className="space-y-2">
@@ -43,7 +56,15 @@ export default function ImageUpload({
                         {emptyText}
                     </div>
                 )}
-                <Input type="file" accept="image/*" onChange={onImageChange} />
+                <div className="flex items-center gap-2 w-full">
+                    <Button type="button" variant="outline" size="sm" onClick={handleButtonClick}>
+                        파일 선택
+                    </Button>
+                    <span className="text-sm text-muted-foreground truncate flex-1">
+                        {fileName || "선택된 파일 없음"}
+                    </span>
+                </div>
+                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
             </div>
         </div>
     );
