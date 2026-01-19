@@ -18,6 +18,7 @@ export default function AlbaPage() {
     const [searchValue, setSearchValue] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedAlba, setSelectedAlba] = useState<Alba | null>(null);
     const [albaList, setAlbaList] = useState<Alba[]>(mockAlbaList);
@@ -104,6 +105,33 @@ export default function AlbaPage() {
 
     const handleDetailModalClose = () => {
         setIsDetailModalOpen(false);
+        setSelectedAlba(null);
+    };
+
+    const handleEditAlba = () => {
+        setIsDetailModalOpen(false);
+        setIsEditModalOpen(true);
+    };
+
+    const handleAlbaUpdate = (data: AlbaFormData) => {
+        if (!selectedAlba) return;
+
+        setAlbaList((prev) =>
+            prev.map((alba) =>
+                alba.albaId === selectedAlba.albaId
+                    ? {
+                          ...alba,
+                          albaName: data.albaName,
+                          albaPhone: data.albaPhone,
+                          workDays: data.workDays,
+                      }
+                    : alba
+            )
+        );
+    };
+
+    const handleEditModalClose = () => {
+        setIsEditModalOpen(false);
         setSelectedAlba(null);
     };
 
@@ -240,7 +268,24 @@ export default function AlbaPage() {
             />
 
             <AlbaFormModal open={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleAlbaSave} storeName="자초단" />
-            <AlbaDetailModal open={isDetailModalOpen} alba={selectedAlba} onClose={handleDetailModalClose} />
+            <AlbaFormModal
+                open={isEditModalOpen}
+                onClose={handleEditModalClose}
+                onSave={handleAlbaUpdate}
+                storeName="자초단"
+                mode="edit"
+                initialData={
+                    selectedAlba
+                        ? {
+                              albaName: selectedAlba.albaName,
+                              albaPhone: selectedAlba.albaPhone,
+                              workDays: selectedAlba.workDays,
+                              albaEmail: "",
+                          }
+                        : null
+                }
+            />
+            <AlbaDetailModal open={isDetailModalOpen} alba={selectedAlba} onClose={handleDetailModalClose} onEdit={handleEditAlba} />
         </div>
     );
 }

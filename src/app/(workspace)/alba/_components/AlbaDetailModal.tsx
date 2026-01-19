@@ -11,6 +11,7 @@ interface AlbaDetailModalProps {
     open: boolean;
     alba: Alba | null;
     onClose: () => void;
+    onEdit?: () => void;
 }
 
 const workStatusColors: Record<WorkStatus, { bg: string; text: string; badge: string }> = {
@@ -22,7 +23,7 @@ const workStatusColors: Record<WorkStatus, { bg: string; text: string; badge: st
     퇴근: { bg: "bg-green-50", text: "text-green-700", badge: "bg-green-100 text-green-800" },
 };
 
-export default function AlbaDetailModal({ open, alba, onClose }: AlbaDetailModalProps) {
+export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDetailModalProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
 
     const handleSlideChange = (direction: "prev" | "next") => {
@@ -58,7 +59,16 @@ export default function AlbaDetailModal({ open, alba, onClose }: AlbaDetailModal
             onClose={onClose}
             title="알바 정보"
             size="md"
-            footer={<Button onClick={onClose}>닫기</Button>}
+            footer={
+                <>
+                    {onEdit && (
+                        <Button variant="outline" onClick={onEdit}>
+                            수정
+                        </Button>
+                    )}
+                    <Button onClick={onClose}>닫기</Button>
+                </>
+            }
         >
             <div className="space-y-6">
                 {/* 상단: 고용상태 (좌) + 근무상태 (우) */}

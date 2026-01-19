@@ -1,12 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CommonModal from "@/components/common/CommonModal";
 import ImageUpload from "@/components/common/ImageUpload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { SCHEDULE_DAYS, type ScheduleDays } from "@/types/work";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export interface AlbaFormData {
     albaName: string;
@@ -21,9 +30,11 @@ interface AlbaFormModalProps {
     onClose: () => void;
     onSave: (data: AlbaFormData) => void;
     storeName: string;
+    mode?: "create" | "edit";
+    initialData?: AlbaFormData | null;
 }
 
-export default function AlbaFormModal({ open, onClose, onSave, storeName }: AlbaFormModalProps) {
+export default function AlbaFormModal({ open, onClose, onSave, storeName, mode = "create", initialData }: AlbaFormModalProps) {
     const [formData, setFormData] = useState<AlbaFormData>({
         albaName: "",
         albaPhone: "",
@@ -32,6 +43,20 @@ export default function AlbaFormModal({ open, onClose, onSave, storeName }: Alba
     });
 
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [showAlert, setShowAlert] = useState(false);
+
+    const isEditMode = mode === "edit";
+
+    useEffect(() => {
+        if (open && initialData) {
+            setFormData({
+                albaName: initialData.albaName,
+                albaPhone: initialData.albaPhone,
+                workDays: initialData.workDays,
+                albaEmail: initialData.albaEmail,
+            });
+        }
+    }, [open, initialData]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -77,7 +102,11 @@ export default function AlbaFormModal({ open, onClose, onSave, storeName }: Alba
 
     const handleSave = () => {
         onSave(formData);
-        alert(`${storeName} 근무를 환영합니다`);
+        setShowAlert(true);
+    };
+
+    const handleAlertClose = () => {
+        setShowAlert(false);
         handleClose();
     };
 
@@ -101,7 +130,7 @@ export default function AlbaFormModal({ open, onClose, onSave, storeName }: Alba
             <CommonModal
                 open={open}
                 onClose={handleClose}
-                title="알바 추가"
+                title={isEditMode ? "알바 수정" : "알바 추가"}
                 size="md"
                 footer={
                     <>
@@ -110,9 +139,9 @@ export default function AlbaFormModal({ open, onClose, onSave, storeName }: Alba
                         </Button>
                         <Button
                             onClick={handleSave}
-                            disabled={!formData.albaName || !formData.albaPhone || formData.workDays.length === 0}
+                            disabled={!formData.albaName || formData.workDays.length === 0}
                         >
-                            등록
+                            {isEditMode ? "저장" : "등록"}
                         </Button>
                     </>
                 }
@@ -185,6 +214,20 @@ export default function AlbaFormModal({ open, onClose, onSave, storeName }: Alba
                     </div>
                 </div>
             </CommonModal>
+
+            <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{isEditMode ? "수정 완료" : "등록 완료"}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {isEditMode ? "알바 정보가 수정되었습니다" : `${storeName} 근무를 환영합니다`}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogAction onClick={handleAlertClose}>확인</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
