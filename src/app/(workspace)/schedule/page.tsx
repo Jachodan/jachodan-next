@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
+import { Calendar } from "@/components/ui/calendar";
 import { useEffect, useState } from "react";
 
 interface CardState {
@@ -84,13 +85,7 @@ export default function SchedulePage() {
             <div className="flex w-full gap-6">
                 {/* 왼쪽: 캘린더 영역 */}
                 <div className="w-1/2">
-                    <div className="rounded-lg border bg-white p-4 shadow-sm">
-                        <h2 className="mb-4 text-lg font-semibold">캘린더</h2>
-                        {/* 캘린더 컴포넌트 영역 - 추후 구현 */}
-                        <div className="flex h-96 items-center justify-center border-2 border-dashed border-gray-300 rounded">
-                            <p className="text-gray-400">캘린더 영역</p>
-                        </div>
-                    </div>
+                    <Calendar />
                 </div>
 
                 {/* 오른쪽: 날짜/시간 및 직원 카드 영역 */}
