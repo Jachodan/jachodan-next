@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { mockAlbaList, type Alba } from "@/lib/mock/alba";
 import AlbaFormModal, { type AlbaFormData } from "./_components/AlbaFormModal";
 import AlbaDetailModal from "./_components/AlbaDetailModal";
+import AlbaTooltip from "./_components/AlbaTooltip";
 
 export default function AlbaPage() {
     const { setHeaderTitle } = useLayout();
@@ -220,65 +221,67 @@ export default function AlbaPage() {
                     </TableHeader>
                     <TableBody>
                         {paginatedAlbaList.map((alba) => (
-                            <TableRow key={alba.albaId} onClick={() => handleRowClick(alba)} className="cursor-pointer hover:bg-gray-50">
-                                <TableCell className="py-4 text-center">
-                                    <div
-                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                            alba.albaStatus === "재직"
-                                                ? "bg-green-100 text-green-800"
-                                                : alba.albaStatus === "단기"
-                                                ? "bg-blue-100 text-blue-800"
-                                                : "bg-gray-100 text-gray-800"
-                                        }`}
-                                    >
-                                        {alba.albaStatus}
-                                    </div>
-                                </TableCell>
-                                <TableCell className="py-4 text-center">
-                                    {alba.albaStatus !== "퇴사" && alba.workStatus && (
-                                        <button
-                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors ${
-                                                alba.workStatus === "출근"
-                                                    ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
-                                                    : alba.workStatus === "휴무"
-                                                    ? "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                                                    : alba.workStatus === "대타"
-                                                    ? "bg-purple-100 text-purple-800 hover:bg-purple-200"
-                                                    : alba.workStatus === "지각"
-                                                    ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                                                    : alba.workStatus === "결근"
-                                                    ? "bg-red-100 text-red-800 hover:bg-red-200"
-                                                    : "bg-green-100 text-green-800 hover:bg-green-200"
+                            <AlbaTooltip key={alba.albaId} alba={alba}>
+                                <TableRow onClick={() => handleRowClick(alba)} className="cursor-pointer hover:bg-gray-50">
+                                    <TableCell className="py-4 text-center">
+                                        <div
+                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                alba.albaStatus === "재직"
+                                                    ? "bg-green-100 text-green-800"
+                                                    : alba.albaStatus === "단기"
+                                                    ? "bg-blue-100 text-blue-800"
+                                                    : "bg-gray-100 text-gray-800"
                                             }`}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                // TODO: 근무상태 변경 모달 또는 드롭다운
-                                            }}
                                         >
-                                            {alba.workStatus}
-                                        </button>
-                                    )}
-                                    {alba.albaStatus === "퇴사" && <span className="text-xs text-gray-400">-</span>}
-                                </TableCell>
-                                <TableCell className="py-4 font-medium text-center">{alba.albaName}</TableCell>
-                                <TableCell className="py-4">
-                                    <div className="flex gap-1 justify-center">
-                                        {SCHEDULE_DAYS.map((day) => (
-                                            <div
-                                                key={day}
-                                                className={`flex items-center justify-center w-6 h-6 text-xs border rounded ${
-                                                    alba.workDays.includes(day)
-                                                        ? "bg-black text-white border-black"
-                                                        : "bg-white text-gray-400 border-gray-200"
+                                            {alba.albaStatus}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="py-4 text-center">
+                                        {alba.albaStatus !== "퇴사" && alba.workStatus && (
+                                            <button
+                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors ${
+                                                    alba.workStatus === "출근"
+                                                        ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                                        : alba.workStatus === "휴무"
+                                                        ? "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                                                        : alba.workStatus === "대타"
+                                                        ? "bg-purple-100 text-purple-800 hover:bg-purple-200"
+                                                        : alba.workStatus === "지각"
+                                                        ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                                                        : alba.workStatus === "결근"
+                                                        ? "bg-red-100 text-red-800 hover:bg-red-200"
+                                                        : "bg-green-100 text-green-800 hover:bg-green-200"
                                                 }`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    // TODO: 근무상태 변경 모달 또는 드롭다운
+                                                }}
                                             >
-                                                {day}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </TableCell>
-                                <TableCell className="py-4 text-center">{alba.albaPhone}</TableCell>
-                            </TableRow>
+                                                {alba.workStatus}
+                                            </button>
+                                        )}
+                                        {alba.albaStatus === "퇴사" && <span className="text-xs text-gray-400">-</span>}
+                                    </TableCell>
+                                    <TableCell className="py-4 font-medium text-center tooltip-anchor">{alba.albaName}</TableCell>
+                                    <TableCell className="py-4">
+                                        <div className="flex gap-1 justify-center">
+                                            {SCHEDULE_DAYS.map((day) => (
+                                                <div
+                                                    key={day}
+                                                    className={`flex items-center justify-center w-6 h-6 text-xs border rounded ${
+                                                        alba.workDays.includes(day)
+                                                            ? "bg-black text-white border-black"
+                                                            : "bg-white text-gray-400 border-gray-200"
+                                                    }`}
+                                                >
+                                                    {day}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="py-4 text-center">{alba.albaPhone}</TableCell>
+                                </TableRow>
+                            </AlbaTooltip>
                         ))}
                     </TableBody>
                 </Table>
