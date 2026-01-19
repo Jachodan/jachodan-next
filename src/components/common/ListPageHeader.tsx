@@ -42,7 +42,7 @@ interface ListPageHeaderProps<FilterType = string, ViewModeType = string> {
     filterPlaceholder?: string;
 
     // 다중 필터 (새로운 방식)
-    filters?: FilterConfig[];
+    filters?: FilterConfig<FilterType>[];
     // 검색
     searchLabel?: string;
     searchValue: string;
@@ -76,7 +76,7 @@ export default function ListPageHeader<FilterType = string, ViewModeType = strin
     onViewModeChange,
 }: ListPageHeaderProps<FilterType, ViewModeType>) {
     // 다중 필터가 있으면 사용, 없으면 단일 필터 사용 (하위 호환성)
-    const filterConfigs: FilterConfig[] = filters || (filterValue !== undefined && filterOptions && onFilterChange
+    const filterConfigs: FilterConfig<FilterType>[] = filters || (filterValue !== undefined && filterOptions && onFilterChange
         ? [{
             label: filterLabel,
             value: filterValue,
