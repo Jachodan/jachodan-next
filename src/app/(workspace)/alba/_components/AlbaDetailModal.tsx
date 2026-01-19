@@ -24,7 +24,15 @@ const workStatusColors: Record<WorkStatus, { bg: string; text: string; badge: st
 };
 
 export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDetailModalProps) {
+    const workDaysKey = alba?.workDays.join(",") ?? "";
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [prevWorkDaysKey, setPrevWorkDaysKey] = useState(workDaysKey);
+
+    // workDays가 변경되면 슬라이드 초기화
+    if (workDaysKey !== prevWorkDaysKey) {
+        setCurrentSlide(0);
+        setPrevWorkDaysKey(workDaysKey);
+    }
 
     const handleSlideChange = (direction: "prev" | "next") => {
         if (!alba) return;
@@ -41,6 +49,12 @@ export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDet
     const getVisibleWorkDays = () => {
         if (!alba || alba.workDays.length === 0) return [];
 
+        // 3개 이하면 그대로 반환
+        if (alba.workDays.length <= 3) {
+            return alba.workDays;
+        }
+
+        // 4개 이상이면 캐러셀로 3개씩 보여주기
         const days = [];
         for (let i = 0; i < 3; i++) {
             const index = (currentSlide + i) % alba.workDays.length;
