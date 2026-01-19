@@ -239,7 +239,7 @@ export default function AlbaPage() {
                 }}
             />
 
-            <AlbaFormModal open={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleAlbaSave} />
+            <AlbaFormModal open={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleAlbaSave} storeName="자초단" />
             <AlbaDetailModal open={isDetailModalOpen} alba={selectedAlba} onClose={handleDetailModalClose} />
         </div>
     );

@@ -12,6 +12,7 @@ export interface AlbaFormData {
     albaName: string;
     albaPhone: string;
     workDays: ScheduleDays[];
+    albaEmail: string;
     profileImage?: File;
 }
 
@@ -19,13 +20,15 @@ interface AlbaFormModalProps {
     open: boolean;
     onClose: () => void;
     onSave: (data: AlbaFormData) => void;
+    storeName: string;
 }
 
-export default function AlbaFormModal({ open, onClose, onSave }: AlbaFormModalProps) {
+export default function AlbaFormModal({ open, onClose, onSave, storeName }: AlbaFormModalProps) {
     const [formData, setFormData] = useState<AlbaFormData>({
         albaName: "",
         albaPhone: "",
         workDays: [],
+        albaEmail: "",
     });
 
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -74,6 +77,7 @@ export default function AlbaFormModal({ open, onClose, onSave }: AlbaFormModalPr
 
     const handleSave = () => {
         onSave(formData);
+        alert(`${storeName} 근무를 환영합니다`);
         handleClose();
     };
 
@@ -82,6 +86,7 @@ export default function AlbaFormModal({ open, onClose, onSave }: AlbaFormModalPr
             albaName: "",
             albaPhone: "",
             workDays: [],
+            albaEmail: "",
         });
         setImagePreview(null);
         onClose();
@@ -165,6 +170,18 @@ export default function AlbaFormModal({ open, onClose, onSave }: AlbaFormModalPr
                                 </button>
                             ))}
                         </div>
+                    </div>
+
+                    {/* 이메일 입력 */}
+                    <div className="space-y-2">
+                        <Label htmlFor="albaEmail">이메일</Label>
+                        <Input
+                            id="albaEmail"
+                            type="email"
+                            value={formData.albaEmail}
+                            onChange={(e) => handleInputChange("albaEmail", e.target.value)}
+                            placeholder="example@email.com"
+                        />
                     </div>
                 </div>
             </CommonModal>
