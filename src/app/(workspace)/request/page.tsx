@@ -1,106 +1,117 @@
 "use client";
 
-import { REQUEST_TYPES, REQUEST_STATUS } from "@/types/request";
+import { useState } from "react";
+import { REQUEST_TYPES, REQUEST_STATUS, type RequestType } from "@/types/itemRequest";
+import {
+    RequestTable,
+    RequestTableHeader,
+    RequestTableBody,
+    RequestTableHead,
+    RequestTableRow,
+    RequestTableCell,
+} from "@/components/ui/request-table";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ListPageHeader from "@/components/common/ListPageHeader";
+import CustomPagination from "@/components/common/CustomPagination";
 
 export default function RequestPage() {
+    const [typeFilter, setTypeFilter] = useState<RequestType | "전체">("전체");
+    const [searchValue, setSearchValue] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalPages = 3; // 임시 값 (실제 데이터 연결 시 itemsPerPage = 8로 계산)
+
+    const filterOptions = [
+        { value: "전체" as const, label: "전체" },
+        ...REQUEST_TYPES.map((type) => ({ value: type, label: type })),
+    ];
+
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold mb-2">요청사항 게시판</h1>
-                <p className="text-gray-600">재고 관련 요청사항을 관리합니다.</p>
-            </div>
+        <div className="p-10">
+            <ListPageHeader
+                filterLabel="요청유형"
+                filterValue={typeFilter}
+                filterOptions={filterOptions}
+                onFilterChange={(value) => setTypeFilter(value as RequestType | "전체")}
+                filterPlaceholder="유형 선택"
+                searchLabel="검색"
+                searchValue={searchValue}
+                onSearchChange={setSearchValue}
+                searchPlaceholder="상품명 검색"
+            />
 
-            <div className="mb-6 flex justify-between items-center">
-                <div className="flex gap-2">
-                    <select className="px-4 py-2 border rounded-lg">
-                        <option value="all">전체 유형</option>
-                        {REQUEST_TYPES.map((type) => (
-                            <option key={type} value={type}>
-                                {type}
-                            </option>
-                        ))}
-                    </select>
-                    <select className="px-4 py-2 border rounded-lg">
-                        <option value="all">전체 상태</option>
-                        {REQUEST_STATUS.map((status) => (
-                            <option key={status} value={status}>
-                                {status}
-                            </option>
-                        ))}
-                    </select>
-                    <input type="text" placeholder="상품명 검색..." className="px-4 py-2 border rounded-lg w-64" />
-                </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow">
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gray-50 border-b">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    요청유형
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    상품명
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    수량
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    요청일
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    요청자
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    확인상태
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            <tr className="hover:bg-gray-50">
-                                <td className="px-6 py-4">
-                                    <select className="text-sm border rounded px-2 py-1">
-                                        {REQUEST_TYPES.map((type) => (
-                                            <option key={type} value={type} selected={type === "입고요청"}>
-                                                {type}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="text-sm text-gray-900">샘플 상품</div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="text-sm text-gray-900">10</div>
-                                </td>
-                                <td className="px-6 py-4 text-sm text-gray-500">2026-01-16</td>
-                                <td className="px-6 py-4">
-                                    <div className="text-sm text-gray-900">홍길동</div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <select className="text-sm border rounded px-2 py-1">
-                                        {REQUEST_STATUS.map((status) => (
-                                            <option key={status} value={status} selected={status === "대기"}>
-                                                {status}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div className="rounded-md border">
+                <RequestTable>
+                    <RequestTableHeader>
+                        <RequestTableRow className="bg-gray-50">
+                            <RequestTableHead className="font-semibold text-center">요청유형</RequestTableHead>
+                            <RequestTableHead className="font-semibold text-center">상품명</RequestTableHead>
+                            <RequestTableHead className="font-semibold text-center">수량</RequestTableHead>
+                            <RequestTableHead className="font-semibold text-center">요청일</RequestTableHead>
+                            <RequestTableHead className="font-semibold text-center">요청자</RequestTableHead>
+                            <RequestTableHead className="font-semibold text-center">확인상태</RequestTableHead>
+                        </RequestTableRow>
+                    </RequestTableHeader>
+                    <RequestTableBody>
+                        <RequestTableRow className="hover:bg-gray-50">
+                            <RequestTableCell className="py-4">
+                                <div className="flex justify-center">
+                                    <Select defaultValue="입고요청">
+                                        <SelectTrigger size="sm">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {REQUEST_TYPES.map((type) => (
+                                                    <SelectItem key={type} value={type}>
+                                                        {type}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </RequestTableCell>
+                            <RequestTableCell className="py-4 text-center">
+                                <span className="text-sm text-gray-900">샘플 상품</span>
+                            </RequestTableCell>
+                            <RequestTableCell className="py-4 text-center">
+                                <span className="text-sm text-gray-900">10</span>
+                            </RequestTableCell>
+                            <RequestTableCell className="py-4 text-center text-sm text-gray-500">
+                                2026-01-16
+                            </RequestTableCell>
+                            <RequestTableCell className="py-4 text-center">
+                                <span className="text-sm text-gray-900">홍길동</span>
+                            </RequestTableCell>
+                            <RequestTableCell className="py-4">
+                                <div className="flex justify-center">
+                                    <Select defaultValue="대기">
+                                        <SelectTrigger size="sm">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {REQUEST_STATUS.map((status) => (
+                                                    <SelectItem key={status} value={status}>
+                                                        {status}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </RequestTableCell>
+                        </RequestTableRow>
+                    </RequestTableBody>
+                </RequestTable>
             </div>
 
             <div className="mt-6 flex justify-center">
-                <nav className="flex gap-2">
-                    <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">이전</button>
-                    <button className="px-4 py-2 border rounded-lg bg-blue-600 text-white">1</button>
-                    <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">2</button>
-                    <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">3</button>
-                    <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">다음</button>
-                </nav>
+                <CustomPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
             </div>
         </div>
     );
