@@ -13,6 +13,7 @@ interface CardState {
 export default function SchedulePage() {
     const { setHeaderTitle } = useLayout();
     const today = new Date();
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(today);
     const [cardStates, setCardStates] = useState<CardState[]>(
         Array.from({ length: 6 }).map(() => ({
             status: "none",
@@ -81,18 +82,29 @@ export default function SchedulePage() {
     };
 
     return (
-        <div className="flex h-full items-center justify-center p-10">
+        <div className="flex h-full items-stretch p-10">
             <div className="flex w-full gap-6">
                 {/* 왼쪽: 캘린더 영역 */}
-                <div className="w-1/2">
-                    <Calendar />
+                <div className="w-1/2 flex">
+                    <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        classNames={{
+                            caption_label: "text-xl font-semibold",
+                            month_caption: "flex items-center justify-center h-12 mb-2",
+                        }}
+                        className="w-full flex-1 rounded-lg border bg-white p-6 shadow-sm flex flex-col [&_[data-slot=calendar]]:flex-1 [&_[data-slot=calendar]]:flex [&_[data-slot=calendar]]:flex-col [&_.rdp-months]:flex-1 [&_.rdp-month]:h-full [&_.rdp-month]:flex [&_.rdp-month]:flex-col [&_.rdp-month_table]:flex-1 [&_.rdp-tbody]:h-full [&_.rdp-week]:flex-1 [&_.rdp-table]:w-full [&_.rdp-table]:h-full [&_.rdp-table]:flex [&_.rdp-table]:flex-col [&_.rdp-cell]:text-center [&_.rdp-day]:w-full [&_.rdp-day]:h-full [&_.rdp-head_th]:w-full [&_.rdp-head_th]:pb-2 [&_.rdp-head_th]:text-base [&_.rdp-button]:w-full [&_.rdp-button]:h-full [&_.rdp-button]:text-lg"
+                    />
                 </div>
 
                 {/* 오른쪽: 날짜/시간 및 직원 카드 영역 */}
                 <div className="flex w-1/2 flex-col gap-6">
-                    {/* 상단: 오늘 날짜와 시간 */}
+                    {/* 상단: 선택된 날짜와 시간 */}
                     <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="text-2xl text-muted-foreground">{formatDate(today)}</div>
+                        <div className="text-2xl text-muted-foreground">
+                            {formatDate(selectedDate || today)}
+                        </div>
                         <div className="text-4xl font-bold">{formatTime(today)}</div>
                     </div>
 
