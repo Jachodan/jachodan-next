@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/request-table";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ListPageHeader from "@/components/common/ListPageHeader";
-import CustomPagination from "@/components/common/CustomPagination";
+import ListPageFooter from "@/components/common/ListPageFooter";
 
 export default function RequestPage() {
     const [typeFilter, setTypeFilter] = useState<RequestType | "전체">("전체");
@@ -106,13 +106,16 @@ export default function RequestPage() {
                 </RequestTable>
             </div>
 
-            <div className="mt-6 flex justify-center">
-                <CustomPagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
-            </div>
+            <ListPageFooter
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                actionButton={{
+                    label: "상품등록",
+                    onClick: () => console.log("상품등록 클릭"),
+                    variant: "outline",
+                }}
+            />
         </div>
     );
 }
