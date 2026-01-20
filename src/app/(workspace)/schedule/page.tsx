@@ -1,21 +1,18 @@
 "use client";
 
+import CustomPagination from "@/components/common/CustomPagination";
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
-import { buttonVariants } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
 import { SCHEDULE_CONSTANTS } from "@/constants/schedule";
 import { mockEmployeeAttendances } from "@/lib/mock/schedule";
-import { cn } from "@/lib/utils";
 import { AttendanceState } from "@/types/schedule";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function SchedulePage() {
     const { setHeaderTitle } = useLayout();
     const today = new Date();
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(today);
-    const [currentPage, setCurrentPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
     const [cardStates, setCardStates] = useState<AttendanceState[]>(
         mockEmployeeAttendances.map((employee) => employee.attendance)
     );
@@ -23,8 +20,8 @@ export default function SchedulePage() {
     const { ITEMS_PER_PAGE } = SCHEDULE_CONSTANTS;
     const totalPages = Math.ceil(cardStates.length / ITEMS_PER_PAGE);
     const paginatedCards = cardStates.slice(
-        currentPage * ITEMS_PER_PAGE,
-        (currentPage + 1) * ITEMS_PER_PAGE
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
     );
 
     const formatDate = (date: Date) => {
@@ -116,7 +113,7 @@ export default function SchedulePage() {
                         <h2 className="mb-4 text-lg font-semibold">근무 직원</h2>
                         <div className="grid grid-cols-3 gap-4">
                             {paginatedCards.map((card, index) => {
-                                const actualIndex = currentPage * ITEMS_PER_PAGE + index;
+                                const actualIndex = (currentPage - 1) * ITEMS_PER_PAGE + index;
                                 return (
                                     <div
                                         key={actualIndex}
@@ -149,45 +146,13 @@ export default function SchedulePage() {
                         </div>
 
                         {/* 페이지네이션 */}
-                        {totalPages > 1 && (
-                            <Pagination className="mt-4 pt-4 border-t">
-                                <PaginationContent>
-                                    <PaginationItem>
-                                        <button
-                                            onClick={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
-                                            disabled={currentPage === 0}
-                                            className={cn(
-                                                buttonVariants({ variant: "ghost", size: "default" }),
-                                                "gap-1 px-2.5",
-                                                currentPage === 0 && "pointer-events-none opacity-50"
-                                            )}
-                                        >
-                                            <ChevronLeftIcon className="h-4 w-4" />
-                                            <span className="hidden sm:block">이전</span>
-                                        </button>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <span className="text-sm text-muted-foreground px-2">
-                                            {currentPage + 1} / {totalPages}
-                                        </span>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <button
-                                            onClick={() => setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1))}
-                                            disabled={currentPage === totalPages - 1}
-                                            className={cn(
-                                                buttonVariants({ variant: "ghost", size: "default" }),
-                                                "gap-1 px-2.5",
-                                                currentPage === totalPages - 1 && "pointer-events-none opacity-50"
-                                            )}
-                                        >
-                                            <span className="hidden sm:block">다음</span>
-                                            <ChevronRightIcon className="h-4 w-4" />
-                                        </button>
-                                    </PaginationItem>
-                                </PaginationContent>
-                            </Pagination>
-                        )}
+                        <div className="mt-4 pt-4 border-t">
+                            <CustomPagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
