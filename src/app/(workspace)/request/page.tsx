@@ -74,7 +74,7 @@ export default function RequestPage() {
                                 <RequestTableCell className="py-4">
                                     <div className="flex justify-center">
                                         <Select defaultValue={request.requestType}>
-                                            <SelectTrigger size="sm">
+                                            <SelectTrigger size="sm" className="w-[123px]">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -136,17 +136,9 @@ export default function RequestPage() {
                 }}
             />
 
-            <CommonModal
-                open={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title="요청 상세 정보"
-            >
+            <CommonModal open={isModalOpen} onClose={() => setIsModalOpen(false)} title="요청 상세 정보">
                 {selectedRequest && (
                     <div className="grid gap-4">
-                        <div className="grid grid-cols-2 gap-2">
-                            <span className="text-sm font-medium text-gray-500">요청 ID</span>
-                            <span className="text-sm">{selectedRequest.requestId}</span>
-                        </div>
                         <div className="grid grid-cols-2 gap-2">
                             <span className="text-sm font-medium text-gray-500">요청 유형</span>
                             <span className="text-sm">{selectedRequest.requestType}</span>
