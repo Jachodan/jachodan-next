@@ -7,14 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { generateMockItems } from "@/lib/mock/items";
 
 // 목 데이터 생성 (스크롤이 생길 정도로 충분히 많이)
@@ -47,9 +40,7 @@ export default function RequestCreatePage() {
     // 검색 필터링된 상품 목록
     const filteredItems = useMemo(() => {
         if (!searchValue) return MOCK_ITEMS;
-        return MOCK_ITEMS.filter((item) =>
-            item.itemName.toLowerCase().includes(searchValue.toLowerCase())
-        );
+        return MOCK_ITEMS.filter((item) => item.itemName.toLowerCase().includes(searchValue.toLowerCase()));
     }, [searchValue]);
 
     // 체크박스 토글
@@ -72,9 +63,7 @@ export default function RequestCreatePage() {
             }
         } else {
             setSelectedItemIds((prev) => prev.filter((id) => id !== itemId));
-            setRequestItems((prev) =>
-                prev.filter((item) => item.itemId !== itemId || item.isManual)
-            );
+            setRequestItems((prev) => prev.filter((item) => item.itemId !== itemId || item.isManual));
         }
     };
 
@@ -95,9 +84,7 @@ export default function RequestCreatePage() {
 
     // 요청 항목 업데이트
     const updateRequestItem = (id: string, field: keyof RequestItem, value: string | number) => {
-        setRequestItems((prev) =>
-            prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-        );
+        setRequestItems((prev) => prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
     };
 
     // 수동 항목에서 상품 선택
@@ -106,9 +93,7 @@ export default function RequestCreatePage() {
         if (selectedItem) {
             setRequestItems((prev) =>
                 prev.map((item) =>
-                    item.id === id
-                        ? { ...item, itemId: selectedItem.itemId, itemName: selectedItem.itemName }
-                        : item
+                    item.id === id ? { ...item, itemId: selectedItem.itemId, itemName: selectedItem.itemName } : item
                 )
             );
         }
@@ -130,9 +115,7 @@ export default function RequestCreatePage() {
                     {/* 좌상단 - 검색 */}
                     <div className="p-4 border-b bg-gray-50">
                         <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                검색
-                            </span>
+                            <span className="text-sm font-medium text-gray-700 whitespace-nowrap">검색</span>
                             <div className="relative flex-1">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
                                 <Input
@@ -150,7 +133,7 @@ export default function RequestCreatePage() {
                         {/* 헤더 */}
                         <div className="grid grid-cols-[40px_1fr_100px] gap-2 px-4 py-3 bg-gray-50 border-b text-sm font-medium text-gray-600">
                             <div></div>
-                            <div>상품명</div>
+                            <div className="text-center">상품명</div>
                             <div className="text-center">수량</div>
                         </div>
 
@@ -168,12 +151,8 @@ export default function RequestCreatePage() {
                                                 handleCheckboxChange(item.itemId, checked as boolean)
                                             }
                                         />
-                                        <span className="text-sm text-gray-900 truncate">
-                                            {item.itemName}
-                                        </span>
-                                        <span className="text-sm text-gray-600 text-center">
-                                            {item.stockAmount}
-                                        </span>
+                                        <div className="text-sm text-gray-900 truncate text-center">{item.itemName}</div>
+                                        <div className="text-sm text-gray-600 text-center">{item.stockAmount}</div>
                                     </div>
                                 ))}
                             </div>
@@ -227,9 +206,7 @@ export default function RequestCreatePage() {
                                     {item.isManual ? (
                                         <Select
                                             value={item.itemId?.toString() || ""}
-                                            onValueChange={(value) =>
-                                                handleManualItemSelect(item.id, value)
-                                            }
+                                            onValueChange={(value) => handleManualItemSelect(item.id, value)}
                                         >
                                             <SelectTrigger size="sm" className="w-full">
                                                 <SelectValue placeholder="상품 선택" />
@@ -258,24 +235,18 @@ export default function RequestCreatePage() {
                                         type="number"
                                         min={1}
                                         value={item.quantity}
-                                        onChange={(e) =>
-                                            updateRequestItem(item.id, "quantity", Number(e.target.value))
-                                        }
+                                        onChange={(e) => updateRequestItem(item.id, "quantity", Number(e.target.value))}
                                         className="text-center h-8"
                                     />
 
                                     {/* 요청일 */}
-                                    <span className="text-sm text-gray-500 text-center">
-                                        {item.requestDate}
-                                    </span>
+                                    <span className="text-sm text-gray-500 text-center">{item.requestDate}</span>
 
                                     {/* 요청자 */}
                                     <Input
                                         type="text"
                                         value={item.requester}
-                                        onChange={(e) =>
-                                            updateRequestItem(item.id, "requester", e.target.value)
-                                        }
+                                        onChange={(e) => updateRequestItem(item.id, "requester", e.target.value)}
                                         placeholder="이름"
                                         className="text-center h-8"
                                     />
