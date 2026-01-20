@@ -4,31 +4,23 @@ import { useLayout } from "@/components/layouts/provider/LayoutProvider";
 import { buttonVariants } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
+import { SCHEDULE_CONSTANTS } from "@/constants/schedule";
+import { mockEmployeeAttendances } from "@/lib/mock/schedule";
 import { cn } from "@/lib/utils";
+import { AttendanceState } from "@/types/schedule";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-
-interface CardState {
-    status: "none" | "checkedIn" | "checkedOut";
-    startTime: string;
-    endTime: string;
-}
-
-const ITEMS_PER_PAGE = 6;
 
 export default function SchedulePage() {
     const { setHeaderTitle } = useLayout();
     const today = new Date();
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(today);
     const [currentPage, setCurrentPage] = useState(0);
-    const [cardStates, setCardStates] = useState<CardState[]>(
-        Array.from({ length: 10 }).map(() => ({
-            status: "none",
-            startTime: "00:00",
-            endTime: "00:00",
-        }))
+    const [cardStates, setCardStates] = useState<AttendanceState[]>(
+        mockEmployeeAttendances.map((employee) => employee.attendance)
     );
 
+    const { ITEMS_PER_PAGE } = SCHEDULE_CONSTANTS;
     const totalPages = Math.ceil(cardStates.length / ITEMS_PER_PAGE);
     const paginatedCards = cardStates.slice(
         currentPage * ITEMS_PER_PAGE,
