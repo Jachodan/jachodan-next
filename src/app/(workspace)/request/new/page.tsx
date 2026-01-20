@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Search, Plus, X } from "lucide-react";
+import { toast } from "sonner";
 import { REQUEST_TYPES, type RequestType } from "@/types/itemRequest";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { generateMockItems } from "@/lib/mock/items";
+import { createRequests } from "@/lib/mock/itemRequests";
 
 // 목 데이터 생성 (스크롤이 생길 정도로 충분히 많이)
 const mockItemsData = generateMockItems(30);
@@ -29,10 +32,16 @@ interface RequestItem {
     isManual: boolean;
 }
 
+// 고유 ID 생성을 위한 카운터
+let idCounter = 0;
+const generateId = (prefix: string) => `${prefix}-${++idCounter}`;
+
 export default function RequestCreatePage() {
+    const router = useRouter();
     const [searchValue, setSearchValue] = useState("");
     const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]);
     const [requestItems, setRequestItems] = useState<RequestItem[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // 오늘 날짜
     const today = new Date().toISOString().split("T")[0];
@@ -50,7 +59,7 @@ export default function RequestCreatePage() {
             const item = MOCK_ITEMS.find((i) => i.itemId === itemId);
             if (item) {
                 const newRequestItem: RequestItem = {
-                    id: `item-${itemId}-${Date.now()}`,
+                    id: generateId(`item-${itemId}`),
                     itemId: item.itemId,
                     itemName: item.itemName,
                     requestType: "입고요청",
@@ -70,7 +79,7 @@ export default function RequestCreatePage() {
     // 수동으로 행 추가
     const handleAddManualRow = () => {
         const newRequestItem: RequestItem = {
-            id: `manual-${Date.now()}`,
+            id: generateId("manual"),
             itemId: null,
             itemName: "",
             requestType: "입고요청",
@@ -104,6 +113,49 @@ export default function RequestCreatePage() {
         setRequestItems((prev) => prev.filter((item) => item.id !== id));
         if (itemId !== null) {
             setSelectedItemIds((prev) => prev.filter((id) => id !== itemId));
+        }
+    };
+
+    // 취소
+    const handleCancel = () => {
+        router.back();
+    };
+
+    // 확인 (요청 생성)
+    const handleSubmit = () => {
+        // 유효성 검사
+        const validItems = requestItems.filter((item) => item.itemId !== null);
+
+        if (validItems.length === 0) {
+            toast.error("최소 1개 이상의 상품을 선택해주세요.");
+            return;
+        }
+
+        const invalidItems = validItems.filter((item) => !item.requester.trim());
+        if (invalidItems.length > 0) {
+            toast.error("모든 항목에 요청자를 입력해주세요.");
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const inputs = validItems.map((item) => ({
+                itemId: item.itemId!,
+                itemName: item.itemName,
+                requestType: item.requestType,
+                quantity: item.quantity,
+                requestDate: item.requestDate,
+                requester: item.requester,
+            }));
+
+            const createdRequests = createRequests(inputs);
+            toast.success(`${createdRequests.length}건의 요청이 등록되었습니다.`);
+            router.push("/request");
+        } catch {
+            toast.error("요청 등록에 실패했습니다.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -279,8 +331,12 @@ export default function RequestCreatePage() {
 
                     {/* 하단 버튼 */}
                     <div className="p-4 border-t bg-gray-50 flex justify-end gap-2">
-                        <Button variant="outline">취소</Button>
-                        <Button>확인</Button>
+                        <Button variant="outline" onClick={handleCancel}>
+                            취소
+                        </Button>
+                        <Button onClick={handleSubmit} disabled={isSubmitting}>
+                            {isSubmitting ? "등록 중..." : "확인"}
+                        </Button>
                     </div>
                 </div>
             </div>
