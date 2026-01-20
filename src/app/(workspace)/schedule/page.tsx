@@ -1,7 +1,11 @@
 "use client";
 
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
+import { buttonVariants } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
+import { cn } from "@/lib/utils";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface CardState {
@@ -10,16 +14,25 @@ interface CardState {
     endTime: string;
 }
 
+const ITEMS_PER_PAGE = 6;
+
 export default function SchedulePage() {
     const { setHeaderTitle } = useLayout();
     const today = new Date();
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(today);
+    const [currentPage, setCurrentPage] = useState(0);
     const [cardStates, setCardStates] = useState<CardState[]>(
-        Array.from({ length: 6 }).map(() => ({
+        Array.from({ length: 10 }).map(() => ({
             status: "none",
             startTime: "00:00",
             endTime: "00:00",
         }))
+    );
+
+    const totalPages = Math.ceil(cardStates.length / ITEMS_PER_PAGE);
+    const paginatedCards = cardStates.slice(
+        currentPage * ITEMS_PER_PAGE,
+        (currentPage + 1) * ITEMS_PER_PAGE
     );
 
     const formatDate = (date: Date) => {
@@ -110,35 +123,79 @@ export default function SchedulePage() {
                     <div className="rounded-lg border bg-white p-6 shadow-sm">
                         <h2 className="mb-4 text-lg font-semibold">근무 직원</h2>
                         <div className="grid grid-cols-3 gap-4">
-                            {Array.from({ length: 6 }).map((_, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => handleCardClick(index)}
-                                    className="aspect-4/5 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col cursor-pointer hover:bg-gray-100 transition-colors relative"
-                                >
-                                    <div className="flex-1 flex items-center justify-center relative">
-                                        {cardStates[index].status === "checkedIn" && (
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                <div className="bg-transparent text-red-600 px-8 py-4 rounded-full text-2xl font-bold shadow-lg transform rotate-12 border-4 border-red-600">
-                                                    출석
+                            {paginatedCards.map((card, index) => {
+                                const actualIndex = currentPage * ITEMS_PER_PAGE + index;
+                                return (
+                                    <div
+                                        key={actualIndex}
+                                        onClick={() => handleCardClick(actualIndex)}
+                                        className="aspect-4/5 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col cursor-pointer hover:bg-gray-100 transition-colors relative"
+                                    >
+                                        <div className="flex-1 flex items-center justify-center relative">
+                                            {card.status === "checkedIn" && (
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <div className="bg-transparent text-red-600 px-8 py-4 rounded-full text-2xl font-bold shadow-lg transform rotate-12 border-4 border-red-600">
+                                                        출석
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
-                                        {cardStates[index].status === "checkedOut" && (
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                <div className="bg-transparent text-purple-600 px-8 py-4 rounded-full text-2xl font-bold shadow-lg transform rotate-12 border-4 border-purple-600">
-                                                    퇴근
+                                            )}
+                                            {card.status === "checkedOut" && (
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <div className="bg-transparent text-purple-600 px-8 py-4 rounded-full text-2xl font-bold shadow-lg transform rotate-12 border-4 border-purple-600">
+                                                        퇴근
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
-                                        <p className="text-gray-400">직원 카드 {index + 1}</p>
+                                            )}
+                                            <p className="text-gray-400">직원 카드 {actualIndex + 1}</p>
+                                        </div>
+                                        <div className="bg-gray-200 px-3 py-2 rounded-b-lg text-center text-sm text-gray-700">
+                                            {card.startTime} - {card.endTime}
+                                        </div>
                                     </div>
-                                    <div className="bg-gray-200 px-3 py-2 rounded-b-lg text-center text-sm text-gray-700">
-                                        {cardStates[index].startTime} - {cardStates[index].endTime}
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
+
+                        {/* 페이지네이션 */}
+                        {totalPages > 1 && (
+                            <Pagination className="mt-4 pt-4 border-t">
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <button
+                                            onClick={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
+                                            disabled={currentPage === 0}
+                                            className={cn(
+                                                buttonVariants({ variant: "ghost", size: "default" }),
+                                                "gap-1 px-2.5",
+                                                currentPage === 0 && "pointer-events-none opacity-50"
+                                            )}
+                                        >
+                                            <ChevronLeftIcon className="h-4 w-4" />
+                                            <span className="hidden sm:block">이전</span>
+                                        </button>
+                                    </PaginationItem>
+                                    <PaginationItem>
+                                        <span className="text-sm text-muted-foreground px-2">
+                                            {currentPage + 1} / {totalPages}
+                                        </span>
+                                    </PaginationItem>
+                                    <PaginationItem>
+                                        <button
+                                            onClick={() => setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1))}
+                                            disabled={currentPage === totalPages - 1}
+                                            className={cn(
+                                                buttonVariants({ variant: "ghost", size: "default" }),
+                                                "gap-1 px-2.5",
+                                                currentPage === totalPages - 1 && "pointer-events-none opacity-50"
+                                            )}
+                                        >
+                                            <span className="hidden sm:block">다음</span>
+                                            <ChevronRightIcon className="h-4 w-4" />
+                                        </button>
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+                        )}
                     </div>
                 </div>
             </div>
