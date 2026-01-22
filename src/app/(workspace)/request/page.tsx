@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { REQUEST_TYPES, REQUEST_STATUS, type RequestType, type RequestStatus } from "@/types/itemRequest";
 import {
     RequestTable,
@@ -18,15 +19,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getPaginatedRequests, mockItemNames, updateRequest, type ItemRequestWithDetails } from "@/lib/mock/itemRequests";
 
-// 상품 목록 (드롭다운용)
-const itemOptions = Object.entries(mockItemNames).map(([itemId, itemName]) => ({
-    itemId: Number(itemId),
-    itemName,
-}));
-
 const PAGE_SIZE = 10;
 
 export default function RequestPage() {
+    const router = useRouter();
     const [typeFilter, setTypeFilter] = useState<RequestType | "전체">("전체");
     const [searchValue, setSearchValue] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -36,6 +32,12 @@ export default function RequestPage() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _ = updateTrigger;
     const { data: requests, totalPages } = getPaginatedRequests(currentPage, PAGE_SIZE, typeFilter, searchValue);
+
+    // 상품 목록 (드롭다운용) - 컴포넌트 내부에서 최신 데이터 반영
+    const itemOptions = Object.entries(mockItemNames).map(([itemId, itemName]) => ({
+        itemId: Number(itemId),
+        itemName,
+    }));
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState<ItemRequestWithDetails | null>(null);
@@ -57,13 +59,16 @@ export default function RequestPage() {
         }
     };
 
-    const handleCancelEdit = () => {
+    const handleCancelEdit = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsModalOpen(false);
         setIsEditMode(false);
         setEditItemId(null);
         setEditAmount(undefined);
     };
 
-    const handleSaveEdit = () => {
+    const handleSaveEdit = (e: React.MouseEvent) => {
+        e.stopPropagation();
         if (selectedRequest && editItemId) {
             const updated = updateRequest({
                 requestId: selectedRequest.requestId,
@@ -73,9 +78,13 @@ export default function RequestPage() {
 
             if (updated) {
                 setSelectedRequest(updated);
+                setUpdateTrigger((prev) => prev + 1);
             }
-            setIsEditMode(false);
         }
+        setIsModalOpen(false);
+        setIsEditMode(false);
+        setEditItemId(null);
+        setEditAmount(undefined);
     };
 
     const handleModalClose = () => {
@@ -199,7 +208,7 @@ export default function RequestPage() {
                 onPageChange={setCurrentPage}
                 actionButton={{
                     label: "상품등록",
-                    onClick: () => console.log("상품등록 클릭"),
+                    onClick: () => router.push("/request/new"),
                     variant: "outline",
                 }}
             />

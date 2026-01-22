@@ -36,12 +36,12 @@ const createMockRequest = (index: number): ItemRequest => {
 export let mockItemRequests: ItemRequest[] = Array.from({ length: 25 }, (_, i) => createMockRequest(i));
 
 // 상품명 매핑 (itemId -> 상품명)
-export const mockItemNames: Record<number, string> = Object.fromEntries(
+export let mockItemNames: Record<number, string> = Object.fromEntries(
     itemNames.map((name, i) => [101 + i, name])
 );
 
 // 요청자 매핑 (albaId -> 이름)
-export const mockAlbaNames: Record<number, string> = Object.fromEntries(
+export let mockAlbaNames: Record<number, string> = Object.fromEntries(
     albaNames.map((name, i) => [i + 1, name])
 );
 
@@ -126,38 +126,62 @@ export interface CreateRequestInput {
     requester: string;
 }
 
-// 메모리 기반 요청 저장소 (실제로는 API 호출로 대체)
-let mockRequestStore: ItemRequest[] = [];
-let nextRequestId = 1;
+// 다음 요청 ID (기존 목데이터의 마지막 ID + 1)
+let nextRequestId = mockItemRequests.length + 1;
+
+// 요청자명으로 albaId 찾기 또는 생성
+const getOrCreateAlbaId = (requesterName: string): number => {
+    // 기존 요청자 찾기
+    const existingEntry = Object.entries(mockAlbaNames).find(([, name]) => name === requesterName);
+    if (existingEntry) {
+        return Number(existingEntry[0]);
+    }
+
+    // 새 요청자 추가
+    const newAlbaId = Math.max(...Object.keys(mockAlbaNames).map(Number), 0) + 1;
+    mockAlbaNames[newAlbaId] = requesterName;
+    return newAlbaId;
+};
 
 // 요청 생성 함수
-export const createRequests = (inputs: CreateRequestInput[], albaId: number = 1): ItemRequest[] => {
+export const createRequests = (inputs: CreateRequestInput[]): ItemRequest[] => {
     const now = new Date().toISOString();
-    const newRequests: ItemRequest[] = inputs.map((input) => ({
-        requestId: nextRequestId++,
-        itemId: input.itemId,
-        albaId,
-        requestAmount: input.quantity,
-        requestDate: input.requestDate,
-        requestType: input.requestType,
-        requestStatus: "대기",
-        createdAt: now,
-        isActive: true,
-    }));
+    const newRequests: ItemRequest[] = inputs.map((input) => {
+        // 상품명 매핑에 추가 (새로운 itemId인 경우)
+        if (!mockItemNames[input.itemId]) {
+            mockItemNames[input.itemId] = input.itemName;
+        }
 
-    mockRequestStore = [...mockRequestStore, ...newRequests];
+        // 요청자 ID 가져오기 또는 생성
+        const albaId = getOrCreateAlbaId(input.requester);
+
+        return {
+            requestId: nextRequestId++,
+            itemId: input.itemId,
+            albaId,
+            requestAmount: input.quantity,
+            requestDate: input.requestDate,
+            requestType: input.requestType,
+            requestStatus: "대기",
+            createdAt: now,
+            isActive: true,
+        };
+    });
+
+    // mockItemRequests에 직접 추가하여 목록에 반영
+    mockItemRequests = [...newRequests, ...mockItemRequests];
     return newRequests;
 };
 
 // 저장된 요청 목록 조회
 export const getRequests = (): ItemRequest[] => {
-    return mockRequestStore;
+    return mockItemRequests;
 };
 
 // 요청 저장소 초기화 (테스트용)
 export const resetRequestStore = () => {
-    mockRequestStore = [];
-    nextRequestId = 1;
+    mockItemRequests = Array.from({ length: 25 }, (_, i) => createMockRequest(i));
+    nextRequestId = mockItemRequests.length + 1;
 };
 
 // 요청 수정 입력 타입
