@@ -33,7 +33,7 @@ const createMockRequest = (index: number): ItemRequest => {
 };
 
 // 고정된 목데이터 (25개)
-export const mockItemRequests: ItemRequest[] = Array.from({ length: 25 }, (_, i) => createMockRequest(i));
+export let mockItemRequests: ItemRequest[] = Array.from({ length: 25 }, (_, i) => createMockRequest(i));
 
 // 상품명 매핑 (itemId -> 상품명)
 export const mockItemNames: Record<number, string> = Object.fromEntries(
@@ -158,4 +158,31 @@ export const getRequests = (): ItemRequest[] => {
 export const resetRequestStore = () => {
     mockRequestStore = [];
     nextRequestId = 1;
+};
+
+// 요청 수정 입력 타입
+export interface UpdateRequestInput {
+    requestId: number;
+    itemId: number;
+    requestAmount?: number;
+}
+
+// 요청 수정 함수
+export const updateRequest = (input: UpdateRequestInput): ItemRequestWithDetails | null => {
+    const index = mockItemRequests.findIndex((r) => r.requestId === input.requestId);
+    if (index === -1) return null;
+
+    const now = new Date().toISOString();
+    mockItemRequests[index] = {
+        ...mockItemRequests[index],
+        itemId: input.itemId,
+        requestAmount: input.requestAmount,
+        updatedAt: now,
+    };
+
+    return {
+        ...mockItemRequests[index],
+        itemName: mockItemNames[input.itemId] || "알 수 없는 상품",
+        requesterName: mockAlbaNames[mockItemRequests[index].albaId] || "알 수 없음",
+    };
 };

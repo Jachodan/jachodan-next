@@ -14,7 +14,15 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import CommonModal from "@/components/common/CommonModal";
 import ListPageHeader from "@/components/common/ListPageHeader";
 import ListPageFooter from "@/components/common/ListPageFooter";
-import { getPaginatedRequests, type ItemRequestWithDetails } from "@/lib/mock/itemRequests";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { getPaginatedRequests, mockItemNames, updateRequest, type ItemRequestWithDetails } from "@/lib/mock/itemRequests";
+
+// 상품 목록 (드롭다운용)
+const itemOptions = Object.entries(mockItemNames).map(([itemId, itemName]) => ({
+    itemId: Number(itemId),
+    itemName,
+}));
 
 const PAGE_SIZE = 10;
 
@@ -27,10 +35,50 @@ export default function RequestPage() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState<ItemRequestWithDetails | null>(null);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editItemId, setEditItemId] = useState<number | null>(null);
+    const [editAmount, setEditAmount] = useState<number | undefined>(undefined);
 
     const handleRowClick = (request: ItemRequestWithDetails) => {
         setSelectedRequest(request);
         setIsModalOpen(true);
+        setIsEditMode(false);
+    };
+
+    const handleEditClick = () => {
+        if (selectedRequest) {
+            setEditItemId(selectedRequest.itemId);
+            setEditAmount(selectedRequest.requestAmount);
+            setIsEditMode(true);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditMode(false);
+        setEditItemId(null);
+        setEditAmount(undefined);
+    };
+
+    const handleSaveEdit = () => {
+        if (selectedRequest && editItemId) {
+            const updated = updateRequest({
+                requestId: selectedRequest.requestId,
+                itemId: editItemId,
+                requestAmount: editAmount,
+            });
+
+            if (updated) {
+                setSelectedRequest(updated);
+            }
+            setIsEditMode(false);
+        }
+    };
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setIsEditMode(false);
+        setEditItemId(null);
+        setEditAmount(undefined);
     };
 
     const filterOptions = [
@@ -136,30 +184,80 @@ export default function RequestPage() {
                 }}
             />
 
-            <CommonModal open={isModalOpen} onClose={() => setIsModalOpen(false)} title="요청 상세 정보">
+            <CommonModal
+                open={isModalOpen}
+                onClose={handleModalClose}
+                title="요청 상세 정보"
+                footer={
+                    isEditMode ? (
+                        <div className="flex gap-2">
+                            <Button variant="outline" onClick={handleCancelEdit}>
+                                취소
+                            </Button>
+                            <Button onClick={handleSaveEdit}>
+                                저장
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button onClick={handleEditClick}>
+                            수정
+                        </Button>
+                    )
+                }
+            >
                 {selectedRequest && (
                     <div className="grid gap-4">
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-2 items-center">
                             <span className="text-sm font-medium text-gray-500">요청 유형</span>
                             <span className="text-sm">{selectedRequest.requestType}</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-2 items-center">
                             <span className="text-sm font-medium text-gray-500">상품명</span>
-                            <span className="text-sm">{selectedRequest.itemName}</span>
+                            {isEditMode ? (
+                                <Select
+                                    value={editItemId?.toString()}
+                                    onValueChange={(value) => setEditItemId(Number(value))}
+                                >
+                                    <SelectTrigger size="sm">
+                                        <SelectValue placeholder="상품 선택" />
+                                    </SelectTrigger>
+                                    <SelectContent position="popper" className="max-h-60">
+                                        <SelectGroup>
+                                            {itemOptions.map((item) => (
+                                                <SelectItem key={item.itemId} value={item.itemId.toString()}>
+                                                    {item.itemName}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            ) : (
+                                <span className="text-sm">{selectedRequest.itemName}</span>
+                            )}
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-2 items-center">
                             <span className="text-sm font-medium text-gray-500">수량</span>
-                            <span className="text-sm">{selectedRequest.requestAmount ?? "-"}</span>
+                            {isEditMode ? (
+                                <Input
+                                    type="number"
+                                    value={editAmount ?? ""}
+                                    onChange={(e) => setEditAmount(e.target.value ? Number(e.target.value) : undefined)}
+                                    placeholder="수량 입력"
+                                    className="h-8"
+                                />
+                            ) : (
+                                <span className="text-sm">{selectedRequest.requestAmount ?? "-"}</span>
+                            )}
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-2 items-center">
                             <span className="text-sm font-medium text-gray-500">요청일</span>
                             <span className="text-sm">{selectedRequest.requestDate}</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-2 items-center">
                             <span className="text-sm font-medium text-gray-500">요청자</span>
                             <span className="text-sm">{selectedRequest.requesterName}</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-2 items-center">
                             <span className="text-sm font-medium text-gray-500">처리 상태</span>
                             <span className="text-sm">{selectedRequest.requestStatus}</span>
                         </div>
