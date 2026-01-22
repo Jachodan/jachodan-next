@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { REQUEST_TYPES, REQUEST_STATUS, type RequestType } from "@/types/itemRequest";
+import { REQUEST_TYPES, REQUEST_STATUS, type RequestType, type RequestStatus } from "@/types/itemRequest";
 import {
     RequestTable,
     RequestTableHeader,
@@ -30,7 +30,11 @@ export default function RequestPage() {
     const [typeFilter, setTypeFilter] = useState<RequestType | "전체">("전체");
     const [searchValue, setSearchValue] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [updateTrigger, setUpdateTrigger] = useState(0);
 
+    // updateTrigger를 사용하여 데이터 변경 시 리렌더링
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _ = updateTrigger;
     const { data: requests, totalPages } = getPaginatedRequests(currentPage, PAGE_SIZE, typeFilter, searchValue);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,6 +85,16 @@ export default function RequestPage() {
         setEditAmount(undefined);
     };
 
+    const handleRequestTypeChange = (requestId: number, newType: RequestType) => {
+        updateRequest({ requestId, requestType: newType });
+        setUpdateTrigger((prev) => prev + 1);
+    };
+
+    const handleRequestStatusChange = (requestId: number, newStatus: RequestStatus) => {
+        updateRequest({ requestId, requestStatus: newStatus });
+        setUpdateTrigger((prev) => prev + 1);
+    };
+
     const filterOptions = [
         { value: "전체" as const, label: "전체" },
         ...REQUEST_TYPES.map((type) => ({ value: type, label: type })),
@@ -120,8 +134,11 @@ export default function RequestPage() {
                                 onClick={() => handleRowClick(request)}
                             >
                                 <RequestTableCell className="py-4">
-                                    <div className="flex justify-center">
-                                        <Select defaultValue={request.requestType}>
+                                    <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+                                        <Select
+                                            value={request.requestType}
+                                            onValueChange={(value) => handleRequestTypeChange(request.requestId, value as RequestType)}
+                                        >
                                             <SelectTrigger size="sm" className="w-[123px]">
                                                 <SelectValue />
                                             </SelectTrigger>
@@ -150,8 +167,11 @@ export default function RequestPage() {
                                     <span className="text-sm text-gray-900">{request.requesterName}</span>
                                 </RequestTableCell>
                                 <RequestTableCell className="py-4">
-                                    <div className="flex justify-center">
-                                        <Select defaultValue={request.requestStatus}>
+                                    <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+                                        <Select
+                                            value={request.requestStatus}
+                                            onValueChange={(value) => handleRequestStatusChange(request.requestId, value as RequestStatus)}
+                                        >
                                             <SelectTrigger size="sm">
                                                 <SelectValue />
                                             </SelectTrigger>
@@ -187,7 +207,7 @@ export default function RequestPage() {
             <CommonModal
                 open={isModalOpen}
                 onClose={handleModalClose}
-                title="요청 상세 정보"
+                title="요청사항"
                 footer={
                     isEditMode ? (
                         <div className="flex gap-2">
