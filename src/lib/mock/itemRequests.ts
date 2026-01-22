@@ -163,8 +163,10 @@ export const resetRequestStore = () => {
 // 요청 수정 입력 타입
 export interface UpdateRequestInput {
     requestId: number;
-    itemId: number;
+    itemId?: number;
     requestAmount?: number;
+    requestType?: RequestType;
+    requestStatus?: RequestStatus;
 }
 
 // 요청 수정 함수
@@ -175,14 +177,17 @@ export const updateRequest = (input: UpdateRequestInput): ItemRequestWithDetails
     const now = new Date().toISOString();
     mockItemRequests[index] = {
         ...mockItemRequests[index],
-        itemId: input.itemId,
-        requestAmount: input.requestAmount,
+        ...(input.itemId !== undefined && { itemId: input.itemId }),
+        ...(input.requestAmount !== undefined && { requestAmount: input.requestAmount }),
+        ...(input.requestType !== undefined && { requestType: input.requestType }),
+        ...(input.requestStatus !== undefined && { requestStatus: input.requestStatus }),
         updatedAt: now,
     };
 
+    const updatedRequest = mockItemRequests[index];
     return {
-        ...mockItemRequests[index],
-        itemName: mockItemNames[input.itemId] || "알 수 없는 상품",
-        requesterName: mockAlbaNames[mockItemRequests[index].albaId] || "알 수 없음",
+        ...updatedRequest,
+        itemName: mockItemNames[updatedRequest.itemId] || "알 수 없는 상품",
+        requesterName: mockAlbaNames[updatedRequest.albaId] || "알 수 없음",
     };
 };
