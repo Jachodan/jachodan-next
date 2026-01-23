@@ -34,20 +34,20 @@ export default function StatusBadge({
             ? getEmploymentStatusClass(status as AlbaStatus, clickable)
             : getWorkStatusClass(status as WorkStatus, clickable);
 
-    const Component = clickable ? "button" : "span";
-
-    return (
-        <Component
-            className={cn(
-                "inline-flex items-center rounded-full font-medium",
-                SIZE_CLASSES[size],
-                colorClass,
-                clickable && "transition-colors cursor-pointer",
-                className,
-            )}
-            onClick={onClick}
-        >
-            {status}
-        </Component>
+    const baseClassName = cn(
+        "inline-flex items-center rounded-full font-medium",
+        SIZE_CLASSES[size],
+        colorClass,
+        className,
     );
+
+    if (clickable) {
+        return (
+            <button className={baseClassName} onClick={onClick} type="button">
+                {status}
+            </button>
+        );
+    }
+
+    return <span className={baseClassName}>{status}</span>;
 }
