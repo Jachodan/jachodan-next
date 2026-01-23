@@ -6,10 +6,14 @@ import ListPageHeader from "@/components/common/ListPageHeader";
 import StatusBadge from "@/components/common/StatusBadge";
 import WorkDayDisplay from "@/components/common/WorkDayDisplay";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import type { WorkStatus } from "@/types/work";
-import type { Alba, AlbaFormData, AlbaStatus } from "@/types/alba";
+import { type WorkStatus } from "@/types/work";
+import { type Alba, type AlbaFormData, type AlbaStatus } from "@/types/alba";
+import { EMPLOYMENT_FILTER_OPTIONS, WORK_STATUS_FILTER_OPTIONS } from "@/types/alba";
 import { useEffect, useState } from "react";
 import { mockAlbaList } from "@/lib/mock/alba";
+import { useAlbaFilter } from "@/hooks/useAlbaFilter";
+import { useAlbaModal } from "@/hooks/useAlbaModal";
+import { usePagination } from "@/hooks/usePagination";
 import AlbaFormModal from "./_components/AlbaFormModal";
 import AlbaDetailModal from "./_components/AlbaDetailModal";
 import AlbaTooltip from "./_components/AlbaTooltip";
@@ -20,51 +24,47 @@ export default function AlbaPage() {
     const [workStatusFilter, setWorkStatusFilter] = useState<WorkStatus | "전체">("전체");
     const [searchValue, setSearchValue] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    const [selectedAlba, setSelectedAlba] = useState<Alba | null>(null);
     const [albaList, setAlbaList] = useState<Alba[]>(mockAlbaList);
     const itemsPerPage = 10;
+
+    // 모달 상태 관리
+    const {
+        isCreateModalOpen,
+        isEditModalOpen,
+        isDetailModalOpen,
+        selectedAlba,
+        openCreateModal,
+        openDetailModal,
+        openEditModal,
+        closeCreateModal,
+        closeDetailModal,
+        closeEditModal,
+    } = useAlbaModal();
+
+    // 필터링
+    const filteredAlbaList = useAlbaFilter({
+        albaList,
+        employmentFilter,
+        workStatusFilter,
+        searchValue,
+    });
+
+    // 페이지네이션
+    const {
+        paginatedItems: paginatedAlbaList,
+        totalPages,
+        handlePageChange,
+    } = usePagination({
+        items: filteredAlbaList,
+        itemsPerPage,
+        currentPage,
+        setCurrentPage,
+        scrollToTop: false,
+    });
 
     useEffect(() => {
         setHeaderTitle("알바관리");
     }, [setHeaderTitle]);
-
-    // 필터링 및 검색 로직
-    const filteredAlbaList = albaList
-        .filter((alba) => {
-            // 고용상태 필터
-            const matchesEmployment = employmentFilter === "전체" || alba.albaStatus === employmentFilter;
-
-            // 근무상태 필터 (퇴사자는 근무상태가 없으므로 필터링 제외)
-            const matchesWorkStatus =
-                workStatusFilter === "전체" || alba.albaStatus === "퇴사" || alba.workStatus === workStatusFilter;
-
-            // 검색어 필터 (이름만)
-            const matchesSearch = searchValue === "" || alba.albaName.toLowerCase().includes(searchValue.toLowerCase());
-
-            return matchesEmployment && matchesWorkStatus && matchesSearch;
-        })
-        .sort((a, b) => {
-            // 퇴사자를 마지막으로 정렬
-            if (a.albaStatus === "퇴사" && b.albaStatus !== "퇴사") return 1;
-            if (a.albaStatus !== "퇴사" && b.albaStatus === "퇴사") return -1;
-            return 0;
-        });
-
-    // 페이지네이션 계산
-    const totalPages = Math.ceil(filteredAlbaList.length / itemsPerPage);
-    // 현재 페이지가 총 페이지 수를 초과하면 첫 페이지로 조정
-    const validCurrentPage = currentPage > totalPages && totalPages > 0 ? 1 : currentPage;
-    const startIndex = (validCurrentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedAlbaList = filteredAlbaList.slice(startIndex, endIndex);
-
-    // 페이지 변경 핸들러 (필터 변경 시 첫 페이지로 이동)
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
 
     const handleEmploymentFilterChange = (value: AlbaStatus | "전체") => {
         setEmploymentFilter(value);
@@ -99,21 +99,6 @@ export default function AlbaPage() {
         setAlbaList((prev) => [...prev, newAlba]);
 
         console.log("알바 추가 완료:", newAlba);
-    };
-
-    const handleRowClick = (alba: Alba) => {
-        setSelectedAlba(alba);
-        setIsDetailModalOpen(true);
-    };
-
-    const handleDetailModalClose = () => {
-        setIsDetailModalOpen(false);
-        setSelectedAlba(null);
-    };
-
-    const handleEditAlba = () => {
-        setIsDetailModalOpen(false);
-        setIsEditModalOpen(true);
     };
 
     const handleAlbaUpdate = (data: AlbaFormData) => {
@@ -157,33 +142,9 @@ export default function AlbaPage() {
                     albaPhone: data.albaPhone,
                     workDays: data.workDays,
                 };
-            })
+            }),
         );
     };
-
-    const handleEditModalClose = () => {
-        setIsEditModalOpen(false);
-        setSelectedAlba(null);
-    };
-
-    // 고용상태 필터 옵션
-    const employmentOptions = [
-        { value: "전체" as const, label: "전체" },
-        { value: "재직" as const, label: "재직" },
-        { value: "단기" as const, label: "단기" },
-        { value: "퇴사" as const, label: "퇴사" },
-    ];
-
-    // 근무상태 필터 옵션
-    const workStatusOptions = [
-        { value: "전체" as const, label: "전체" },
-        { value: "출근" as const, label: "출근" },
-        { value: "휴무" as const, label: "휴무" },
-        { value: "대타" as const, label: "대타" },
-        { value: "지각" as const, label: "지각" },
-        { value: "결근" as const, label: "결근" },
-        { value: "퇴근" as const, label: "퇴근" },
-    ];
 
     return (
         <div className="p-10">
@@ -192,14 +153,14 @@ export default function AlbaPage() {
                     {
                         label: "고용상태",
                         value: employmentFilter,
-                        options: employmentOptions,
+                        options: EMPLOYMENT_FILTER_OPTIONS,
                         onChange: (value) => handleEmploymentFilterChange(value as AlbaStatus | "전체"),
                         placeholder: "고용상태 선택",
                     },
                     {
                         label: "근무상태",
                         value: workStatusFilter,
-                        options: workStatusOptions,
+                        options: WORK_STATUS_FILTER_OPTIONS,
                         onChange: (value) => handleWorkStatusFilterChange(value as WorkStatus | "전체"),
                         placeholder: "근무상태 선택",
                     },
@@ -224,25 +185,22 @@ export default function AlbaPage() {
                     <TableBody>
                         {paginatedAlbaList.map((alba) => (
                             <AlbaTooltip key={alba.albaId} alba={alba}>
-                                <TableRow onClick={() => handleRowClick(alba)} className="cursor-pointer hover:bg-gray-50">
+                                <TableRow
+                                    onClick={() => openDetailModal(alba)}
+                                    className="cursor-pointer hover:bg-gray-50"
+                                >
                                     <TableCell className="py-4 text-center">
                                         <StatusBadge type="employment" status={alba.albaStatus} />
                                     </TableCell>
                                     <TableCell className="py-4 text-center">
                                         {alba.albaStatus !== "퇴사" && alba.workStatus && (
-                                            <StatusBadge
-                                                type="work"
-                                                status={alba.workStatus}
-                                                clickable
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    // TODO: 근무상태 변경 모달 또는 드롭다운
-                                                }}
-                                            />
+                                            <StatusBadge type="work" status={alba.workStatus} />
                                         )}
                                         {alba.albaStatus === "퇴사" && <span className="text-xs text-gray-400">-</span>}
                                     </TableCell>
-                                    <TableCell className="py-4 font-medium text-center tooltip-anchor">{alba.albaName}</TableCell>
+                                    <TableCell className="py-4 font-medium text-center tooltip-anchor">
+                                        {alba.albaName}
+                                    </TableCell>
                                     <TableCell className="py-4">
                                         <WorkDayDisplay days={alba.workDays} mode="all" size="sm" />
                                     </TableCell>
@@ -255,20 +213,25 @@ export default function AlbaPage() {
             </div>
 
             <ListPageFooter
-                currentPage={validCurrentPage}
+                currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
                 actionButton={{
                     label: "알바 추가",
-                    onClick: () => setIsModalOpen(true),
+                    onClick: openCreateModal,
                     variant: "outline",
                 }}
             />
 
-            <AlbaFormModal open={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleAlbaSave} storeName="자초단" />
+            <AlbaFormModal
+                open={isCreateModalOpen}
+                onClose={closeCreateModal}
+                onSave={handleAlbaSave}
+                storeName="자초단"
+            />
             <AlbaFormModal
                 open={isEditModalOpen}
-                onClose={handleEditModalClose}
+                onClose={closeEditModal}
                 onSave={handleAlbaUpdate}
                 storeName="자초단"
                 mode="edit"
@@ -283,7 +246,12 @@ export default function AlbaPage() {
                         : null
                 }
             />
-            <AlbaDetailModal open={isDetailModalOpen} alba={selectedAlba} onClose={handleDetailModalClose} onEdit={handleEditAlba} />
+            <AlbaDetailModal
+                open={isDetailModalOpen}
+                alba={selectedAlba}
+                onClose={closeDetailModal}
+                onEdit={openEditModal}
+            />
         </div>
     );
 }
