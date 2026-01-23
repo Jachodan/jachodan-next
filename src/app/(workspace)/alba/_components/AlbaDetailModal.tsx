@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import CommonModal from "@/components/common/CommonModal";
+import StatusBadge from "@/components/common/StatusBadge";
 import { Button } from "@/components/ui/button";
-import type { WorkStatus } from "@/types/work";
 import type { Alba } from "@/lib/mock/alba";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -13,15 +13,6 @@ interface AlbaDetailModalProps {
     onClose: () => void;
     onEdit?: () => void;
 }
-
-const workStatusColors: Record<WorkStatus, { bg: string; text: string; badge: string }> = {
-    출근: { bg: "bg-blue-50", text: "text-blue-700", badge: "bg-blue-100 text-blue-800" },
-    휴무: { bg: "bg-gray-50", text: "text-gray-700", badge: "bg-gray-100 text-gray-800" },
-    대타: { bg: "bg-purple-50", text: "text-purple-700", badge: "bg-purple-100 text-purple-800" },
-    지각: { bg: "bg-yellow-50", text: "text-yellow-700", badge: "bg-yellow-100 text-yellow-800" },
-    결근: { bg: "bg-red-50", text: "text-red-700", badge: "bg-red-100 text-red-800" },
-    퇴근: { bg: "bg-green-50", text: "text-green-700", badge: "bg-green-100 text-green-800" },
-};
 
 export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDetailModalProps) {
     const workDaysKey = alba?.workDays.join(",") ?? "";
@@ -65,8 +56,6 @@ export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDet
 
     if (!alba) return null;
 
-    const statusColor = alba.workStatus ? workStatusColors[alba.workStatus] : null;
-
     return (
         <CommonModal
             open={open}
@@ -88,29 +77,11 @@ export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDet
                 {/* 상단: 고용상태 (좌) + 근무상태 (우) */}
                 <div className="flex items-center justify-end gap-2">
                     {/* 좌측: 고용상태 */}
-                    <div>
-                        <span
-                            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                                alba.albaStatus === "재직"
-                                    ? "bg-green-100 text-green-800"
-                                    : alba.albaStatus === "단기"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : "bg-gray-100 text-gray-800"
-                            }`}
-                        >
-                            {alba.albaStatus}
-                        </span>
-                    </div>
+                    <StatusBadge type="employment" status={alba.albaStatus} size="md" />
 
                     {/* 우측: 근무상태 (퇴사자 제외) */}
-                    {alba.albaStatus !== "퇴사" && alba.workStatus && statusColor && (
-                        <div>
-                            <span
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${statusColor.badge}`}
-                            >
-                                {alba.workStatus}
-                            </span>
-                        </div>
+                    {alba.albaStatus !== "퇴사" && alba.workStatus && (
+                        <StatusBadge type="work" status={alba.workStatus} size="md" />
                     )}
                 </div>
 

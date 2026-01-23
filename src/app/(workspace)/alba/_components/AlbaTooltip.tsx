@@ -1,22 +1,13 @@
 "use client";
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import StatusBadge from "@/components/common/StatusBadge";
 import type { Alba } from "@/lib/mock/alba";
-import type { WorkStatus } from "@/types/work";
 
 interface AlbaTooltipProps {
     alba: Alba;
     children: React.ReactNode;
 }
-
-const workStatusColors: Record<WorkStatus, string> = {
-    출근: "bg-blue-100 text-blue-800",
-    휴무: "bg-gray-100 text-gray-800",
-    대타: "bg-purple-100 text-purple-800",
-    지각: "bg-yellow-100 text-yellow-800",
-    결근: "bg-red-100 text-red-800",
-    퇴근: "bg-green-100 text-green-800",
-};
 
 export default function AlbaTooltip({ alba, children }: AlbaTooltipProps) {
     return (
@@ -26,25 +17,9 @@ export default function AlbaTooltip({ alba, children }: AlbaTooltipProps) {
                 <div className="space-y-3">
                     {/* 상태 배지 */}
                     <div className="flex items-center gap-2">
-                        <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                alba.albaStatus === "재직"
-                                    ? "bg-green-100 text-green-800"
-                                    : alba.albaStatus === "단기"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : "bg-gray-100 text-gray-800"
-                            }`}
-                        >
-                            {alba.albaStatus}
-                        </span>
+                        <StatusBadge type="employment" status={alba.albaStatus} />
                         {alba.albaStatus !== "퇴사" && alba.workStatus && (
-                            <span
-                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                    workStatusColors[alba.workStatus]
-                                }`}
-                            >
-                                {alba.workStatus}
-                            </span>
+                            <StatusBadge type="work" status={alba.workStatus} />
                         )}
                     </div>
 
