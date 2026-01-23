@@ -3,29 +3,38 @@
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
 import ListPageFooter from "@/components/common/ListPageFooter";
 import ListPageHeader from "@/components/common/ListPageHeader";
-import StatusBadge from "@/components/common/StatusBadge";
-import WorkDayDisplay from "@/components/common/WorkDayDisplay";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { type AlbaFormData, type AlbaStatus } from "@/types/alba";
 import { type WorkStatus } from "@/types/work";
-import { type Alba, type AlbaFormData, type AlbaStatus } from "@/types/alba";
 import { EMPLOYMENT_FILTER_OPTIONS, WORK_STATUS_FILTER_OPTIONS } from "@/types/alba";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { mockAlbaList } from "@/lib/mock/alba";
 import { useAlbaFilter } from "@/hooks/useAlbaFilter";
 import { useAlbaModal } from "@/hooks/useAlbaModal";
 import { usePagination } from "@/hooks/usePagination";
+import { useAlbaList } from "./_hooks/useAlbaList";
+import { useAlbaPageFilters } from "./_hooks/useAlbaPageFilters";
+import AlbaTable from "./_components/AlbaTable";
 import AlbaFormModal from "./_components/AlbaFormModal";
 import AlbaDetailModal from "./_components/AlbaDetailModal";
-import AlbaTooltip from "./_components/AlbaTooltip";
 
 export default function AlbaPage() {
     const { setHeaderTitle } = useLayout();
-    const [employmentFilter, setEmploymentFilter] = useState<AlbaStatus | "전체">("전체");
-    const [workStatusFilter, setWorkStatusFilter] = useState<WorkStatus | "전체">("전체");
-    const [searchValue, setSearchValue] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [albaList, setAlbaList] = useState<Alba[]>(mockAlbaList);
     const itemsPerPage = 10;
+
+    // 알바 리스트 관리
+    const { albaList, addAlba, updateAlba } = useAlbaList(mockAlbaList);
+
+    // 필터 상태 관리
+    const {
+        employmentFilter,
+        workStatusFilter,
+        searchValue,
+        currentPage,
+        setCurrentPage,
+        handleEmploymentFilterChange,
+        handleWorkStatusFilterChange,
+        handleSearchChange,
+    } = useAlbaPageFilters();
 
     // 모달 상태 관리
     const {
@@ -66,84 +75,9 @@ export default function AlbaPage() {
         setHeaderTitle("알바관리");
     }, [setHeaderTitle]);
 
-    const handleEmploymentFilterChange = (value: AlbaStatus | "전체") => {
-        setEmploymentFilter(value);
-        setCurrentPage(1);
-    };
-
-    const handleWorkStatusFilterChange = (value: WorkStatus | "전체") => {
-        setWorkStatusFilter(value);
-        setCurrentPage(1);
-    };
-
-    const handleSearchChange = (value: string) => {
-        setSearchValue(value);
-        setCurrentPage(1);
-    };
-
-    const handleAlbaSave = (data: AlbaFormData) => {
-        // 새로운 알바 ID 생성 (현재 최대 ID + 1)
-        const newAlbaId = albaList.length > 0 ? Math.max(...albaList.map((alba) => alba.albaId)) + 1 : 1;
-
-        // 새 알바 객체 생성
-        const newAlba: Alba = {
-            albaId: newAlbaId,
-            albaName: data.albaName,
-            albaStatus: "재직", // 신규 등록은 기본적으로 재직
-            albaPhone: data.albaPhone,
-            workDays: data.workDays,
-            workStatus: "휴무", // 기본 근무상태는 휴무
-        };
-
-        // 알바 리스트에 추가
-        setAlbaList((prev) => [...prev, newAlba]);
-
-        console.log("알바 추가 완료:", newAlba);
-    };
-
     const handleAlbaUpdate = (data: AlbaFormData) => {
         if (!selectedAlba) return;
-
-        setAlbaList((prev) =>
-            prev.map((alba) => {
-                if (alba.albaId !== selectedAlba.albaId) return alba;
-
-                const hasWorkDays = data.workDays.length > 0;
-                const wasRetired = alba.albaStatus === "퇴사";
-
-                // 근무일이 없으면 퇴사 처리
-                if (!hasWorkDays) {
-                    return {
-                        ...alba,
-                        albaName: data.albaName,
-                        albaPhone: data.albaPhone,
-                        workDays: data.workDays,
-                        albaStatus: "퇴사",
-                        workStatus: undefined,
-                    };
-                }
-
-                // 퇴사자가 근무일이 생기면 재직으로 변경
-                if (wasRetired && hasWorkDays) {
-                    return {
-                        ...alba,
-                        albaName: data.albaName,
-                        albaPhone: data.albaPhone,
-                        workDays: data.workDays,
-                        albaStatus: "재직",
-                        workStatus: "휴무",
-                    };
-                }
-
-                // 일반 수정
-                return {
-                    ...alba,
-                    albaName: data.albaName,
-                    albaPhone: data.albaPhone,
-                    workDays: data.workDays,
-                };
-            }),
-        );
+        updateAlba(selectedAlba.albaId, data);
     };
 
     return (
@@ -171,46 +105,7 @@ export default function AlbaPage() {
                 searchPlaceholder="이름으로 검색"
             />
 
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow className="bg-gray-50">
-                            <TableHead className="w-[100px] font-semibold text-center">고용</TableHead>
-                            <TableHead className="w-[100px] font-semibold text-center">근무</TableHead>
-                            <TableHead className="font-semibold text-center">이름</TableHead>
-                            <TableHead className="font-semibold text-center">근무일</TableHead>
-                            <TableHead className="font-semibold text-center">연락처</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {paginatedAlbaList.map((alba) => (
-                            <AlbaTooltip key={alba.albaId} alba={alba}>
-                                <TableRow
-                                    onClick={() => openDetailModal(alba)}
-                                    className="cursor-pointer hover:bg-gray-50"
-                                >
-                                    <TableCell className="py-4 text-center">
-                                        <StatusBadge type="employment" status={alba.albaStatus} />
-                                    </TableCell>
-                                    <TableCell className="py-4 text-center">
-                                        {alba.albaStatus !== "퇴사" && alba.workStatus && (
-                                            <StatusBadge type="work" status={alba.workStatus} />
-                                        )}
-                                        {alba.albaStatus === "퇴사" && <span className="text-xs text-gray-400">-</span>}
-                                    </TableCell>
-                                    <TableCell className="py-4 font-medium text-center tooltip-anchor">
-                                        {alba.albaName}
-                                    </TableCell>
-                                    <TableCell className="py-4">
-                                        <WorkDayDisplay days={alba.workDays} mode="all" size="sm" />
-                                    </TableCell>
-                                    <TableCell className="py-4 text-center">{alba.albaPhone}</TableCell>
-                                </TableRow>
-                            </AlbaTooltip>
-                        ))}
-                    </TableBody>
-                </Table>
-            </div>
+            <AlbaTable albaList={paginatedAlbaList} onRowClick={openDetailModal} />
 
             <ListPageFooter
                 currentPage={currentPage}
@@ -223,12 +118,7 @@ export default function AlbaPage() {
                 }}
             />
 
-            <AlbaFormModal
-                open={isCreateModalOpen}
-                onClose={closeCreateModal}
-                onSave={handleAlbaSave}
-                storeName="자초단"
-            />
+            <AlbaFormModal open={isCreateModalOpen} onClose={closeCreateModal} onSave={addAlba} storeName="자초단" />
             <AlbaFormModal
                 open={isEditModalOpen}
                 onClose={closeEditModal}
@@ -239,7 +129,7 @@ export default function AlbaPage() {
                     selectedAlba
                         ? {
                               albaName: selectedAlba.albaName,
-                              albaPhone: selectedAlba.albaPhone,
+                              albaPhone: "",
                               workDays: selectedAlba.workDays,
                               albaEmail: "",
                           }
