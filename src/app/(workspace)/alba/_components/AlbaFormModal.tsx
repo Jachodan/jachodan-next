@@ -135,7 +135,7 @@ export default function AlbaFormModal({ open, onClose, onSave, storeName, mode =
                         </Button>
                         <Button
                             onClick={handleSave}
-                            disabled={!formData.albaName || formData.workDays.length === 0}
+                            disabled={!formData.albaName || (!isEditMode && formData.workDays.length === 0)}
                         >
                             {isEditMode ? "저장" : "등록"}
                         </Button>
