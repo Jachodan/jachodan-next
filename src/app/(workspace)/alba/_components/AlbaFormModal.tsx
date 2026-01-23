@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import CommonModal from "@/components/common/CommonModal";
 import ImageUpload from "@/components/common/ImageUpload";
+import WorkDayDisplay from "@/components/common/WorkDayDisplay";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { SCHEDULE_DAYS, type ScheduleDays } from "@/types/work";
+import type { AlbaFormData } from "@/types/alba";
+import type { ScheduleDays } from "@/types/work";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -17,13 +19,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export interface AlbaFormData {
-    albaName: string;
-    albaPhone: string;
-    workDays: ScheduleDays[];
-    albaEmail: string;
-    profileImage?: File;
-}
+export type { AlbaFormData };
 
 interface AlbaFormModalProps {
     open: boolean;
@@ -183,22 +179,14 @@ export default function AlbaFormModal({ open, onClose, onSave, storeName, mode =
                     {/* 근무요일 선택 */}
                     <div className="space-y-2">
                         <Label>근무요일</Label>
-                        <div className="flex gap-2 justify-center">
-                            {SCHEDULE_DAYS.map((day) => (
-                                <button
-                                    key={day}
-                                    type="button"
-                                    onClick={() => toggleWorkDay(day)}
-                                    className={`flex items-center justify-center w-10 h-10 text-sm border rounded transition-colors ${
-                                        formData.workDays.includes(day)
-                                            ? "bg-black text-white border-black"
-                                            : "bg-white text-gray-400 border-gray-200 hover:border-gray-400"
-                                    }`}
-                                >
-                                    {day}
-                                </button>
-                            ))}
-                        </div>
+                        <WorkDayDisplay
+                            days={formData.workDays}
+                            mode="all"
+                            size="md"
+                            selectable
+                            onToggle={toggleWorkDay}
+                            className="gap-2"
+                        />
                     </div>
 
                     {/* 이메일 입력 */}

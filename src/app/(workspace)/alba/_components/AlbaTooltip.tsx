@@ -2,7 +2,8 @@
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import StatusBadge from "@/components/common/StatusBadge";
-import type { Alba } from "@/lib/mock/alba";
+import WorkDayDisplay from "@/components/common/WorkDayDisplay";
+import type { Alba } from "@/types/alba";
 
 interface AlbaTooltipProps {
     alba: Alba;
@@ -38,16 +39,7 @@ export default function AlbaTooltip({ alba, children }: AlbaTooltipProps) {
                     {alba.workDays.length > 0 && (
                         <div>
                             <p className="text-xs text-muted-foreground mb-1">근무요일</p>
-                            <div className="flex gap-1">
-                                {alba.workDays.map((day) => (
-                                    <div
-                                        key={day}
-                                        className="flex items-center justify-center w-6 h-6 text-xs border rounded bg-black text-white border-black"
-                                    >
-                                        {day}
-                                    </div>
-                                ))}
-                            </div>
+                            <WorkDayDisplay days={alba.workDays} mode="selected" size="sm" />
                         </div>
                     )}
                 </div>

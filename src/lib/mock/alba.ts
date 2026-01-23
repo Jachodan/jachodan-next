@@ -1,14 +1,7 @@
-import type { AlbaStatus } from "@/types/user";
+import type { Alba, AlbaStatus } from "@/types/alba";
 import type { ScheduleDays, WorkStatus } from "@/types/work";
 
-export interface Alba {
-    albaId: number;
-    albaName: string;
-    albaStatus: AlbaStatus;
-    albaPhone: string;
-    workDays: ScheduleDays[];
-    workStatus?: WorkStatus;
-}
+export type { Alba };
 
 const sampleLastNames = ["김", "이", "박", "최", "정", "강", "조", "윤", "장", "임", "한", "오", "신", "전", "홍"];
 const sampleFirstNames = [

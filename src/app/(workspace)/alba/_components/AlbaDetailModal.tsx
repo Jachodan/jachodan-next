@@ -3,8 +3,10 @@
 import { useState } from "react";
 import CommonModal from "@/components/common/CommonModal";
 import StatusBadge from "@/components/common/StatusBadge";
+import WorkDayDisplay from "@/components/common/WorkDayDisplay";
 import { Button } from "@/components/ui/button";
-import type { Alba } from "@/lib/mock/alba";
+import type { Alba } from "@/types/alba";
+import type { ScheduleDays } from "@/types/work";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface AlbaDetailModalProps {
@@ -37,7 +39,7 @@ export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDet
         });
     };
 
-    const getVisibleWorkDays = () => {
+    const getVisibleWorkDays = (): ScheduleDays[] => {
         if (!alba || alba.workDays.length === 0) return [];
 
         // 3개 이하면 그대로 반환
@@ -46,7 +48,7 @@ export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDet
         }
 
         // 4개 이상이면 캐러셀로 3개씩 보여주기
-        const days = [];
+        const days: ScheduleDays[] = [];
         for (let i = 0; i < 3; i++) {
             const index = (currentSlide + i) % alba.workDays.length;
             days.push(alba.workDays[index]);
@@ -119,16 +121,7 @@ export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDet
                             )}
 
                             {/* 3개의 근무요일 표시 */}
-                            <div className="flex gap-2">
-                                {getVisibleWorkDays().map((day, index) => (
-                                    <div
-                                        key={`${day}-${index}`}
-                                        className="flex items-center justify-center w-10 h-10 text-sm border rounded bg-black text-white border-black"
-                                    >
-                                        {day}
-                                    </div>
-                                ))}
-                            </div>
+                            <WorkDayDisplay days={getVisibleWorkDays()} mode="selected" size="md" className="gap-2" />
 
                             {/* 우측 화살표 */}
                             {alba.workDays.length > 3 && (

@@ -4,12 +4,13 @@ import { useLayout } from "@/components/layouts/provider/LayoutProvider";
 import ListPageFooter from "@/components/common/ListPageFooter";
 import ListPageHeader from "@/components/common/ListPageHeader";
 import StatusBadge from "@/components/common/StatusBadge";
+import WorkDayDisplay from "@/components/common/WorkDayDisplay";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { SCHEDULE_DAYS, type WorkStatus } from "@/types/work";
-import type { AlbaStatus } from "@/types/user";
+import type { WorkStatus } from "@/types/work";
+import type { Alba, AlbaFormData, AlbaStatus } from "@/types/alba";
 import { useEffect, useState } from "react";
-import { mockAlbaList, type Alba } from "@/lib/mock/alba";
-import AlbaFormModal, { type AlbaFormData } from "./_components/AlbaFormModal";
+import { mockAlbaList } from "@/lib/mock/alba";
+import AlbaFormModal from "./_components/AlbaFormModal";
 import AlbaDetailModal from "./_components/AlbaDetailModal";
 import AlbaTooltip from "./_components/AlbaTooltip";
 
@@ -243,20 +244,7 @@ export default function AlbaPage() {
                                     </TableCell>
                                     <TableCell className="py-4 font-medium text-center tooltip-anchor">{alba.albaName}</TableCell>
                                     <TableCell className="py-4">
-                                        <div className="flex gap-1 justify-center">
-                                            {SCHEDULE_DAYS.map((day) => (
-                                                <div
-                                                    key={day}
-                                                    className={`flex items-center justify-center w-6 h-6 text-xs border rounded ${
-                                                        alba.workDays.includes(day)
-                                                            ? "bg-black text-white border-black"
-                                                            : "bg-white text-gray-400 border-gray-200"
-                                                    }`}
-                                                >
-                                                    {day}
-                                                </div>
-                                            ))}
-                                        </div>
+                                        <WorkDayDisplay days={alba.workDays} mode="all" size="sm" />
                                     </TableCell>
                                     <TableCell className="py-4 text-center">{alba.albaPhone}</TableCell>
                                 </TableRow>

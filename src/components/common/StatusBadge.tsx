@@ -1,6 +1,6 @@
 "use client";
 
-import type { AlbaStatus } from "@/types/user";
+import type { AlbaStatus } from "@/types/alba";
 import type { WorkStatus } from "@/types/work";
 import { getEmploymentStatusClass, getWorkStatusClass } from "@/types/albaStatus";
 import { cn } from "@/lib/utils";

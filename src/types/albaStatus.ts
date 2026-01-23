@@ -1,4 +1,4 @@
-import type { AlbaStatus } from "@/types/user";
+import type { AlbaStatus } from "@/types/alba";
 import type { WorkStatus } from "@/types/work";
 import { cn } from "@/lib/utils";
 
