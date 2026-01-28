@@ -29,6 +29,7 @@ export function formatStockInfo(item: ItemWithStock): string {
     return stockText + bufferText;
 }
 
+
 export const FILTER_TYPES = ["all", "request", "lowStock", "favorite", "deadStock"] as const;
 export type FilterType = (typeof FILTER_TYPES)[number];
 

@@ -1,5 +1,6 @@
 "use client";
 
+
 import { Suspense } from "react";
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
 import { useEffect } from "react";
@@ -16,9 +17,9 @@ import ItemListContainer from "./_components/ItemListContainer";
 import ItemModalManager from "./_components/ItemModalManager";
 import ItemAlertDialogs from "./_components/ItemAlertDialogs";
 import { useUrlFilterSync } from "@/hooks/useUrlFilterSync";
-
 const LIST_ITEMS_PER_PAGE = 8;
 const CARD_ITEMS_PER_PAGE = 10;
+
 
 function ItemListContent() {
     const { setHeaderTitle } = useLayout();
@@ -89,6 +90,7 @@ function ItemListContent() {
 
     return (
         <div className="p-10">
+
             <ItemListHeader filterType={filterType} setFilterType={setFilterType} />
 
             <ItemListStats
@@ -146,6 +148,7 @@ function ItemListContent() {
         </div>
     );
 }
+
 
 export default function ItemList() {
     return (

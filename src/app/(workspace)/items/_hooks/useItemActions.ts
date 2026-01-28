@@ -1,3 +1,4 @@
+
 import { ItemWithStock } from "@/types/item";
 import { ItemRequest } from "@/types/itemRequest";
 
@@ -33,6 +34,7 @@ export function useItemActions({
     // 특정 아이템의 입고요청만 가져오기
     const getItemRequests = (itemId: number) => {
         return requests.filter(
+
             (request) =>
                 request.itemId === itemId &&
                 request.isActive &&

@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useItemListStore } from "@/stores/itemListStore";
 import ListPageHeader from "@/components/common/ListPageHeader";
 import { LayoutList, LayoutGrid } from "lucide-react";
@@ -14,6 +15,7 @@ interface ItemListHeaderProps {
 export default function ItemListHeader({ filterType, setFilterType }: ItemListHeaderProps) {
     const { searchQuery, setSearchQuery, excludeZero, setExcludeZero, viewMode, setViewMode } = useItemListStore();
 
+
     const filterOptions: Array<{ value: FilterType; label: string }> = [
         { value: "all", label: "전체보기" },
         { value: "request", label: "요청사항" },
@@ -21,6 +23,7 @@ export default function ItemListHeader({ filterType, setFilterType }: ItemListHe
         { value: "favorite", label: "즐겨찾기" },
         { value: "deadStock", label: "악성재고" },
     ];
+
 
     const viewModeOptions: Array<{
         mode: ViewMode;
