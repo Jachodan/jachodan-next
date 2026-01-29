@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import { useLayout } from "@/components/layouts/provider/LayoutProvider";
 import { useEffect } from "react";
+import { getItems } from "@/lib/api";
 import ItemListHeader from "./_components/ItemListHeader";
 import { useItemListStore } from "@/stores/itemListStore";
 import ListPageFooter from "@/components/common/ListPageFooter";
@@ -58,6 +59,16 @@ function ItemListContent() {
     useEffect(() => {
         setHeaderTitle("상품관리");
     }, [setHeaderTitle]);
+
+    // API 테스트용 (콘솔에서 확인 후 삭제)
+    useEffect(() => {
+        const testApi = async () => {
+            console.log("🔄 API 테스트 시작...");
+            const result = await getItems({ storeId: 1 });
+            console.log("📦 API 응답:", result);
+        };
+        testApi();
+    }, []);
 
     const filteredItems = useFilteredItems({
         items,
