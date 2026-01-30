@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { updateRequest, type ItemRequestWithDetails } from "@/lib/mock/itemRequests";
 
 export interface UseRequestModalOptions {
@@ -48,6 +49,10 @@ export function useRequestModal(options?: UseRequestModalOptions) {
             if (updated) {
                 setSelectedRequest(updated);
                 options?.onUpdate?.();
+                toast.success("요청이 수정되었습니다.");
+            } else {
+                toast.error("요청 수정에 실패했습니다.");
+                return;
             }
         }
         setIsModalOpen(false);
