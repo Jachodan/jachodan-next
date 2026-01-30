@@ -19,6 +19,16 @@ export function useRequestList() {
         forceUpdate({});
     }, []);
 
+    const handleTypeFilterChange = (value: RequestType | "전체") => {
+        setTypeFilter(value);
+        setCurrentPage(1);
+    };
+
+    const handleSearchValueChange = (value: string) => {
+        setSearchValue(value);
+        setCurrentPage(1);
+    };
+
     const handleRequestTypeChange = (requestId: number, newType: RequestType) => {
         updateRequest({ requestId, requestType: newType });
         triggerUpdate();
@@ -32,9 +42,9 @@ export function useRequestList() {
     return {
         // 필터 상태
         typeFilter,
-        setTypeFilter,
+        setTypeFilter: handleTypeFilterChange,
         searchValue,
-        setSearchValue,
+        setSearchValue: handleSearchValueChange,
 
         // 페이지네이션
         currentPage,
