@@ -111,6 +111,12 @@ export function useRequestForm() {
             return;
         }
 
+        const invalidQuantityItems = validItems.filter((item) => item.quantity < 1);
+        if (invalidQuantityItems.length > 0) {
+            toast.error("수량은 1 이상이어야 합니다.");
+            return;
+        }
+
         setIsSubmitting(true);
 
         try {
