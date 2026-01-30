@@ -72,7 +72,7 @@ export default function RequestDetailModal({
                         <span className="text-sm font-medium text-gray-500">상품명</span>
                         {isEditMode ? (
                             <Select
-                                value={editItemId?.toString()}
+                                value={editItemId?.toString() ?? ""}
                                 onValueChange={(value) => onEditItemIdChange(Number(value))}
                             >
                                 <SelectTrigger size="sm">
@@ -98,7 +98,9 @@ export default function RequestDetailModal({
                             <Input
                                 type="number"
                                 value={editAmount ?? ""}
-                                onChange={(e) => onEditAmountChange(e.target.value ? Number(e.target.value) : undefined)}
+                                onChange={(e) =>
+                                    onEditAmountChange(e.target.value ? Number(e.target.value) : undefined)
+                                }
                                 placeholder="수량 입력"
                                 className="h-8"
                             />
