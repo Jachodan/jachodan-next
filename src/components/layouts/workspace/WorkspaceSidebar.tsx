@@ -22,7 +22,7 @@ const navItems = [
     { title: "대시보드", url: "/", icon: Home },
     { title: "상품관리", url: "/items", icon: ShoppingBasket },
     { title: "요청관리", url: "/request", icon: BadgeAlert },
-    { title: "게시판", url: "/", icon: Clipboard },
+    { title: "게시판", url: "/board", icon: Clipboard },
     { title: "알바관리", url: "/alba", icon: User },
     { title: "스케줄관리", url: "/schedule", icon: CalendarCheck },
     { title: "설정", url: "/settings", icon: Settings },

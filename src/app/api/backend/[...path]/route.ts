@@ -17,9 +17,17 @@ async function proxyRequest(
         url.searchParams.set(key, value);
     });
 
-    const headers: HeadersInit = {
-        "Content-Type": request.headers.get("Content-Type") || "application/json",
-    };
+    const contentType = request.headers.get("Content-Type") || "application/json";
+    const isMultipart = contentType.includes("multipart/form-data");
+
+    const headers: HeadersInit = {};
+
+    // multipart일 때는 Content-Type을 그대로 전달 (boundary 포함)
+    if (isMultipart) {
+        headers["Content-Type"] = contentType;
+    } else {
+        headers["Content-Type"] = contentType;
+    }
 
     if (session?.backendSessionId) {
         headers["Cookie"] = `JSESSIONID=${session.backendSessionId}`;
@@ -32,7 +40,12 @@ async function proxyRequest(
 
     if (request.method !== "GET" && request.method !== "HEAD") {
         try {
-            fetchOptions.body = await request.text();
+            // multipart는 바이너리로, 나머지는 text로 처리
+            if (isMultipart) {
+                fetchOptions.body = Buffer.from(await request.arrayBuffer());
+            } else {
+                fetchOptions.body = await request.text();
+            }
         } catch {
             // body가 없는 경우
         }
@@ -40,13 +53,20 @@ async function proxyRequest(
 
     try {
         const res = await fetch(url.toString(), fetchOptions);
-        const data = await res.text();
+        const resContentType = res.headers.get("Content-Type") || "application/json";
 
+        if (resContentType.startsWith("image/") || resContentType === "application/octet-stream") {
+            const buffer = await res.arrayBuffer();
+            return new NextResponse(buffer, {
+                status: res.status,
+                headers: { "Content-Type": resContentType },
+            });
+        }
+
+        const data = await res.text();
         return new NextResponse(data, {
             status: res.status,
-            headers: {
-                "Content-Type": res.headers.get("Content-Type") || "application/json",
-            },
+            headers: { "Content-Type": resContentType },
         });
     } catch {
         return NextResponse.json(

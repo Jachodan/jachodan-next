@@ -93,6 +93,7 @@ export const authOptions: NextAuthOptions = {
 
                 // account에 임시 저장 (jwt 콜백에서 사용)
                 (account as Record<string, unknown>).backendSessionId = sessionId;
+                (account as Record<string, unknown>).storeId = consumeData.storeId;
 
                 return true;
             } catch (error) {
@@ -106,6 +107,7 @@ export const authOptions: NextAuthOptions = {
                 token.accessToken = account.access_token;
                 token.provider = account.provider;
                 token.backendSessionId = (account as Record<string, unknown>).backendSessionId as string | undefined;
+                token.storeId = (account as Record<string, unknown>).storeId as number | undefined;
             }
             return token;
         },
@@ -113,6 +115,7 @@ export const authOptions: NextAuthOptions = {
         async session({ session, token }) {
             session.provider = token.provider;
             session.backendSessionId = token.backendSessionId;
+            session.storeId = token.storeId;
             return session;
         },
 
