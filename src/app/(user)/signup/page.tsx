@@ -51,10 +51,25 @@ function SignupForm() {
         duration: 5000,
     });
 
-    const onSubmit = (values: SignupValues) => {
-        console.log(values);
-        toast.success("회원가입 성공");
-        router.push("/login");
+    const onSubmit = async (values: SignupValues) => {
+        try {
+            const res = await fetch("/api/backend/auth/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(values),
+            });
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => null);
+                toast.error(data?.message || "회원가입에 실패했습니다.");
+                return;
+            }
+
+            toast.success("회원가입 성공");
+            router.push("/login");
+        } catch {
+            toast.error("서버 연결에 실패했습니다.");
+        }
     };
 
     return (

@@ -3,6 +3,8 @@ import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import KakaoProvider from "next-auth/providers/kakao";
 
+const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:8080";
+
 export const authOptions: NextAuthOptions = {
     providers: [
         {
@@ -36,29 +38,101 @@ export const authOptions: NextAuthOptions = {
         }),
     ],
     callbacks: {
+        async signIn({ account }) {
+            if (!account?.access_token || !account?.provider) {
+                return true;
+            }
+
+            try {
+                // 1) Spring 백엔드에 provider + accessToken 전달 → 티켓 발급
+                const params = new URLSearchParams({
+                    provider: account.provider.toUpperCase(),
+                    accessToken: account.access_token,
+                });
+
+                const completeRes = await fetch(
+                    `${BACKEND_URL}/auth/social/complete`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: params.toString(),
+                    }
+                );
+
+                if (!completeRes.ok) {
+                    console.error("social/complete failed:", completeRes.status);
+                    return false;
+                }
+
+                const completeData = await completeRes.json();
+                if (!completeData.success || !completeData.ticketKey) {
+                    console.error("social/complete returned failure:", completeData);
+                    return false;
+                }
+
+                // 2) 티켓 소비 → Spring 세션 생성
+                const consumeRes = await fetch(
+                    `${BACKEND_URL}/auth/social/consume?key=${completeData.ticketKey}`,
+                    { method: "GET" }
+                );
+
+                if (!consumeRes.ok) {
+                    console.error("social/consume failed:", consumeRes.status);
+                    return false;
+                }
+
+                const consumeData = await consumeRes.json();
+                if (!consumeData.success) {
+                    console.error("social/consume returned failure:", consumeData);
+                    return false;
+                }
+
+                // 3) Set-Cookie에서 JSESSIONID 추출
+                const setCookie = consumeRes.headers.get("set-cookie");
+                const sessionId = extractSessionId(setCookie);
+
+                // account에 임시 저장 (jwt 콜백에서 사용)
+                (account as Record<string, unknown>).backendSessionId = sessionId;
+
+                return true;
+            } catch (error) {
+                console.error("Backend auth error:", error);
+                return false;
+            }
+        },
+
         async jwt({ token, account }) {
             if (account) {
                 token.accessToken = account.access_token;
                 token.provider = account.provider;
+                token.backendSessionId = (account as Record<string, unknown>).backendSessionId as string | undefined;
             }
             return token;
         },
+
         async session({ session, token }) {
-            session.provider = token.provider as string;
+            session.provider = token.provider;
+            session.backendSessionId = token.backendSessionId;
             return session;
         },
+
         async redirect({ url, baseUrl }) {
-            // 소셜 로그인 후 회원가입 페이지로 리다이렉트
-            if (url === baseUrl || url === "/") {
-                return `${baseUrl}/signup?provider=social`;
-            }
-            return url;
+            if (url.startsWith("/")) return `${baseUrl}${url}`;
+            if (url.startsWith(baseUrl)) return url;
+            return `${baseUrl}/home`;
         },
     },
     pages: {
         signIn: "/login",
+        error: "/login",
     },
 };
+
+function extractSessionId(setCookie: string | null): string | undefined {
+    if (!setCookie) return undefined;
+    const match = setCookie.match(/JSESSIONID=([^;]+)/);
+    return match?.[1];
+}
 
 const handler = NextAuth(authOptions);
 
