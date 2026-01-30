@@ -39,22 +39,32 @@ export function useRequestModal(options?: UseRequestModalOptions) {
 
     const handleSaveEdit = (e?: React.MouseEvent) => {
         e?.stopPropagation();
-        if (selectedRequest && editItemId) {
-            const updated = updateRequest({
-                requestId: selectedRequest.requestId,
-                itemId: editItemId,
-                requestAmount: editAmount,
-            });
 
-            if (updated) {
-                setSelectedRequest(updated);
-                options?.onUpdate?.();
-                toast.success("요청이 수정되었습니다.");
-            } else {
-                toast.error("요청 수정에 실패했습니다.");
-                return;
-            }
+        if (!selectedRequest || editItemId == null) {
+            toast.error("요청 정보가 올바르지 않습니다.");
+            return;
         }
+
+        if (editAmount == null || !Number.isFinite(editAmount) || editAmount < 1) {
+            toast.error("수량은 1 이상의 숫자여야 합니다.");
+            return;
+        }
+
+        const updated = updateRequest({
+            requestId: selectedRequest.requestId,
+            itemId: editItemId,
+            requestAmount: editAmount,
+        });
+
+        if (!updated) {
+            toast.error("요청 수정에 실패했습니다.");
+            return;
+        }
+
+        setSelectedRequest(updated);
+        options?.onUpdate?.();
+        toast.success("요청이 수정되었습니다.");
+
         setIsModalOpen(false);
         setIsEditMode(false);
         setEditItemId(null);
