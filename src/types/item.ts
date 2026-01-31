@@ -9,6 +9,83 @@ export interface Item {
     isPin: boolean;
 }
 
+// API Response Types
+export type ItemFilter = "FAVORITE" | "LOW_STOCK" | "HAS_REQUEST" | "BAD_STOCK";
+export type ItemKeyword = "itemName" | "stockAmount";
+export type RequestStatus = "WAIT" | "APPROVED" | "REJECTED";
+export type RequestType = "ORDER" | "RETURN";
+export type LogType = "IN" | "OUT";
+
+// GET /stores/{storeId}/items - 목록 조회 요청 파라미터
+export interface GetItemsParams {
+    storeId: number;
+    excludeZero?: boolean;
+    filter?: ItemFilter;
+    keyword?: string;
+    keywordValue?: string;
+    page?: number;
+    pageValue?: number;
+    size?: number;
+    sizeValue?: number;
+}
+
+// GET /stores/{storeId}/items - 목록 조회 응답 아이템
+export interface ItemListItem {
+    imageId: number;
+    isPinned: boolean;
+    itemId: number;
+    itemName: string;
+    latestRequestAmount: number;
+    latestRequestCreatedAt: string;
+    latestRequestId: number;
+    latestRequestStatus: RequestStatus;
+    latestRequestType: RequestType;
+    stockAmount: number;
+}
+
+// GET /stores/{storeId}/items - 목록 조회 응답
+export interface ItemListResponse {
+    content: ItemListItem[];
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+}
+
+// POST /stores/{storeId}/items - 아이템 생성 요청
+export interface CreateItemRequest {
+    imageId?: number;
+    itemName: string;
+    stockAmount: number;
+}
+
+// POST /stores/{storeId}/items - 아이템 생성 응답
+export interface CreateItemResponse {
+    itemId: number;
+    stockId: number;
+}
+
+// GET /stores/{storeId}/items/{itemId} - 상세 조회 응답
+export interface ItemDetailResponse {
+    bufferAmount: number;
+    imageId: number;
+    isPinned: boolean;
+    itemId: number;
+    itemName: string;
+    lastLogAt: string;
+    lastLogType: LogType;
+    stockAmount: number;
+}
+
+// PUT /stores/{storeId}/items/{itemId} - 수정 요청
+export interface UpdateItemRequest {
+    bufferAmount?: number;
+    imageId?: number;
+    isPinned?: boolean;
+    itemName?: string;
+    targetAmount?: number;
+}
+
 // 가게 재고
 export interface Stock {
     itemId: number;
