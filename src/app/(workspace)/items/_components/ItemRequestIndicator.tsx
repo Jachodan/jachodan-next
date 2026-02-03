@@ -13,17 +13,13 @@ interface ItemRequestIndicatorProps {
 }
 
 export default function ItemRequestIndicator({ item, variant = "card", className }: ItemRequestIndicatorProps) {
-    // 대기 중인 요청이 없으면 아무것도 표시하지 않음
-    if (!hasActiveRequest(item)) return null;
+    if (!hasActiveRequest(item) || item.latestRequestType !== "ORDER") return null;
 
     // 툴팁 내용 생성
     const getRequestTooltipContent = () => {
         return (
             <div className="text-xs">
-                <div className="font-semibold">{formatRequestType(item.latestRequestType)}</div>
-                {item.latestRequestAmount > 0 && (
-                    <div className="text-background/80">수량: {item.latestRequestAmount}개</div>
-                )}
+                <div className="text-background/80">수량: {item.latestRequestAmount}개</div>
                 <div className="text-background/80">상태: {formatRequestStatus(item.latestRequestStatus)}</div>
             </div>
         );
