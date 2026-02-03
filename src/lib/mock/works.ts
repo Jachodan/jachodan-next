@@ -1,4 +1,4 @@
-import { Work, WorkStatus, SCHEDULE_DAYS } from "@/types/work";
+import { Work, SCHEDULE_DAYS } from "@/types/work";
 import { Alba } from "@/types/user";
 
 const sampleAlbaNames = ["김민수", "이서연", "박지훈", "최유진", "정하늘"];
@@ -9,7 +9,9 @@ export const generateMockAlbas = (count: number = 5, storeId: number = 1): Alba[
         storeId,
         albaName: sampleAlbaNames[index % sampleAlbaNames.length],
         albaPhone: `010-${String(Math.floor(Math.random() * 9000) + 1000)}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
-        albaStatus: "재직",
+        albaStatus: "재직" as const,
+        createdAt: new Date().toISOString(),
+        isActive: true,
     }));
 };
 
@@ -27,7 +29,6 @@ export const generateMockWorks = (albas: Alba[], weekStartDate?: Date): Work[] =
             const isPast = workDate <= today;
 
             if (isWorkDay && isPast) {
-                const statuses: WorkStatus[] = ["출근", "지각"];
                 const status = Math.random() > 0.1 ? "출근" : "지각";
 
                 works.push({
