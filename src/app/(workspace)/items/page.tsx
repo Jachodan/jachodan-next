@@ -15,7 +15,7 @@ import ItemModalManager from "./_components/ItemModalManager";
 import ItemAlertDialogs from "./_components/ItemAlertDialogs";
 import { useUrlFilterSync } from "@/hooks/useUrlFilterSync";
 import { toApiFilter } from "@/lib/utils/item";
-import { ItemListItem, ItemWithStock } from "@/types/item";
+import { ItemListItem } from "@/types/item";
 
 const LIST_ITEMS_PER_PAGE = 8;
 const CARD_ITEMS_PER_PAGE = 10;
@@ -54,6 +54,7 @@ function ItemListContent() {
         selectedItem,
         showSaveAlert,
         showDeleteAlert,
+        isLoading: isModalLoading,
         handleOpenCreateModal,
         handleOpenDetailModal,
         handleCloseModal,
@@ -81,25 +82,9 @@ function ItemListContent() {
         }
     };
 
-    // 아이템 클릭 핸들러 (상세 모달)
+    // 아이템 클릭 핸들러 (상세 모달) - API에서 상세 정보를 가져옴
     const handleItemClick = (item: ItemListItem) => {
-        // ItemListItem을 ItemWithStock으로 변환 (상세 모달용)
-        const itemWithStock: ItemWithStock = {
-            itemId: item.itemId,
-            storeId: 1, // TODO: 세션에서 가져올 예정
-            imageId: item.imageId,
-            itemName: item.itemName,
-            createdAt: "",
-            isActive: true,
-            isPin: item.isPinned,
-            stock: {
-                itemId: item.itemId,
-                stockId: 0,
-                stockAmount: item.stockAmount,
-                createdAt: "",
-            },
-        };
-        handleOpenDetailModal(itemWithStock);
+        handleOpenDetailModal(item.itemId);
     };
 
     // 즐겨찾기 토글 (모달에서)
@@ -166,6 +151,7 @@ function ItemListContent() {
                 mode={modalMode}
                 selectedItem={selectedItem}
                 currentSelectedItem={selectedItem}
+                isLoading={isModalLoading}
                 onClose={handleCloseModal}
                 onModeChange={handleModeChange}
                 onFormChange={handleFormChange}

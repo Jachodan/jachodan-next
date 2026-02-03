@@ -1,6 +1,6 @@
 "use client";
 
-import { ItemWithStock } from "@/types/item";
+import { ItemDetailResponse } from "@/types/item";
 import { useItemForm } from "./hooks/useItemForm";
 import { useImagePreview } from "./hooks/useImagePreview";
 import { ItemDetailView } from "./components/ItemDetailView";
@@ -18,7 +18,7 @@ export interface ItemFormData {
 
 interface ItemModalContentProps {
     mode: "create" | "detail" | "edit";
-    item?: ItemWithStock | null;
+    item?: ItemDetailResponse | null;
     onModeChange?: (mode: "detail" | "edit") => void;
     onFormChange: (data: ItemFormData) => void;
     onToggleFavorite?: () => void;
@@ -63,12 +63,12 @@ export default function ItemModalContent({
                         onToggleFavorite={onToggleFavorite}
                     />
 
-                    {/* 마지막 수정일 */}
+                    {/* 마지막 입출고 */}
                     <div className="flex justify-end">
                         <div className="text-xs text-muted-foreground">
                             <p>
-                                마지막 수정일:{" "}
-                                {item.updatedAt ? new Date(item.updatedAt).toLocaleString("ko-KR") : "정보 없음"}
+                                마지막 {item.lastLogType === "IN" ? "입고" : "출고"}:{" "}
+                                {item.lastLogAt ? new Date(item.lastLogAt).toLocaleString("ko-KR") : "정보 없음"}
                             </p>
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ItemWithStock } from "@/types/item";
+import { ItemDetailResponse } from "@/types/item";
 import { ItemFormData } from "@/app/(workspace)/items/_components/ItemModalContent";
-import { createItem } from "@/lib/api";
+import { createItem, getItemDetail } from "@/lib/api";
 
 interface UseItemModalProps {
     refetch: () => Promise<void>;
@@ -10,10 +10,11 @@ interface UseItemModalProps {
 export function useItemModal({ refetch }: UseItemModalProps) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "detail" | "edit">("create");
-    const [selectedItem, setSelectedItem] = useState<ItemWithStock | null>(null);
+    const [selectedItem, setSelectedItem] = useState<ItemDetailResponse | null>(null);
     const [formData, setFormData] = useState<ItemFormData | null>(null);
     const [showSaveAlert, setShowSaveAlert] = useState(false);
     const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleOpenCreateModal = () => {
         setModalMode("create");
@@ -21,10 +22,21 @@ export function useItemModal({ refetch }: UseItemModalProps) {
         setModalOpen(true);
     };
 
-    const handleOpenDetailModal = (item: ItemWithStock) => {
+    const handleOpenDetailModal = async (itemId: number) => {
         setModalMode("detail");
-        setSelectedItem(item);
+        setIsLoading(true);
         setModalOpen(true);
+
+        const result = await getItemDetail(itemId);
+
+        if (result.error) {
+            console.error("Failed to fetch item detail:", result.error);
+            setIsLoading(false);
+            return;
+        }
+
+        setSelectedItem(result.data);
+        setIsLoading(false);
     };
 
     const handleCloseModal = () => {
@@ -103,6 +115,7 @@ export function useItemModal({ refetch }: UseItemModalProps) {
         formData,
         showSaveAlert,
         showDeleteAlert,
+        isLoading,
         // Handlers
         handleOpenCreateModal,
         handleOpenDetailModal,
