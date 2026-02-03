@@ -1,22 +1,17 @@
 import { cn } from "@/lib/utils";
-
 import { FilterType, getItemListEmptyMessage } from "@/lib/utils/item";
-import { ItemWithStock, ViewMode } from "@/types/item";
+import { ItemListItem, ViewMode } from "@/types/item";
 import ItemCardView from "./ItemCardView";
 import ItemListView from "./ItemListView";
-import { ItemRequest } from "@/types/itemRequest";
 
 interface ItemListContainerProps {
-    items: ItemWithStock[];
+    items: ItemListItem[];
     viewMode: ViewMode;
     filterType: FilterType;
     searchQuery: string;
-    excludeZero: boolean;
-    onItemClick: (item: ItemWithStock) => void;
+    onItemClick: (item: ItemListItem) => void;
     onToggleFavorite: (itemId: number) => void;
     onStockChange: (itemId: number, newStock: number) => void;
-
-    getItemRequests: (itemId: number) => ItemRequest[];
 }
 
 export default function ItemListContainer({
@@ -24,17 +19,14 @@ export default function ItemListContainer({
     viewMode,
     filterType,
     searchQuery,
-    excludeZero,
     onItemClick,
     onToggleFavorite,
     onStockChange,
-    getItemRequests,
 }: ItemListContainerProps) {
     return (
         <div
             className={cn(
                 "grid gap-4",
-
                 viewMode === "card"
                     ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
                     : "grid-cols-1"
@@ -47,11 +39,7 @@ export default function ItemListContainer({
                         viewMode === "card" && "col-span-full"
                     )}
                 >
-                    {getItemListEmptyMessage(
-                        filterType,
-                        searchQuery,
-                        excludeZero
-                    )}
+                    {getItemListEmptyMessage(filterType, searchQuery)}
                 </div>
             ) : (
                 items.map((item) => (
@@ -59,7 +47,6 @@ export default function ItemListContainer({
                         key={item.itemId}
                         className={cn(
                             "border rounded-lg p-4 transition-shadow cursor-pointer",
-
                             viewMode === "card"
                                 ? "hover:shadow-md"
                                 : "hover:shadow-sm flex items-center gap-4"
@@ -69,14 +56,12 @@ export default function ItemListContainer({
                         {viewMode === "card" ? (
                             <ItemCardView
                                 item={item}
-                                requests={getItemRequests(item.itemId)}
                                 onToggleFavorite={onToggleFavorite}
                                 onStockChange={onStockChange}
                             />
                         ) : (
                             <ItemListView
                                 item={item}
-                                requests={getItemRequests(item.itemId)}
                                 onToggleFavorite={onToggleFavorite}
                                 onStockChange={onStockChange}
                             />

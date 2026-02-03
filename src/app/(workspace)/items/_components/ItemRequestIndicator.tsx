@@ -2,32 +2,29 @@
 
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ItemRequest } from "@/types/itemRequest";
+import { ItemListItem } from "@/types/item";
 import { cn } from "@/lib/utils";
+import { formatRequestType, formatRequestStatus, hasActiveRequest } from "@/lib/utils/item";
 
 interface ItemRequestIndicatorProps {
-    requests: ItemRequest[];
+    item: ItemListItem;
     variant?: "card" | "list";
     className?: string;
 }
 
-export default function ItemRequestIndicator({ requests, variant = "card", className }: ItemRequestIndicatorProps) {
-    // 요청사항이 없으면 아무것도 표시하지 않음
-    if (requests.length === 0) return null;
+export default function ItemRequestIndicator({ item, variant = "card", className }: ItemRequestIndicatorProps) {
+    // 대기 중인 요청이 없으면 아무것도 표시하지 않음
+    if (!hasActiveRequest(item)) return null;
 
     // 툴팁 내용 생성
     const getRequestTooltipContent = () => {
         return (
-            <div className="space-y-2">
-                {requests.map((request) => (
-                    <div key={request.requestId} className="text-xs">
-                        <div className="font-semibold">{request.requestType}</div>
-                        <div className="text-background/80">
-                            {request.requestAmount && `수량: ${request.requestAmount}개`}
-                        </div>
-                        <div className="text-background/80">상태: {request.requestStatus}</div>
-                    </div>
-                ))}
+            <div className="text-xs">
+                <div className="font-semibold">{formatRequestType(item.latestRequestType)}</div>
+                {item.latestRequestAmount > 0 && (
+                    <div className="text-background/80">수량: {item.latestRequestAmount}개</div>
+                )}
+                <div className="text-background/80">상태: {formatRequestStatus(item.latestRequestStatus)}</div>
             </div>
         );
     };

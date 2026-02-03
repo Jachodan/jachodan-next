@@ -19,14 +19,10 @@ export type LogType = "IN" | "OUT";
 // GET /stores/{storeId}/items - 목록 조회 요청 파라미터
 export interface GetItemsParams {
     storeId: number;
-    excludeZero?: boolean;
     filter?: ItemFilter;
     keyword?: string;
-    keywordValue?: string;
     page?: number;
-    pageValue?: number;
     size?: number;
-    sizeValue?: number;
 }
 
 // GET /stores/{storeId}/items - 목록 조회 응답 아이템

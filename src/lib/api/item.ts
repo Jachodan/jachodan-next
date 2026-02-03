@@ -19,20 +19,12 @@ export async function getItems(params: Partial<GetItemsParams> = {}) {
     const storeId = params.storeId ?? DEFAULT_STORE_ID;
     const queryParams = new URLSearchParams();
 
-    if (params.excludeZero !== undefined)
-        queryParams.append("excludeZero", String(params.excludeZero));
     if (params.filter) queryParams.append("filter", params.filter);
     if (params.keyword) queryParams.append("keyword", params.keyword);
-    if (params.keywordValue)
-        queryParams.append("keywordValue", params.keywordValue);
     if (params.page !== undefined)
         queryParams.append("page", String(params.page));
-    if (params.pageValue !== undefined)
-        queryParams.append("pageValue", String(params.pageValue));
     if (params.size !== undefined)
         queryParams.append("size", String(params.size));
-    if (params.sizeValue !== undefined)
-        queryParams.append("sizeValue", String(params.sizeValue));
 
     const queryString = queryParams.toString();
     const endpoint = `/stores/${storeId}/items${queryString ? `?${queryString}` : ""}`;
