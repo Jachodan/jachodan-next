@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ItemDetailResponse } from "@/types/item";
 import { ItemFormData } from "@/app/(workspace)/items/_components/ItemModalContent";
-import { createItem, getItemDetail } from "@/lib/api";
+import { createItem, getItemDetail, updateItem, deleteItem } from "@/lib/api";
 
 interface UseItemModalProps {
     refetch: () => Promise<void>;
@@ -82,13 +82,51 @@ export function useItemModal({ refetch }: UseItemModalProps) {
     const handleSaveConfirm = async () => {
         if (!formData || !selectedItem) return;
 
-        // TODO: 아이템 수정 API 연결 필요
-        console.log("Update item:", selectedItem.itemId, formData);
+        const result = await updateItem(selectedItem.itemId, {
+            bufferAmount: formData.bufferAmount ?? selectedItem.bufferAmount,
+            imageId: formData.imageId ?? selectedItem.imageId,
+            isPinned: selectedItem.isPinned ?? false,
+            itemName: formData.itemName,
+            targetAmount: selectedItem.stockAmount,
+        });
+
+        if (result.error) {
+            console.error("Failed to update item:", result.error);
+            setShowSaveAlert(false);
+            return;
+        }
 
         // 목록 리프레시
         await refetch();
         setShowSaveAlert(false);
         handleCloseModal();
+    };
+
+    const handleToggleFavorite = async () => {
+        if (!selectedItem) return;
+
+        const newPinnedState = !(selectedItem.isPinned ?? false);
+
+        // 낙관적 업데이트 - 모달 상태
+        setSelectedItem({ ...selectedItem, isPinned: newPinnedState });
+
+        const result = await updateItem(selectedItem.itemId, {
+            bufferAmount: selectedItem.bufferAmount,
+            imageId: selectedItem.imageId,
+            isPinned: newPinnedState,
+            itemName: selectedItem.itemName,
+            targetAmount: 0,
+        });
+
+        if (result.error) {
+            // 실패 시 롤백
+            setSelectedItem({ ...selectedItem, isPinned: !newPinnedState });
+            console.error("Failed to toggle favorite:", result.error);
+            return;
+        }
+
+        // 목록 리프레시
+        await refetch();
     };
 
     const handleDelete = () => {
@@ -98,8 +136,13 @@ export function useItemModal({ refetch }: UseItemModalProps) {
     const handleDeleteConfirm = async () => {
         if (!selectedItem) return;
 
-        // TODO: 아이템 삭제 API 연결 필요
-        console.log("Delete item:", selectedItem.itemId);
+        const result = await deleteItem(selectedItem.itemId);
+
+        if (result.error) {
+            console.error("Failed to delete item:", result.error);
+            setShowDeleteAlert(false);
+            return;
+        }
 
         // 목록 리프레시
         await refetch();
@@ -122,6 +165,7 @@ export function useItemModal({ refetch }: UseItemModalProps) {
         handleCloseModal,
         handleModeChange,
         handleFormChange,
+        handleToggleFavorite,
         handleSave,
         handleSaveConfirm,
         handleDelete,

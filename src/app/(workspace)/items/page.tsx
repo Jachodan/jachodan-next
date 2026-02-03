@@ -60,6 +60,7 @@ function ItemListContent() {
         handleCloseModal,
         handleModeChange,
         handleFormChange,
+        handleToggleFavorite: handleModalToggleFavorite,
         handleSave,
         handleSaveConfirm,
         handleDelete,
@@ -85,13 +86,6 @@ function ItemListContent() {
     // 아이템 클릭 핸들러 (상세 모달) - API에서 상세 정보를 가져옴
     const handleItemClick = (item: ItemListItem) => {
         handleOpenDetailModal(item.itemId);
-    };
-
-    // 즐겨찾기 토글 (모달에서)
-    const handleModalToggleFavorite = () => {
-        if (selectedItem) {
-            handleToggleFavorite(selectedItem.itemId);
-        }
     };
 
     if (isLoading) {

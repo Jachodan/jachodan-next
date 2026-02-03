@@ -4,7 +4,7 @@ import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ItemListItem } from "@/types/item";
 import { cn } from "@/lib/utils";
-import { formatRequestType, formatRequestStatus, hasActiveRequest } from "@/lib/utils/item";
+import { formatRequestStatus, hasActiveRequest } from "@/lib/utils/item";
 
 interface ItemRequestIndicatorProps {
     item: ItemListItem;

@@ -31,7 +31,13 @@ async function apiClient<T>(
             };
         }
 
-        const data = await response.json();
+        // 204 No Content 또는 빈 응답 처리
+        if (response.status === 204 || response.headers.get("content-length") === "0") {
+            return { data: null, error: null, status: response.status };
+        }
+
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : null;
         return { data, error: null, status: response.status };
     } catch (error) {
         return {
