@@ -8,11 +8,14 @@ import { useItemListStore } from "@/stores/itemListStore";
 import ListPageFooter from "@/components/common/ListPageFooter";
 import { useItemData } from "@/hooks/useItemData";
 import { useItemActions } from "./_hooks/useItemActions";
+import { useItemModal } from "@/hooks/useItemModal";
 import ItemListStats from "./_components/ItemListStats";
 import ItemListContainer from "./_components/ItemListContainer";
+import ItemModalManager from "./_components/ItemModalManager";
+import ItemAlertDialogs from "./_components/ItemAlertDialogs";
 import { useUrlFilterSync } from "@/hooks/useUrlFilterSync";
 import { toApiFilter } from "@/lib/utils/item";
-import { ItemListItem } from "@/types/item";
+import { ItemListItem, ItemWithStock } from "@/types/item";
 
 const LIST_ITEMS_PER_PAGE = 8;
 const CARD_ITEMS_PER_PAGE = 10;
@@ -44,6 +47,26 @@ function ItemListContent() {
         refetch,
     });
 
+    // 모달 관리 훅
+    const {
+        modalOpen,
+        modalMode,
+        selectedItem,
+        showSaveAlert,
+        showDeleteAlert,
+        handleOpenCreateModal,
+        handleOpenDetailModal,
+        handleCloseModal,
+        handleModeChange,
+        handleFormChange,
+        handleSave,
+        handleSaveConfirm,
+        handleDelete,
+        handleDeleteConfirm,
+        setShowSaveAlert,
+        setShowDeleteAlert,
+    } = useItemModal({ refetch });
+
     useEffect(() => {
         setHeaderTitle("상품관리");
     }, [setHeaderTitle]);
@@ -59,17 +82,31 @@ function ItemListContent() {
     };
 
     // 아이템 클릭 핸들러 (상세 모달)
-    // TODO: 모달 기능은 별도 작업 필요 (ItemListItem 타입에 맞게 수정)
     const handleItemClick = (item: ItemListItem) => {
-        console.log("Item clicked:", item);
-        // TODO: 상세 모달 열기
+        // ItemListItem을 ItemWithStock으로 변환 (상세 모달용)
+        const itemWithStock: ItemWithStock = {
+            itemId: item.itemId,
+            storeId: 1, // TODO: 세션에서 가져올 예정
+            imageId: item.imageId,
+            itemName: item.itemName,
+            createdAt: "",
+            isActive: true,
+            isPin: item.isPinned,
+            stock: {
+                itemId: item.itemId,
+                stockId: 0,
+                stockAmount: item.stockAmount,
+                createdAt: "",
+            },
+        };
+        handleOpenDetailModal(itemWithStock);
     };
 
-    // 상품 등록 핸들러
-    // TODO: 모달 기능은 별도 작업 필요
-    const handleOpenCreateModal = () => {
-        console.log("Open create modal");
-        // TODO: 생성 모달 열기
+    // 즐겨찾기 토글 (모달에서)
+    const handleModalToggleFavorite = () => {
+        if (selectedItem) {
+            handleToggleFavorite(selectedItem.itemId);
+        }
     };
 
     if (isLoading) {
@@ -124,10 +161,28 @@ function ItemListContent() {
                 }}
             />
 
-            {/* TODO: 모달 기능 추가 예정
-            <ItemModalManager ... />
-            <ItemAlertDialogs ... />
-            */}
+            <ItemModalManager
+                open={modalOpen}
+                mode={modalMode}
+                selectedItem={selectedItem}
+                currentSelectedItem={selectedItem}
+                onClose={handleCloseModal}
+                onModeChange={handleModeChange}
+                onFormChange={handleFormChange}
+                onToggleFavorite={handleModalToggleFavorite}
+                onDelete={handleDelete}
+                onSave={handleSave}
+            />
+
+            <ItemAlertDialogs
+                showSaveAlert={showSaveAlert}
+                showDeleteAlert={showDeleteAlert}
+                itemName={selectedItem?.itemName}
+                onSaveAlertChange={setShowSaveAlert}
+                onDeleteAlertChange={setShowDeleteAlert}
+                onSaveConfirm={handleSaveConfirm}
+                onDeleteConfirm={handleDeleteConfirm}
+            />
         </div>
     );
 }

@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { ItemWithStock } from "@/types/item";
 import { ItemFormData } from "@/app/(workspace)/items/_components/ItemModalContent";
+import { createItem } from "@/lib/api";
 
 interface UseItemModalProps {
-    updateItem: (itemId: number, updates: Partial<ItemWithStock>) => void;
-    addItem: (item: ItemWithStock) => void;
-    deleteItem: (itemId: number) => void;
+    refetch: () => Promise<void>;
 }
 
-export function useItemModal({ updateItem, addItem, deleteItem }: UseItemModalProps) {
+export function useItemModal({ refetch }: UseItemModalProps) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "detail" | "edit">("create");
     const [selectedItem, setSelectedItem] = useState<ItemWithStock | null>(null);
@@ -42,68 +41,40 @@ export function useItemModal({ updateItem, addItem, deleteItem }: UseItemModalPr
         setFormData(data);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!formData) return;
 
         if (modalMode === "edit") {
             setShowSaveAlert(true);
         } else if (modalMode === "create") {
-            // TODO: 실제 API 호출로 변경
-            const timestamp = Date.now();
-            const itemId = timestamp;
-            const stockId = timestamp + 1;
-            const bufferId = timestamp + 2;
-            const createdAt = new Date().toISOString();
-
-            addItem({
-                itemId,
-                itemName: formData.itemName,
-                storeId: 1,
-                createdAt,
-                isActive: true,
-                isPin: false,
+            // 아이템 생성 API 호출
+            const result = await createItem({
                 imageId: formData.imageId,
-                stock: {
-                    itemId,
-                    stockId,
-                    stockAmount: formData.stockAmount,
-                    createdAt,
-                },
-                buffer: formData.bufferAmount
-                    ? {
-                          itemId,
-                          bufferId,
-                          bufferAmount: formData.bufferAmount,
-                          createdAt,
-                      }
-                    : undefined,
+                itemName: formData.itemName,
+                stockAmount: formData.stockAmount,
             });
+
+            if (result.error) {
+                console.error("Failed to create item:", result.error);
+                // TODO: 에러 토스트 표시
+                return;
+            }
+
+            console.log("Item created:", result.data);
+            // 목록 리프레시
+            await refetch();
             handleCloseModal();
         }
     };
 
-    const handleSaveConfirm = () => {
+    const handleSaveConfirm = async () => {
         if (!formData || !selectedItem) return;
 
-        // TODO: 실제 API 호출로 변경
-        updateItem(selectedItem.itemId, {
-            itemName: formData.itemName,
-            stock: {
-                ...selectedItem.stock,
-                stockAmount: formData.stockAmount,
-            },
-            buffer: formData.bufferAmount
-                ? {
-                      ...selectedItem.buffer,
-                      bufferId: selectedItem.buffer?.bufferId ?? Date.now(),
-                      itemId: selectedItem.itemId,
-                      bufferAmount: formData.bufferAmount,
-                      createdAt: selectedItem.buffer?.createdAt ?? new Date().toISOString(),
-                  }
-                : undefined,
-            imageId: formData.imageId,
-        });
+        // TODO: 아이템 수정 API 연결 필요
+        console.log("Update item:", selectedItem.itemId, formData);
 
+        // 목록 리프레시
+        await refetch();
         setShowSaveAlert(false);
         handleCloseModal();
     };
@@ -112,11 +83,14 @@ export function useItemModal({ updateItem, addItem, deleteItem }: UseItemModalPr
         setShowDeleteAlert(true);
     };
 
-    const handleDeleteConfirm = () => {
+    const handleDeleteConfirm = async () => {
         if (!selectedItem) return;
 
-        // TODO: 실제 API 호출로 변경
-        deleteItem(selectedItem.itemId);
+        // TODO: 아이템 삭제 API 연결 필요
+        console.log("Delete item:", selectedItem.itemId);
+
+        // 목록 리프레시
+        await refetch();
         setShowDeleteAlert(false);
         handleCloseModal();
     };
