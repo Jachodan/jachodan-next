@@ -20,12 +20,12 @@ export function toApiFilter(filterType: FilterType): ItemFilter | undefined {
  */
 export function formatRequestStatus(status: string): string {
     const statusMap: Record<string, string> = {
+        WORKING: "확인중",
         WAIT: "대기",
-        APPROVED: "승인",
-        REJECTED: "반려",
-        CONFIRM: "확인중",
-        CANCLE: "취소",
-        COMPLETE: "완료",
+        REVERT: "반려",
+        CONFIRM: "승인",
+        DONE: "완료",
+        CANCEL: "취소",
     };
     return statusMap[status] || status;
 }
@@ -35,10 +35,10 @@ export function formatRequestStatus(status: string): string {
  */
 export function formatRequestType(type: string): string {
     const typeMap: Record<string, string> = {
-        ORDER: "입고요청",
-        RETURN: "발주금지",
-        DISCARD: "폐기요청",
-        CHECK: "유통기한 확인",
+        ORDER: "주문요청",
+        DROP: "폐기요청",
+        BAN: "금지요청",
+        CHECK: "확인요청",
     };
     return typeMap[type] || type;
 }
@@ -54,7 +54,7 @@ export function formatStockAmount(stockAmount: number): string {
  * 아이템에 대기 중인 요청이 있는지 확인
  */
 export function hasActiveRequest(item: ItemListItem): boolean {
-    return item.latestRequestId > 0 && ["WAIT", "CONFIRM", "APPROVED"].includes(item.latestRequestStatus);
+    return item.latestRequestId > 0 && ["WAIT", "WORKING", "CONFIRM"].includes(item.latestRequestStatus);
 }
 
 export const FILTER_TYPES = ["all", "request", "lowStock", "favorite", "deadStock"] as const;
