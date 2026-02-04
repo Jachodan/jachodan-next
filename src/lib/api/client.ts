@@ -1,6 +1,4 @@
-// 프록시를 통해 API 호출 (CORS 우회)
-// CORS 해결 후: process.env.NEXT_PUBLIC_API_URL || "" 로 변경
-const API_BASE_URL = "/api/proxy";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 interface ApiResponse<T> {
     data: T | null;
