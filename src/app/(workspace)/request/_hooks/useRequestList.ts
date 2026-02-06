@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { type RequestType, type RequestStatus } from "@/types/itemRequest";
 import { getPaginatedRequests, updateRequest } from "@/lib/mock/itemRequests";
 
@@ -14,6 +14,13 @@ export function useRequestList() {
 
     // refreshKey 변경 시 리렌더링되어 새로운 데이터를 가져옴
     const { data: requests, totalPages } = getPaginatedRequests(currentPage, PAGE_SIZE, typeFilter, searchValue);
+
+    // 페이지 범위 검증: 필터 적용 후 totalPages가 줄어들면 currentPage 조정
+    useEffect(() => {
+        if (currentPage > totalPages && totalPages > 0) {
+            setCurrentPage(totalPages);
+        }
+    }, [currentPage, totalPages]);
 
     const triggerUpdate = useCallback(() => {
         setRefreshKey((prev) => prev + 1);
