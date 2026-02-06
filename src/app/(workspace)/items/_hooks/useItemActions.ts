@@ -1,5 +1,5 @@
 import { ItemListItem } from "@/types/item";
-import { updateItem as updateItemApi } from "@/lib/api";
+import { toggleItemPin } from "@/lib/api";
 
 interface UseItemActionsProps {
     items: ItemListItem[];
@@ -35,15 +35,9 @@ export function useItemActions({
         // 낙관적 업데이트
         updateItemLocally(itemId, { isPinned: newPinnedState });
 
-        // API 호출 - 모든 필드 전송 필요
+        // API 호출
         try {
-            const result = await updateItemApi(itemId, {
-                bufferAmount: 0,
-                imageId: item.imageId,
-                isPinned: newPinnedState,
-                itemName: item.itemName,
-                targetAmount: 0,
-            });
+            const result = await toggleItemPin(itemId);
             if (result.error) {
                 // 실패 시 롤백
                 updateItemLocally(itemId, { isPinned: !newPinnedState });

@@ -76,3 +76,14 @@ export async function deleteItem(
 ) {
     return api.delete<void>(`/stores/${storeId}/items/${itemId}`);
 }
+
+/**
+ * 아이템 즐겨찾기 토글
+ * PATCH /stores/{storeId}/items/{itemId}/pin
+ */
+export async function toggleItemPin(
+    itemId: number,
+    storeId: number = DEFAULT_STORE_ID
+) {
+    return api.patch<void>(`/stores/${storeId}/items/${itemId}/pin`);
+}
