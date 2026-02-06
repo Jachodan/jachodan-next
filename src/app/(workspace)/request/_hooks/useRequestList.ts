@@ -10,9 +10,7 @@ export function useRequestList() {
     const [typeFilter, setTypeFilter] = useState<RequestType | "전체">("전체");
     const [searchValue, setSearchValue] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [refreshKey, setRefreshKey] = useState(0);
 
-    // refreshKey 변경 시 리렌더링되어 새로운 데이터를 가져옴
     const { data: requests, totalPages } = getPaginatedRequests(currentPage, PAGE_SIZE, typeFilter, searchValue);
 
     // 페이지 범위 검증: 필터 적용 후 totalPages가 줄어들면 currentPage 조정
@@ -21,10 +19,6 @@ export function useRequestList() {
             setCurrentPage(totalPages);
         }
     }, [currentPage, totalPages]);
-
-    const triggerUpdate = useCallback(() => {
-        setRefreshKey((prev) => prev + 1);
-    }, []);
 
     const handleTypeFilterChange = (value: RequestType | "전체") => {
         setTypeFilter(value);
@@ -38,12 +32,10 @@ export function useRequestList() {
 
     const handleRequestTypeChange = (requestId: number, newType: RequestType) => {
         updateRequest({ requestId, requestType: newType });
-        triggerUpdate();
     };
 
     const handleRequestStatusChange = (requestId: number, newStatus: RequestStatus) => {
         updateRequest({ requestId, requestStatus: newStatus });
-        triggerUpdate();
     };
 
     return {
@@ -64,6 +56,5 @@ export function useRequestList() {
         // 핸들러
         handleRequestTypeChange,
         handleRequestStatusChange,
-        triggerUpdate,
     };
 }
