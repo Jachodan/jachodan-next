@@ -8,17 +8,19 @@ interface ApiResponse<T> {
 
 async function apiClient<T>(
     endpoint: string,
-    options?: RequestInit
+    options?: RequestInit,
+    skipContentType?: boolean
 ): Promise<ApiResponse<T>> {
     const url = `${API_BASE_URL}${endpoint}`;
 
     try {
+        const headers: HeadersInit = skipContentType
+            ? { ...options?.headers }
+            : { "Content-Type": "application/json", ...options?.headers };
+
         const response = await fetch(url, {
             ...options,
-            headers: {
-                "Content-Type": "application/json",
-                ...options?.headers,
-            },
+            headers,
         });
 
         if (!response.ok) {
@@ -73,4 +75,15 @@ export const api = {
             method: "PATCH",
             body: body ? JSON.stringify(body) : undefined,
         }),
+
+    postFormData: <T>(endpoint: string, formData: FormData, options?: RequestInit) =>
+        apiClient<T>(
+            endpoint,
+            {
+                ...options,
+                method: "POST",
+                body: formData,
+            },
+            true
+        ),
 };
