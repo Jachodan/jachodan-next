@@ -111,7 +111,10 @@ export default function RequestFormTable({
                                 type="number"
                                 min={1}
                                 value={item.quantity}
-                                onChange={(e) => onUpdateItem(item.id, "quantity", Number(e.target.value))}
+                                onChange={(e) => {
+                                    const value = Math.max(1, Number(e.target.value) || 1);
+                                    onUpdateItem(item.id, "quantity", value);
+                                }}
                                 className="text-center h-8"
                             />
 
