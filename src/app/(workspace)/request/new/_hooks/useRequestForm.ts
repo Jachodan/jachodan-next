@@ -17,9 +17,10 @@ export interface RequestItem {
     isManual: boolean;
 }
 
-// 고유 ID 생성을 위한 카운터
-let idCounter = 0;
-const generateId = (prefix: string) => `${prefix}-${++idCounter}`;
+// 고유 ID 생성 (타임스탬프 + 랜덤 문자열 조합)
+const generateId = (prefix: string) => {
+    return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+};
 
 // 오늘 날짜
 const getToday = () => new Date().toISOString().split("T")[0];
