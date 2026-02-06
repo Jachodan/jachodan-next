@@ -1,16 +1,16 @@
 import { ItemListItem } from "@/types/item";
 import FavoriteButton from "@/components/common/FavoriteButton";
 import StockInfo from "@/components/common/StockInfo";
-import StockControl from "@/components/common/StockControl";
+import StockControl, { StockInOutParams } from "@/components/common/StockControl";
 import ItemRequestIndicator from "./ItemRequestIndicator";
 
 interface ItemCardViewProps {
     item: ItemListItem;
     onToggleFavorite: (itemId: number) => void;
-    onStockChange: (itemId: number, newStock: number) => void;
+    onStockInOut: (itemId: number, stockId: number, params: StockInOutParams) => void;
 }
 
-export default function ItemCardView({ item, onToggleFavorite, onStockChange }: ItemCardViewProps) {
+export default function ItemCardView({ item, onToggleFavorite, onStockInOut }: ItemCardViewProps) {
     return (
         <div>
             <div className="relative aspect-square bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
@@ -25,7 +25,7 @@ export default function ItemCardView({ item, onToggleFavorite, onStockChange }: 
             <StockControl
                 itemName={item.itemName}
                 currentStock={item.stockAmount}
-                onStockChange={(newStock) => onStockChange(item.itemId, newStock)}
+                onStockInOut={(params) => onStockInOut(item.itemId, item.stockId, params)}
                 variant="card"
             />
         </div>

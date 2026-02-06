@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { StockChangeData } from "./useStockConfirmDialog";
 
 export type StockActionType = "in" | "out" | null;
 
 interface UseStockActionProps {
     currentStock: number;
-    onConfirm: (newStock: number) => void;
+    onConfirm: (data: StockChangeData) => void;
 }
 
 export function useStockAction({ currentStock, onConfirm }: UseStockActionProps) {
@@ -24,6 +25,8 @@ export function useStockAction({ currentStock, onConfirm }: UseStockActionProps)
     };
 
     const handleActionConfirm = () => {
+        if (!actionType) return;
+
         const amount = Number(actionValue);
         if (!isNaN(amount) && amount > 0) {
             let newStock = currentStock;
@@ -33,7 +36,7 @@ export function useStockAction({ currentStock, onConfirm }: UseStockActionProps)
                 newStock = Math.max(0, currentStock - amount);
             }
 
-            onConfirm(newStock);
+            onConfirm({ newStock, actionType, amount });
         }
     };
 

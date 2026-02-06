@@ -1,16 +1,16 @@
 import { ItemListItem } from "@/types/item";
 import FavoriteButton from "@/components/common/FavoriteButton";
 import StockInfo from "@/components/common/StockInfo";
-import StockControl from "@/components/common/StockControl";
+import StockControl, { StockInOutParams } from "@/components/common/StockControl";
 import ItemRequestIndicator from "./ItemRequestIndicator";
 
 interface ItemListViewProps {
     item: ItemListItem;
     onToggleFavorite: (itemId: number) => void;
-    onStockChange: (itemId: number, newStock: number) => void;
+    onStockInOut: (itemId: number, stockId: number, params: StockInOutParams) => void;
 }
 
-export default function ItemListView({ item, onToggleFavorite, onStockChange }: ItemListViewProps) {
+export default function ItemListView({ item, onToggleFavorite, onStockInOut }: ItemListViewProps) {
     return (
         <>
             {/* 왼쪽 섹션: 이미지 + 아이템명 */}
@@ -37,7 +37,7 @@ export default function ItemListView({ item, onToggleFavorite, onStockChange }: 
                 <StockControl
                     itemName={item.itemName}
                     currentStock={item.stockAmount}
-                    onStockChange={(newStock) => onStockChange(item.itemId, newStock)}
+                    onStockInOut={(params) => onStockInOut(item.itemId, item.stockId, params)}
                     variant="list"
                 />
             </div>

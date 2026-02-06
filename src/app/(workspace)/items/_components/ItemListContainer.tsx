@@ -3,6 +3,7 @@ import { FilterType, getItemListEmptyMessage } from "@/lib/utils/item";
 import { ItemListItem, ViewMode } from "@/types/item";
 import ItemCardView from "./ItemCardView";
 import ItemListView from "./ItemListView";
+import { StockInOutParams } from "@/components/common/StockControl";
 
 interface ItemListContainerProps {
     items: ItemListItem[];
@@ -11,7 +12,7 @@ interface ItemListContainerProps {
     searchQuery: string;
     onItemClick: (item: ItemListItem) => void;
     onToggleFavorite: (itemId: number) => void;
-    onStockChange: (itemId: number, newStock: number) => void;
+    onStockInOut: (itemId: number, stockId: number, params: StockInOutParams) => void;
 }
 
 export default function ItemListContainer({
@@ -21,7 +22,7 @@ export default function ItemListContainer({
     searchQuery,
     onItemClick,
     onToggleFavorite,
-    onStockChange,
+    onStockInOut,
 }: ItemListContainerProps) {
     return (
         <div
@@ -57,13 +58,13 @@ export default function ItemListContainer({
                             <ItemCardView
                                 item={item}
                                 onToggleFavorite={onToggleFavorite}
-                                onStockChange={onStockChange}
+                                onStockInOut={onStockInOut}
                             />
                         ) : (
                             <ItemListView
                                 item={item}
                                 onToggleFavorite={onToggleFavorite}
-                                onStockChange={onStockChange}
+                                onStockInOut={onStockInOut}
                             />
                         )}
                     </div>

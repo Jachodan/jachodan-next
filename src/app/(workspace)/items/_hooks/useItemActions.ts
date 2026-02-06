@@ -1,5 +1,6 @@
 import { ItemListItem } from "@/types/item";
-import { toggleItemPin } from "@/lib/api";
+import { toggleItemPin, stockIn, stockOut } from "@/lib/api";
+import { StockInOutParams } from "@/components/common/StockControl";
 
 interface UseItemActionsProps {
     items: ItemListItem[];
@@ -50,24 +51,50 @@ export function useItemActions({
         }
     };
 
-    // 재고 수량 변경
-    // TODO: 재고 변경 API 연결 필요 (현재 API 명세에 없음)
-    const handleStockChange = async (itemId: number, newStock: number) => {
+    // 재고 입고/출고
+    const handleStockInOut = async (
+        itemId: number,
+        stockId: number,
+        params: StockInOutParams
+    ) => {
         const item = items.find((i) => i.itemId === itemId);
         if (!item) return;
 
         const oldStock = item.stockAmount;
+        const newStock =
+            params.actionType === "in"
+                ? oldStock + params.amount
+                : Math.max(0, oldStock - params.amount);
 
         // 낙관적 업데이트
         updateItemLocally(itemId, { stockAmount: newStock });
 
-        // TODO: 재고 변경 API 호출
-        // 현재는 로컬 상태만 변경하고, 다음 refetch 시 서버 데이터로 덮어씌워짐
-        console.log(`Stock changed: ${itemId} ${oldStock} -> ${newStock}`);
+        // API 호출
+        try {
+            const apiCall =
+                params.actionType === "in" ? stockIn : stockOut;
+            const result = await apiCall(stockId, { amount: params.amount });
+
+            if (result.error) {
+                // 실패 시 롤백
+                updateItemLocally(itemId, { stockAmount: oldStock });
+                console.error("Failed to update stock:", result.error);
+                return;
+            }
+
+            // 성공 시 서버 응답으로 업데이트
+            if (result.data) {
+                updateItemLocally(itemId, { stockAmount: result.data.stockAmount });
+            }
+        } catch (error) {
+            // 에러 시 롤백
+            updateItemLocally(itemId, { stockAmount: oldStock });
+            console.error("Failed to update stock:", error);
+        }
     };
 
     return {
         handleToggleFavorite,
-        handleStockChange,
+        handleStockInOut,
     };
 }

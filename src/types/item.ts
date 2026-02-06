@@ -37,6 +37,7 @@ export interface ItemListItem {
     latestRequestStatus: RequestStatus;
     latestRequestType: RequestType;
     stockAmount: number;
+    stockId: number;
 }
 
 // GET /stores/{storeId}/items - 목록 조회 응답
@@ -119,3 +120,16 @@ export interface ItemWithStock extends Item {
 
 // 아이템 리스트 뷰 모드
 export type ViewMode = "list" | "card";
+
+// POST /stores/{storeId}/stocks/{stockId}/in - 재고 입고 요청
+// POST /stores/{storeId}/stocks/{stockId}/out - 재고 출고 요청
+export interface StockInOutRequest {
+    amount: number;
+}
+
+// POST /stores/{storeId}/stocks/{stockId}/in - 재고 입고 응답
+// POST /stores/{storeId}/stocks/{stockId}/out - 재고 출고 응답
+export interface StockInOutResponse {
+    stockAmount: number;
+    stockId: number;
+}

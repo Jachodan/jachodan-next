@@ -40,8 +40,8 @@ function ItemListContent() {
         size: itemsPerPage,
     });
 
-    // 아이템 액션 (즐겨찾기 토글, 재고 변경)
-    const { handleToggleFavorite, handleStockChange } = useItemActions({
+    // 아이템 액션 (즐겨찾기 토글, 재고 입출고)
+    const { handleToggleFavorite, handleStockInOut } = useItemActions({
         items,
         updateItemLocally,
         refetch,
@@ -127,7 +127,7 @@ function ItemListContent() {
                 searchQuery={searchQuery}
                 onItemClick={handleItemClick}
                 onToggleFavorite={handleToggleFavorite}
-                onStockChange={handleStockChange}
+                onStockInOut={handleStockInOut}
             />
 
             <ListPageFooter

@@ -1,22 +1,32 @@
 import { useState } from "react";
 
+export interface StockChangeData {
+    newStock: number;
+    actionType: "in" | "out";
+    amount: number;
+}
+
 interface UseStockConfirmDialogProps {
-    onConfirm: (newStock: number) => void;
+    onConfirm: (data: StockChangeData) => void;
     onCancel?: () => void;
 }
 
 export function useStockConfirmDialog({ onConfirm, onCancel }: UseStockConfirmDialogProps) {
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-    const [pendingNewStock, setPendingNewStock] = useState<number>(0);
+    const [pendingData, setPendingData] = useState<StockChangeData>({
+        newStock: 0,
+        actionType: "in",
+        amount: 0,
+    });
 
-    const showDialog = (newStock: number) => {
-        setPendingNewStock(newStock);
+    const showDialog = (data: StockChangeData) => {
+        setPendingData(data);
         setShowConfirmDialog(true);
     };
 
     const handleConfirmDialogAccept = (e?: React.MouseEvent) => {
         e?.stopPropagation();
-        onConfirm(pendingNewStock);
+        onConfirm(pendingData);
         setShowConfirmDialog(false);
     };
 
@@ -28,7 +38,7 @@ export function useStockConfirmDialog({ onConfirm, onCancel }: UseStockConfirmDi
 
     return {
         showConfirmDialog,
-        pendingNewStock,
+        pendingNewStock: pendingData.newStock,
         showDialog,
         handleConfirmDialogAccept,
         handleConfirmDialogCancel,

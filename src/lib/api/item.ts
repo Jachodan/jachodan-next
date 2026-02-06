@@ -6,6 +6,8 @@ import type {
     CreateItemResponse,
     ItemDetailResponse,
     UpdateItemRequest,
+    StockInOutRequest,
+    StockInOutResponse,
 } from "@/types/item";
 
 // 임시 storeId (추후 실제 로그인 사용자의 storeId로 교체)
@@ -86,4 +88,34 @@ export async function toggleItemPin(
     storeId: number = DEFAULT_STORE_ID
 ) {
     return api.patch<void>(`/stores/${storeId}/items/${itemId}/pin`);
+}
+
+/**
+ * 재고 입고 처리
+ * POST /stores/{storeId}/stocks/{stockId}/in
+ */
+export async function stockIn(
+    stockId: number,
+    data: StockInOutRequest,
+    storeId: number = DEFAULT_STORE_ID
+) {
+    return api.post<StockInOutResponse>(
+        `/stores/${storeId}/stocks/${stockId}/in`,
+        data
+    );
+}
+
+/**
+ * 재고 출고 처리
+ * POST /stores/{storeId}/stocks/{stockId}/out
+ */
+export async function stockOut(
+    stockId: number,
+    data: StockInOutRequest,
+    storeId: number = DEFAULT_STORE_ID
+) {
+    return api.post<StockInOutResponse>(
+        `/stores/${storeId}/stocks/${stockId}/out`,
+        data
+    );
 }
