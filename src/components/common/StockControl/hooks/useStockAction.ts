@@ -19,9 +19,18 @@ export function useStockAction({ currentStock, onConfirm }: UseStockActionProps)
 
     const handleActionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        if (value === "" || (!isNaN(Number(value)) && Number(value) > 0)) {
+        if (value === "") {
             setActionValue(value);
+            return;
         }
+
+        const numValue = Number(value);
+        if (isNaN(numValue) || numValue <= 0) return;
+
+        // 출고 시 현재 재고보다 큰 값 입력 불가
+        if (actionType === "out" && numValue > currentStock) return;
+
+        setActionValue(value);
     };
 
     const handleActionConfirm = () => {

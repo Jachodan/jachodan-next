@@ -14,7 +14,7 @@ export type ItemFilter = "FAVORITE" | "LOW_STOCK" | "HAS_REQUEST" | "BAD_STOCK";
 export type ItemKeyword = "itemName" | "stockAmount";
 export type RequestStatus = "WAIT" | "APPROVED" | "REJECTED" | "CONFIRM" | "CANCLE" | "COMPLETE";
 export type RequestType = "ORDER" | "RETURN" | "DISCARD" | "CHECK";
-export type LogType = "IN" | "OUT";
+export type LogType = "IN" | "OUT" | "ADJUST";
 
 // GET /stores/{storeId}/items - 목록 조회 요청 파라미터
 export interface GetItemsParams {

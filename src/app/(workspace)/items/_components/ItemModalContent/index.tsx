@@ -67,8 +67,14 @@ export default function ItemModalContent({
                     <div className="flex justify-end">
                         <div className="text-xs text-muted-foreground">
                             <p>
-                                마지막 {item.lastLogType === "IN" ? "입고" : "출고"}:{" "}
-                                {item.lastLogAt ? new Date(item.lastLogAt).toLocaleString("ko-KR") : "정보 없음"}
+                                최근 {item.lastLogType === "IN" ? "입고" : item.lastLogType === "OUT" ? "출고" : "조정"}:{" "}
+                                {item.lastLogAt
+                                    ? new Date(item.lastLogAt).toLocaleDateString("ko-KR", {
+                                          year: "numeric",
+                                          month: "2-digit",
+                                          day: "2-digit",
+                                      }).replace(/\. /g, "-").replace(".", "")
+                                    : "정보 없음"}
                             </p>
                         </div>
                     </div>
