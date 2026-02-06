@@ -46,8 +46,7 @@ export function useItemForm({ mode, item, onFormChange }: UseItemFormProps) {
     // 부모 컴포넌트에 초기 데이터 전달 (마운트 시 한 번만)
     useEffect(() => {
         onFormChange(formData);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [formData, onFormChange]);
 
     const handleInputChange = (field: keyof ItemFormData, value: string | number) => {
         const newData = { ...formData, [field]: value };
