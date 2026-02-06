@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import CommonModal from "@/components/common/CommonModal";
-import ImageUpload from "@/components/common/ImageUpload";
+import ClickableImageUpload from "@/components/common/ClickableImageUpload";
 import WorkDayDisplay from "@/components/common/WorkDayDisplay";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -144,13 +144,13 @@ export default function AlbaFormModal({ open, onClose, onSave, storeName, mode =
             >
                 <div className="space-y-4" onClick={(e) => e.stopPropagation()}>
                     {/* 프로필 이미지 업로드 */}
-                    <ImageUpload
-                        label="프로필 사진"
+                    <ClickableImageUpload
                         imagePreview={imagePreview}
                         onImageChange={handleImageChange}
                         emptyText="프로필 사진 없음"
                         size="md"
                         rounded={true}
+                        id="alba-profile-image"
                     />
 
                     {/* 이름 입력 */}
