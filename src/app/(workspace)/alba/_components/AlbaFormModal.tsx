@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import CommonModal from "@/components/common/CommonModal";
 import ClickableImageUpload from "@/components/common/ClickableImageUpload";
 import WorkDayDisplay from "@/components/common/WorkDayDisplay";
@@ -43,7 +43,13 @@ export default function AlbaFormModal({ open, onClose, onSave, storeName, mode =
 
     const isEditMode = mode === "edit";
 
-    useEffect(() => {
+    // React 19: 렌더링 중 상태 업데이트 패턴 (useEffect 대신)
+    const [prevOpen, setPrevOpen] = useState(open);
+    const [prevInitialData, setPrevInitialData] = useState(initialData);
+
+    if (open !== prevOpen || initialData !== prevInitialData) {
+        setPrevOpen(open);
+        setPrevInitialData(initialData);
         if (open && initialData) {
             setFormData({
                 albaName: initialData.albaName,
@@ -52,7 +58,7 @@ export default function AlbaFormModal({ open, onClose, onSave, storeName, mode =
                 albaEmail: initialData.albaEmail,
             });
         }
-    }, [open, initialData]);
+    }
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -66,7 +72,7 @@ export default function AlbaFormModal({ open, onClose, onSave, storeName, mode =
         }
     };
 
-    const handleInputChange = (field: keyof AlbaFormData, value: string) => {
+    const handleInputChange = <K extends keyof AlbaFormData>(field: K, value: AlbaFormData[K]) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
