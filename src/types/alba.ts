@@ -40,3 +40,14 @@ export const WORK_STATUS_FILTER_OPTIONS: FilterOption<WorkStatus | "전체">[] =
     { value: "전체", label: "전체" },
     ...WORK_STATUS.map((status) => ({ value: status, label: status })),
 ];
+
+// GET /alba/list - 알바 리스트 조회 응답 아이템
+export interface AlbaListItem {
+    albaId: number;
+    albaName: string;
+    albaPhone: string;
+    albaStatus: string;
+    workDate: string;
+    workId: number;
+    workStatus: string;
+}
