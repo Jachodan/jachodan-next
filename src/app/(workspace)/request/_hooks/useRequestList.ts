@@ -10,13 +10,13 @@ export function useRequestList() {
     const [typeFilter, setTypeFilter] = useState<RequestType | "전체">("전체");
     const [searchValue, setSearchValue] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [, forceUpdate] = useState({});
+    const [refreshKey, setRefreshKey] = useState(0);
 
-    // 매번 새로운 데이터를 가져옴
+    // refreshKey 변경 시 리렌더링되어 새로운 데이터를 가져옴
     const { data: requests, totalPages } = getPaginatedRequests(currentPage, PAGE_SIZE, typeFilter, searchValue);
 
     const triggerUpdate = useCallback(() => {
-        forceUpdate({});
+        setRefreshKey((prev) => prev + 1);
     }, []);
 
     const handleTypeFilterChange = (value: RequestType | "전체") => {
