@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus, X } from "lucide-react";
+import { toast } from "sonner";
 import { REQUEST_TYPES, type RequestType } from "@/types/itemRequest";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,8 @@ export default function RequestFormTable({
         const selectedItem = allItems.find((item) => item.itemId === Number(itemIdStr));
         if (selectedItem) {
             onSelectItemForManualRow(id, selectedItem.itemId, selectedItem.itemName);
+        } else {
+            toast.error("상품을 찾을 수 없습니다.");
         }
     };
 
