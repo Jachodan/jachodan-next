@@ -54,7 +54,7 @@ export async function registerAlba(data: RegisterAlbaRequest) {
         const formData = new FormData();
         formData.append("file", data.file);
 
-        return api.postFormData<RegisterAlbaResponse>(endpoint, formData);
+        return api.post<RegisterAlbaResponse>(endpoint, formData);
     }
 
     return api.post<RegisterAlbaResponse>(endpoint, {});
