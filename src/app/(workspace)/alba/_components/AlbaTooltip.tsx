@@ -3,10 +3,10 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import StatusBadge from "@/components/common/StatusBadge";
 import WorkDayDisplay from "@/components/common/WorkDayDisplay";
-import type { Alba } from "@/types/alba";
+import type { AlbaListItem } from "@/types/alba";
 
 interface AlbaTooltipProps {
-    alba: Alba;
+    alba: AlbaListItem;
     children: React.ReactNode;
 }
 
@@ -19,7 +19,7 @@ export default function AlbaTooltip({ alba, children }: AlbaTooltipProps) {
                     {/* 상태 배지 */}
                     <div className="flex items-center gap-2">
                         <StatusBadge type="employment" status={alba.albaStatus} />
-                        {alba.albaStatus !== "퇴사" && alba.workStatus && (
+                        {alba.albaStatus !== "RESIGN" && alba.workStatus && (
                             <StatusBadge type="work" status={alba.workStatus} />
                         )}
                     </div>

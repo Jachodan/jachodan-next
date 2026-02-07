@@ -3,12 +3,12 @@
 import StatusBadge from "@/components/common/StatusBadge";
 import WorkDayDisplay from "@/components/common/WorkDayDisplay";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { type Alba } from "@/types/alba";
+import { type AlbaListItem } from "@/types/alba";
 import AlbaTooltip from "./AlbaTooltip";
 
 interface AlbaTableProps {
-    albaList: Alba[];
-    onRowClick: (alba: Alba) => void;
+    albaList: AlbaListItem[];
+    onRowClick: (alba: AlbaListItem) => void;
 }
 
 export default function AlbaTable({ albaList, onRowClick }: AlbaTableProps) {
@@ -32,10 +32,10 @@ export default function AlbaTable({ albaList, onRowClick }: AlbaTableProps) {
                                     <StatusBadge type="employment" status={alba.albaStatus} />
                                 </TableCell>
                                 <TableCell className="py-4 text-center">
-                                    {alba.albaStatus !== "퇴사" && alba.workStatus && (
+                                    {alba.albaStatus !== "RESIGN" && alba.workStatus && (
                                         <StatusBadge type="work" status={alba.workStatus} />
                                     )}
-                                    {alba.albaStatus === "퇴사" && <span className="text-xs text-gray-400">-</span>}
+                                    {alba.albaStatus === "RESIGN" && <span className="text-xs text-gray-400">-</span>}
                                 </TableCell>
                                 <TableCell className="py-4 font-medium text-center tooltip-anchor">
                                     {alba.albaName}

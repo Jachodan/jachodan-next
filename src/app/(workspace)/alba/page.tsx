@@ -7,11 +7,11 @@ import { type AlbaFormData, type AlbaStatus } from "@/types/alba";
 import { type WorkStatus } from "@/types/work";
 import { EMPLOYMENT_FILTER_OPTIONS, WORK_STATUS_FILTER_OPTIONS } from "@/types/alba";
 import { useEffect } from "react";
-import { mockAlbaList } from "@/lib/mock/alba";
+import { useAlbaData } from "@/hooks/useAlbaData";
+import { registerAlba } from "@/lib/api";
 import { useAlbaFilter } from "@/hooks/useAlbaFilter";
 import { useAlbaModal } from "@/hooks/useAlbaModal";
 import { usePagination } from "@/hooks/usePagination";
-import { useAlbaList } from "./_hooks/useAlbaList";
 import { useAlbaPageFilters } from "./_hooks/useAlbaPageFilters";
 import AlbaTable from "./_components/AlbaTable";
 import AlbaFormModal from "./_components/AlbaFormModal";
@@ -21,8 +21,8 @@ export default function AlbaPage() {
     const { setHeaderTitle } = useLayout();
     const itemsPerPage = 10;
 
-    // 알바 리스트 관리
-    const { albaList, addAlba, updateAlba } = useAlbaList(mockAlbaList);
+    // 알바 리스트 API 데이터
+    const { albaList, isLoading, error, refetch } = useAlbaData({ storeId: 1 });
 
     // 필터 상태 관리
     const {
@@ -75,10 +75,47 @@ export default function AlbaPage() {
         setHeaderTitle("알바관리");
     }, [setHeaderTitle]);
 
+    const handleAddAlba = async (data: AlbaFormData) => {
+        const result = await registerAlba({
+            albaName: data.albaName,
+            albaPhone: data.albaPhone,
+            albaStatus: "STAFF",
+            storeId: 1,
+            file: data.profileImage,
+        });
+
+        if (result.error) {
+            console.error("알바 등록 실패:", result.error);
+            return;
+        }
+
+        closeCreateModal();
+        refetch();
+    };
+
     const handleAlbaUpdate = (data: AlbaFormData) => {
         if (!selectedAlba) return;
-        updateAlba(selectedAlba.albaId, data);
+        // TODO: API 연결 후 구현
+        console.log("알바 수정:", selectedAlba.albaId, data);
+        closeEditModal();
+        refetch();
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center p-10">
+                <p>로딩 중...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center p-10">
+                <p className="text-red-500">{error}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="p-10">
@@ -112,13 +149,18 @@ export default function AlbaPage() {
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
                 actionButton={{
-                    label: "알바 추가",
+                    label: "알바등록",
                     onClick: openCreateModal,
                     variant: "outline",
                 }}
             />
 
-            <AlbaFormModal open={isCreateModalOpen} onClose={closeCreateModal} onSave={addAlba} storeName="자초단" />
+            <AlbaFormModal
+                open={isCreateModalOpen}
+                onClose={closeCreateModal}
+                onSave={handleAddAlba}
+                storeName="자초단"
+            />
             <AlbaFormModal
                 open={isEditModalOpen}
                 onClose={closeEditModal}
@@ -129,7 +171,7 @@ export default function AlbaPage() {
                     selectedAlba
                         ? {
                               albaName: selectedAlba.albaName,
-                              albaPhone: "",
+                              albaPhone: selectedAlba.albaPhone,
                               workDays: selectedAlba.workDays,
                               albaEmail: "",
                           }

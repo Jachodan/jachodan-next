@@ -1,11 +1,11 @@
 import Image from "next/image";
 import FavoriteButton from "@/components/common/FavoriteButton";
 import { ItemFormData } from "../hooks/useItemForm";
-import { ItemWithStock } from "@/types/item";
+import { ItemDetailResponse } from "@/types/item";
 
 interface ItemDetailViewProps {
     formData: ItemFormData;
-    item: ItemWithStock;
+    item: ItemDetailResponse;
     imagePreview: string | null;
     onToggleFavorite?: () => void;
 }
@@ -29,7 +29,7 @@ export function ItemDetailView({ formData, item, imagePreview, onToggleFavorite 
             {/* 상품명과 즐겨찾기 */}
             <div className="flex items-center justify-center gap-2">
                 <div className="text-2xl font-bold">{formData.itemName || "-"}</div>
-                <FavoriteButton isPin={item.isPin} onToggle={() => onToggleFavorite?.()} size={24} />
+                <FavoriteButton isPin={item.isPinned} onToggle={() => onToggleFavorite?.()} size={24} />
             </div>
 
             {/* 재고 수량 */}

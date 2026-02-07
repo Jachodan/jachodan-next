@@ -1,6 +1,4 @@
-import Image from "next/image";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import ClickableImageUpload from "@/components/common/ClickableImageUpload";
 
 interface ItemImageUploadProps {
     imagePreview: string | null;
@@ -9,20 +7,11 @@ interface ItemImageUploadProps {
 
 export function ItemImageUpload({ imagePreview, onImageChange }: ItemImageUploadProps) {
     return (
-        <div className="space-y-2">
-            <Label>상품 이미지</Label>
-            <div className="flex flex-col gap-2">
-                {imagePreview ? (
-                    <div className="relative w-full aspect-square bg-muted rounded-md overflow-hidden">
-                        <Image src={imagePreview} alt="상품 이미지" fill className="object-cover" />
-                    </div>
-                ) : (
-                    <div className="w-full aspect-square bg-muted rounded-md flex items-center justify-center text-muted-foreground">
-                        이미지 없음
-                    </div>
-                )}
-                <Input type="file" accept="image/*" onChange={onImageChange} />
-            </div>
-        </div>
+        <ClickableImageUpload
+            imagePreview={imagePreview}
+            onImageChange={onImageChange}
+            emptyText="클릭하여 이미지 업로드"
+            id="item-image-upload"
+        />
     );
 }

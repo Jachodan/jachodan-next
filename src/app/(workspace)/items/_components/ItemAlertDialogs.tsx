@@ -39,7 +39,14 @@ export default function ItemAlertDialogs({
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>취소</AlertDialogCancel>
-                        <AlertDialogAction onClick={onSaveConfirm}>확인</AlertDialogAction>
+                        <AlertDialogAction
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onSaveConfirm();
+                            }}
+                        >
+                            확인
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -56,7 +63,10 @@ export default function ItemAlertDialogs({
                     <AlertDialogFooter>
                         <AlertDialogCancel>취소</AlertDialogCancel>
                         <AlertDialogAction
-                            onClick={onDeleteConfirm}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onDeleteConfirm();
+                            }}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                             삭제
