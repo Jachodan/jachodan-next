@@ -41,8 +41,11 @@ export function useItemModal({ refetch }: UseItemModalProps) {
 
     const handleCloseModal = () => {
         setModalOpen(false);
-        setSelectedItem(null);
-        setFormData(null);
+        // 모달 닫힘 애니메이션 완료 후 상태 초기화
+        setTimeout(() => {
+            setSelectedItem(null);
+            setFormData(null);
+        }, 200);
     };
 
     const handleModeChange = (mode: "detail" | "edit") => {
