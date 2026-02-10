@@ -18,15 +18,20 @@ interface StockControlProps {
     currentStock: number;
     onStockChange?: (newStock: number) => void;
     onStockInOut?: (params: StockInOutParams) => void;
+    onStockAdjust?: (newStock: number) => void;
     variant?: "card" | "list";
 }
 
-export default function StockControl({ itemName, currentStock, onStockChange, onStockInOut, variant = "list" }: StockControlProps) {
+export default function StockControl({ itemName, currentStock, onStockChange, onStockInOut, onStockAdjust, variant = "list" }: StockControlProps) {
     // 재고 변경 확인 다이얼로그
     const confirmDialog = useStockConfirmDialog({
         onConfirm: (data) => {
-            // 입고/출고 콜백이 있으면 호출
-            onStockInOut?.({ actionType: data.actionType, amount: data.amount });
+            if (data.actionType === "adjust") {
+                onStockAdjust?.(data.newStock);
+                onStockChange?.(data.newStock);
+            } else {
+                onStockInOut?.({ actionType: data.actionType, amount: data.amount });
+            }
             stockEdit.resetEdit();
             stockAction.resetAction();
         },
@@ -35,12 +40,11 @@ export default function StockControl({ itemName, currentStock, onStockChange, on
         },
     });
 
-    // 직접 수정 기능 (별도 API로 처리 예정)
+    // 직접 수정 기능
     const stockEdit = useStockEdit({
         currentStock,
         onComplete: (newStock) => {
-            // 직접 수정은 기존 콜백 사용
-            onStockChange?.(newStock);
+            confirmDialog.showDialog({ newStock, actionType: "adjust", amount: newStock });
         },
     });
 

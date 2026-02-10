@@ -1,5 +1,5 @@
 import { ItemListItem } from "@/types/item";
-import { toggleItemPin, stockIn, stockOut } from "@/lib/api";
+import { toggleItemPin, stockIn, stockOut, stockAdjust } from "@/lib/api";
 import { StockInOutParams } from "@/components/common/StockControl";
 
 interface UseItemActionsProps {
@@ -54,7 +54,6 @@ export function useItemActions({
     // 재고 입고/출고
     const handleStockInOut = async (
         itemId: number,
-        stockId: number,
         params: StockInOutParams
     ) => {
         const item = items.find((i) => i.itemId === itemId);
@@ -73,7 +72,7 @@ export function useItemActions({
         try {
             const apiCall =
                 params.actionType === "in" ? stockIn : stockOut;
-            const result = await apiCall(stockId, { amount: params.amount });
+            const result = await apiCall(itemId, { amount: params.amount });
 
             if (result.error) {
                 // 실패 시 롤백
@@ -93,8 +92,37 @@ export function useItemActions({
         }
     };
 
+    // 재고 직접 조정
+    const handleStockAdjust = async (itemId: number, newStock: number) => {
+        const item = items.find((i) => i.itemId === itemId);
+        if (!item) return;
+
+        const oldStock = item.stockAmount;
+
+        // 낙관적 업데이트
+        updateItemLocally(itemId, { stockAmount: newStock });
+
+        try {
+            const result = await stockAdjust(itemId, { stockAmount: newStock });
+
+            if (result.error) {
+                updateItemLocally(itemId, { stockAmount: oldStock });
+                console.error("Failed to adjust stock:", result.error);
+                return;
+            }
+
+            if (result.data) {
+                updateItemLocally(itemId, { stockAmount: result.data.stockAmount });
+            }
+        } catch (error) {
+            updateItemLocally(itemId, { stockAmount: oldStock });
+            console.error("Failed to adjust stock:", error);
+        }
+    };
+
     return {
         handleToggleFavorite,
         handleStockInOut,
+        handleStockAdjust,
     };
 }

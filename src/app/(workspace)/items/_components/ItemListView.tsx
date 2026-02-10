@@ -7,10 +7,11 @@ import ItemRequestIndicator from "./ItemRequestIndicator";
 interface ItemListViewProps {
     item: ItemListItem;
     onToggleFavorite: (itemId: number) => void;
-    onStockInOut: (itemId: number, stockId: number, params: StockInOutParams) => void;
+    onStockInOut: (itemId: number, params: StockInOutParams) => void;
+    onStockAdjust: (itemId: number, newStock: number) => void;
 }
 
-export default function ItemListView({ item, onToggleFavorite, onStockInOut }: ItemListViewProps) {
+export default function ItemListView({ item, onToggleFavorite, onStockInOut, onStockAdjust }: ItemListViewProps) {
     return (
         <>
             {/* 왼쪽 섹션: 이미지 + 아이템명 */}
@@ -37,7 +38,8 @@ export default function ItemListView({ item, onToggleFavorite, onStockInOut }: I
                 <StockControl
                     itemName={item.itemName}
                     currentStock={item.stockAmount}
-                    onStockInOut={(params) => onStockInOut(item.itemId, item.stockId, params)}
+                    onStockInOut={(params) => onStockInOut(item.itemId, params)}
+                    onStockAdjust={(newStock) => onStockAdjust(item.itemId, newStock)}
                     variant="list"
                 />
             </div>

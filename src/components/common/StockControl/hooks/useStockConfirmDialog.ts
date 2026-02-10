@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export interface StockChangeData {
     newStock: number;
-    actionType: "in" | "out";
+    actionType: "in" | "out" | "adjust";
     amount: number;
 }
 

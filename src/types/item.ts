@@ -19,6 +19,7 @@ export type LogType = "IN" | "OUT" | "ADJUST";
 // GET /stores/{storeId}/items - 목록 조회 요청 파라미터
 export interface GetItemsParams {
     storeId: number;
+    excludeZero?: boolean;
     filter?: ItemFilter;
     keyword?: string;
     page?: number;
@@ -130,6 +131,17 @@ export interface StockInOutRequest {
 // POST /stores/{storeId}/stocks/{stockId}/in - 재고 입고 응답
 // POST /stores/{storeId}/stocks/{stockId}/out - 재고 출고 응답
 export interface StockInOutResponse {
+    stockAmount: number;
+    stockId: number;
+}
+
+// POST /stores/{storeId}/items/{itemId}/stock/adjust - 재고 직접 조정 요청
+export interface StockAdjustRequest {
+    stockAmount: number;
+}
+
+// POST /stores/{storeId}/items/{itemId}/stock/adjust - 재고 직접 조정 응답
+export interface StockAdjustResponse {
     stockAmount: number;
     stockId: number;
 }

@@ -3,6 +3,7 @@ import { ItemListItem, ItemFilter } from "@/types/item";
 import { getItems } from "@/lib/api";
 
 interface UseItemDataParams {
+    excludeZero?: boolean;
     filter?: ItemFilter;
     keyword?: string;
     page?: number;
@@ -39,6 +40,7 @@ interface UseItemDataReturn {
  *   });
  */
 export function useItemData({
+    excludeZero,
     filter,
     keyword,
     page = 1,
@@ -61,6 +63,7 @@ export function useItemData({
         try {
             const result = await getItems({
                 storeId: 1, // TODO: 세션에서 가져올 예정
+                excludeZero,
                 filter,
                 keyword,
                 page,
@@ -84,7 +87,7 @@ export function useItemData({
         } finally {
             setIsLoading(false);
         }
-    }, [filter, keyword, page, size]);
+    }, [excludeZero, filter, keyword, page, size]);
 
     useEffect(() => {
         fetchItems();

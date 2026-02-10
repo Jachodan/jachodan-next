@@ -7,10 +7,11 @@ import ItemRequestIndicator from "./ItemRequestIndicator";
 interface ItemCardViewProps {
     item: ItemListItem;
     onToggleFavorite: (itemId: number) => void;
-    onStockInOut: (itemId: number, stockId: number, params: StockInOutParams) => void;
+    onStockInOut: (itemId: number, params: StockInOutParams) => void;
+    onStockAdjust: (itemId: number, newStock: number) => void;
 }
 
-export default function ItemCardView({ item, onToggleFavorite, onStockInOut }: ItemCardViewProps) {
+export default function ItemCardView({ item, onToggleFavorite, onStockInOut, onStockAdjust }: ItemCardViewProps) {
     return (
         <div>
             <div className="relative aspect-square bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
@@ -25,7 +26,8 @@ export default function ItemCardView({ item, onToggleFavorite, onStockInOut }: I
             <StockControl
                 itemName={item.itemName}
                 currentStock={item.stockAmount}
-                onStockInOut={(params) => onStockInOut(item.itemId, item.stockId, params)}
+                onStockInOut={(params) => onStockInOut(item.itemId, params)}
+                onStockAdjust={(newStock) => onStockAdjust(item.itemId, newStock)}
                 variant="card"
             />
         </div>

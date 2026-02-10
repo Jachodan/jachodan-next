@@ -23,7 +23,7 @@ const CARD_ITEMS_PER_PAGE = 10;
 function ItemListContent() {
     const { setHeaderTitle } = useLayout();
     const { filterType, setFilterType } = useUrlFilterSync();
-    const { searchQuery, viewMode, currentPage, setCurrentPage } = useItemListStore();
+    const { searchQuery, excludeZero, viewMode, currentPage, setCurrentPage } = useItemListStore();
 
     // 서버 필터링/페이지네이션 사용
     const itemsPerPage = viewMode === "list" ? LIST_ITEMS_PER_PAGE : CARD_ITEMS_PER_PAGE;
@@ -34,6 +34,7 @@ function ItemListContent() {
      * - useQuery로 대체하면 캐싱, 자동 리페치가 자동화됨
      */
     const { items, isLoading, error, pagination, refetch, updateItemLocally } = useItemData({
+        excludeZero,
         filter: toApiFilter(filterType),
         keyword: searchQuery || undefined,
         page: currentPage, // API도 1-based
@@ -41,7 +42,7 @@ function ItemListContent() {
     });
 
     // 아이템 액션 (즐겨찾기 토글, 재고 입출고)
-    const { handleToggleFavorite, handleStockInOut } = useItemActions({
+    const { handleToggleFavorite, handleStockInOut, handleStockAdjust } = useItemActions({
         items,
         updateItemLocally,
         refetch,
@@ -128,6 +129,7 @@ function ItemListContent() {
                 onItemClick={handleItemClick}
                 onToggleFavorite={handleToggleFavorite}
                 onStockInOut={handleStockInOut}
+                onStockAdjust={handleStockAdjust}
             />
 
             <ListPageFooter

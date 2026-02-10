@@ -12,7 +12,8 @@ interface ItemListContainerProps {
     searchQuery: string;
     onItemClick: (item: ItemListItem) => void;
     onToggleFavorite: (itemId: number) => void;
-    onStockInOut: (itemId: number, stockId: number, params: StockInOutParams) => void;
+    onStockInOut: (itemId: number, params: StockInOutParams) => void;
+    onStockAdjust: (itemId: number, newStock: number) => void;
 }
 
 export default function ItemListContainer({
@@ -23,6 +24,7 @@ export default function ItemListContainer({
     onItemClick,
     onToggleFavorite,
     onStockInOut,
+    onStockAdjust,
 }: ItemListContainerProps) {
     return (
         <div
@@ -59,12 +61,14 @@ export default function ItemListContainer({
                                 item={item}
                                 onToggleFavorite={onToggleFavorite}
                                 onStockInOut={onStockInOut}
+                                onStockAdjust={onStockAdjust}
                             />
                         ) : (
                             <ItemListView
                                 item={item}
                                 onToggleFavorite={onToggleFavorite}
                                 onStockInOut={onStockInOut}
+                                onStockAdjust={onStockAdjust}
                             />
                         )}
                     </div>

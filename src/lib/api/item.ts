@@ -8,6 +8,8 @@ import type {
     UpdateItemRequest,
     StockInOutRequest,
     StockInOutResponse,
+    StockAdjustRequest,
+    StockAdjustResponse,
 } from "@/types/item";
 
 // 임시 storeId (추후 실제 로그인 사용자의 storeId로 교체)
@@ -21,6 +23,7 @@ export async function getItems(params: Partial<GetItemsParams> = {}) {
     const storeId = params.storeId ?? DEFAULT_STORE_ID;
     const queryParams = new URLSearchParams();
 
+    if (params.excludeZero) queryParams.append("excludeZero", "true");
     if (params.filter) queryParams.append("filter", params.filter);
     if (params.keyword) queryParams.append("keyword", params.keyword);
     if (params.page !== undefined)
@@ -92,30 +95,48 @@ export async function toggleItemPin(
 
 /**
  * 재고 입고 처리
- * POST /stores/{storeId}/stocks/{stockId}/in
+ * POST /stores/{storeId}/items/{itemId}/stock/in
  */
 export async function stockIn(
-    stockId: number,
+    itemId: number,
     data: StockInOutRequest,
     storeId: number = DEFAULT_STORE_ID
 ) {
     return api.post<StockInOutResponse>(
-        `/stores/${storeId}/stocks/${stockId}/in`,
-        data
+        `/stores/${storeId}/items/${itemId}/stock/in`,
+        data,
+        { asJson: true }
     );
 }
 
 /**
  * 재고 출고 처리
- * POST /stores/{storeId}/stocks/{stockId}/out
+ * POST /stores/{storeId}/items/{itemId}/stock/out
  */
 export async function stockOut(
-    stockId: number,
+    itemId: number,
     data: StockInOutRequest,
     storeId: number = DEFAULT_STORE_ID
 ) {
     return api.post<StockInOutResponse>(
-        `/stores/${storeId}/stocks/${stockId}/out`,
-        data
+        `/stores/${storeId}/items/${itemId}/stock/out`,
+        data,
+        { asJson: true }
+    );
+}
+
+/**
+ * 재고 직접 조정
+ * POST /stores/{storeId}/items/{itemId}/stock/adjust
+ */
+export async function stockAdjust(
+    itemId: number,
+    data: StockAdjustRequest,
+    storeId: number = DEFAULT_STORE_ID
+) {
+    return api.post<StockAdjustResponse>(
+        `/stores/${storeId}/items/${itemId}/stock/adjust`,
+        data,
+        { asJson: true }
     );
 }
