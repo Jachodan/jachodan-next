@@ -68,7 +68,7 @@ function ItemListContent() {
         handleDeleteConfirm,
         setShowSaveAlert,
         setShowDeleteAlert,
-    } = useItemModal({ refetch });
+    } = useItemModal({ refetch, updateItemLocally });
 
     useEffect(() => {
         setHeaderTitle("상품관리");

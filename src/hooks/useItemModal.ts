@@ -5,9 +5,10 @@ import { createItem, getItemDetail, updateItem, deleteItem } from "@/lib/api";
 
 interface UseItemModalProps {
     refetch: () => Promise<void>;
+    updateItemLocally?: (itemId: number, updates: Partial<{ isPinned: boolean }>) => void;
 }
 
-export function useItemModal({ refetch }: UseItemModalProps) {
+export function useItemModal({ refetch, updateItemLocally }: UseItemModalProps) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "detail" | "edit">("create");
     const [selectedItem, setSelectedItem] = useState<ItemDetailResponse | null>(null);
@@ -128,8 +129,8 @@ export function useItemModal({ refetch }: UseItemModalProps) {
             return;
         }
 
-        // 목록 리프레시
-        await refetch();
+        // 목록 로컬 업데이트 (refetch 시 isLoading이 true가 되어 모달이 닫히는 문제 방지)
+        updateItemLocally?.(selectedItem.itemId, { isPinned: newPinnedState });
     };
 
     const handleDelete = () => {
