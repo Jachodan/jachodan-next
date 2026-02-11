@@ -170,3 +170,33 @@ export interface StockAdjustResponse {
     stockAmount: number;
     stockId: number;
 }
+
+// GET /stores/{storeId}/requests - 요청 목록 조회 파라미터
+export interface GetRequestsParams {
+    storeId: number;
+    page?: number;
+    size?: number;
+    requestStatus?: RequestStatus;
+    type?: RequestType;
+}
+
+// GET /stores/{storeId}/requests - 요청 목록 조회 응답 아이템
+export interface RequestListItem {
+    albaName: string;
+    createdAt: string;
+    itemName: string;
+    requestAmount: number;
+    requestDate: string;
+    requestId: number;
+    requestStatus: RequestStatus;
+    requestType: RequestType;
+}
+
+// GET /stores/{storeId}/requests - 요청 목록 조회 응답
+export interface RequestListResponse {
+    content: RequestListItem[];
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+}

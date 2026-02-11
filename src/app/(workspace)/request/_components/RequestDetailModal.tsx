@@ -4,20 +4,21 @@ import CommonModal from "@/components/common/CommonModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type ItemRequestWithDetails, mockItemNames } from "@/lib/mock/itemRequests";
-
-interface ItemOption {
-    itemId: number;
-    itemName: string;
-}
+import {
+    type RequestListItem,
+    type ItemListItem,
+    REQUEST_TYPE_LABEL,
+    REQUEST_STATUS_LABEL,
+} from "@/types/item";
 
 interface RequestDetailModalProps {
     open: boolean;
     onClose: () => void;
-    selectedRequest: ItemRequestWithDetails | null;
+    selectedRequest: RequestListItem | null;
     isEditMode: boolean;
     editItemId: number | null;
     editAmount: number | undefined;
+    itemOptions: ItemListItem[];
     onEditItemIdChange: (itemId: number) => void;
     onEditAmountChange: (amount: number | undefined) => void;
     onEditClick: () => void;
@@ -32,18 +33,13 @@ export default function RequestDetailModal({
     isEditMode,
     editItemId,
     editAmount,
+    itemOptions,
     onEditItemIdChange,
     onEditAmountChange,
     onEditClick,
     onCancelEdit,
     onSaveEdit,
 }: RequestDetailModalProps) {
-    // 상품 목록 (드롭다운용)
-    const itemOptions: ItemOption[] = Object.entries(mockItemNames).map(([itemId, itemName]) => ({
-        itemId: Number(itemId),
-        itemName,
-    }));
-
     return (
         <CommonModal
             open={open}
@@ -66,7 +62,7 @@ export default function RequestDetailModal({
                 <div className="grid gap-4">
                     <div className="grid grid-cols-2 gap-2 items-center">
                         <span className="text-sm font-medium text-gray-500">요청 유형</span>
-                        <span className="text-sm">{selectedRequest.requestType}</span>
+                        <span className="text-sm">{REQUEST_TYPE_LABEL[selectedRequest.requestType]}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 items-center">
                         <span className="text-sm font-medium text-gray-500">상품명</span>
@@ -114,11 +110,11 @@ export default function RequestDetailModal({
                     </div>
                     <div className="grid grid-cols-2 gap-2 items-center">
                         <span className="text-sm font-medium text-gray-500">요청자</span>
-                        <span className="text-sm">{selectedRequest.requesterName}</span>
+                        <span className="text-sm">{selectedRequest.albaName}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 items-center">
                         <span className="text-sm font-medium text-gray-500">처리 상태</span>
-                        <span className="text-sm">{selectedRequest.requestStatus}</span>
+                        <span className="text-sm">{REQUEST_STATUS_LABEL[selectedRequest.requestStatus]}</span>
                     </div>
                 </div>
             )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { REQUEST_TYPES, type RequestType } from "@/types/itemRequest";
+import { REQUEST_TYPE, REQUEST_TYPE_LABEL, type RequestType } from "@/types/item";
 import ListPageHeader from "@/components/common/ListPageHeader";
 import ListPageFooter from "@/components/common/ListPageFooter";
 import { useRequestList } from "./_hooks/useRequestList";
@@ -34,6 +34,7 @@ export default function RequestPage() {
         setEditItemId,
         editAmount,
         setEditAmount,
+        itemOptions,
         handleRowClick,
         handleEditClick,
         handleCancelEdit,
@@ -42,8 +43,8 @@ export default function RequestPage() {
     } = useRequestModal({ onUpdate: triggerUpdate });
 
     const filterOptions = [
-        { value: "전체" as const, label: "전체" },
-        ...REQUEST_TYPES.map((type) => ({ value: type, label: type })),
+        { value: "ALL" as const, label: "전체" },
+        ...REQUEST_TYPE.map((type) => ({ value: type, label: REQUEST_TYPE_LABEL[type] })),
     ];
 
     return (
@@ -52,7 +53,7 @@ export default function RequestPage() {
                 filterLabel="요청유형"
                 filterValue={typeFilter}
                 filterOptions={filterOptions}
-                onFilterChange={(value) => setTypeFilter(value as RequestType | "전체")}
+                onFilterChange={(value) => setTypeFilter(value as RequestType | "ALL")}
                 filterPlaceholder="유형 선택"
                 searchLabel="검색"
                 searchValue={searchValue}
@@ -85,6 +86,7 @@ export default function RequestPage() {
                 isEditMode={isEditMode}
                 editItemId={editItemId}
                 editAmount={editAmount}
+                itemOptions={itemOptions}
                 onEditItemIdChange={setEditItemId}
                 onEditAmountChange={setEditAmount}
                 onEditClick={handleEditClick}
