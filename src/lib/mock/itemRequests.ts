@@ -104,7 +104,7 @@ export const generateMockRequests = (
                 albaId: 1,
                 requestAmount: Math.floor(Math.random() * 50) + 10,
                 requestDate: now,
-                requestType: "입고요청",
+                requestType: "주문요청",
                 requestStatus: Math.random() > 0.5 ? "확인중" : "대기",
                 createdAt: now,
                 updatedAt: now,

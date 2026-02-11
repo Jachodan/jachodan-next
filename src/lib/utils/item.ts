@@ -1,4 +1,4 @@
-import { ItemFilter, ItemListItem, ItemWithStock } from "@/types/item";
+import { ItemFilter, ItemListItem, ItemWithStock, REQUEST_STATUS_LABEL, REQUEST_TYPE_LABEL, type RequestStatus, type RequestType } from "@/types/item";
 import { ItemRequest } from "@/types/itemRequest";
 
 /**
@@ -18,29 +18,15 @@ export function toApiFilter(filterType: FilterType): ItemFilter | undefined {
 /**
  * 요청 상태를 한글로 변환
  */
-export function formatRequestStatus(status: string): string {
-    const statusMap: Record<string, string> = {
-        WORKING: "확인중",
-        WAIT: "대기",
-        REVERT: "반려",
-        CONFIRM: "승인",
-        DONE: "완료",
-        CANCEL: "취소",
-    };
-    return statusMap[status] || status;
+export function formatRequestStatus(status: RequestStatus): string {
+    return REQUEST_STATUS_LABEL[status] ?? status;
 }
 
 /**
  * 요청 타입을 한글로 변환
  */
-export function formatRequestType(type: string): string {
-    const typeMap: Record<string, string> = {
-        ORDER: "주문요청",
-        DROP: "폐기요청",
-        BAN: "금지요청",
-        CHECK: "확인요청",
-    };
-    return typeMap[type] || type;
+export function formatRequestType(type: RequestType): string {
+    return REQUEST_TYPE_LABEL[type] ?? type;
 }
 
 /**
@@ -91,7 +77,7 @@ export function hasRequest(item: ItemWithStock, requests: ItemRequest[]): boolea
     return requests.some(
         (req) =>
             req.itemId === item.itemId &&
-            req.requestType === "입고요청" &&
+            req.requestType === "주문요청" &&
             !["완료", "취소", "반려"].includes(req.requestStatus),
     );
 }

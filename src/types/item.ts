@@ -12,8 +12,33 @@ export interface Item {
 // API Response Types
 export type ItemFilter = "FAVORITE" | "LOW_STOCK" | "HAS_REQUEST" | "BAD_STOCK";
 export type ItemKeyword = "itemName" | "stockAmount";
-export type RequestStatus = "WAIT" | "APPROVED" | "REJECTED" | "CONFIRM" | "CANCLE" | "COMPLETE";
-export type RequestType = "ORDER" | "RETURN" | "DISCARD" | "CHECK";
+
+// 요청 상태
+export const REQUEST_STATUS = ["WORKING", "WAIT", "REVERT", "CONFIRM", "DONE", "CANCEL"] as const;
+export type RequestStatus = (typeof REQUEST_STATUS)[number];
+
+// 요청 상태 레이블 (한글 표시용)
+export const REQUEST_STATUS_LABEL: Record<RequestStatus, string> = {
+    WORKING: "확인중",
+    WAIT: "대기",
+    REVERT: "반려",
+    CONFIRM: "승인",
+    DONE: "완료",
+    CANCEL: "취소",
+};
+
+// 요청 유형
+export const REQUEST_TYPE = ["ORDER", "DROP", "BAN", "CHECK"] as const;
+export type RequestType = (typeof REQUEST_TYPE)[number];
+
+// 요청 유형 레이블 (한글 표시용)
+export const REQUEST_TYPE_LABEL: Record<RequestType, string> = {
+    ORDER: "주문요청",
+    DROP: "폐기요청",
+    BAN: "금지요청",
+    CHECK: "확인요청",
+};
+
 export type LogType = "IN" | "OUT" | "ADJUST";
 
 // GET /stores/{storeId}/items - 목록 조회 요청 파라미터
