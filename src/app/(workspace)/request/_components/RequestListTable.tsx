@@ -87,7 +87,7 @@ export default function RequestListTable({
                                     <span className="text-sm text-gray-900">{request.requestAmount ?? "-"}</span>
                                 </RequestTableCell>
                                 <RequestTableCell className="py-4 text-center text-sm text-gray-500">
-                                    {request.requestDate}
+                                    {request.requestDate?.split("T")[0]}
                                 </RequestTableCell>
                                 <RequestTableCell className="py-4 text-center">
                                     <span className="text-sm text-gray-900">{request.albaName}</span>

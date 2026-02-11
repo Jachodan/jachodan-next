@@ -201,6 +201,14 @@ export interface RequestDetailResponse {
     requestType: RequestType;
 }
 
+// POST /stores/{storeId}/requests/{requestId} - 요청 수정 요청
+export interface UpdateRequestDto {
+    albaId: number;
+    requestAmount: number;
+    requestDate: string;
+    requestType: RequestType;
+}
+
 // GET /stores/{storeId}/requests - 요청 목록 조회 응답
 export interface RequestListResponse {
     content: RequestListItem[];

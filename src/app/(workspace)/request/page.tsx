@@ -39,6 +39,7 @@ export default function RequestPage() {
         handleEditClick,
         handleCancelEdit,
         handleSaveEdit,
+        handleDelete,
         handleModalClose,
     } = useRequestModal({ onUpdate: triggerUpdate });
 
@@ -92,6 +93,7 @@ export default function RequestPage() {
                 onEditClick={handleEditClick}
                 onCancelEdit={handleCancelEdit}
                 onSaveEdit={handleSaveEdit}
+                onDelete={handleDelete}
             />
         </div>
     );

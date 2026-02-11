@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { type RequestListItem, type ItemListItem } from "@/types/item";
-import { getItems, getRequestDetail } from "@/lib/api";
+import { getItems, getRequestDetail, updateRequest, deleteRequest } from "@/lib/api";
 
 export interface UseRequestModalOptions {
     onUpdate?: () => void;
@@ -64,7 +64,7 @@ export function useRequestModal(options?: UseRequestModalOptions) {
         setEditAmount(undefined);
     };
 
-    const handleSaveEdit = (e?: React.MouseEvent) => {
+    const handleSaveEdit = async (e?: React.MouseEvent) => {
         e?.stopPropagation();
 
         if (!selectedRequest || editItemId == null) {
@@ -77,9 +77,39 @@ export function useRequestModal(options?: UseRequestModalOptions) {
             return;
         }
 
-        // TODO: 요청 수정 API 연결 예정
+        const result = await updateRequest(selectedRequest.requestId, {
+            albaId: 0, // TODO: 세션에서 albaId 가져올 예정
+            requestAmount: editAmount,
+            requestDate: selectedRequest.requestDate,
+            requestType: selectedRequest.requestType,
+        });
+
+        if (result.error) {
+            toast.error("요청 수정에 실패했습니다.");
+            return;
+        }
+
         options?.onUpdate?.();
         toast.success("요청이 수정되었습니다.");
+
+        setIsModalOpen(false);
+        setIsEditMode(false);
+        setEditItemId(null);
+        setEditAmount(undefined);
+    };
+
+    const handleDelete = async () => {
+        if (!selectedRequest) return;
+
+        const result = await deleteRequest(selectedRequest.requestId);
+
+        if (result.error) {
+            toast.error("요청 삭제에 실패했습니다.");
+            return;
+        }
+
+        options?.onUpdate?.();
+        toast.success("요청이 삭제되었습니다.");
 
         setIsModalOpen(false);
         setIsEditMode(false);
@@ -114,6 +144,7 @@ export function useRequestModal(options?: UseRequestModalOptions) {
         handleEditClick,
         handleCancelEdit,
         handleSaveEdit,
+        handleDelete,
         handleModalClose,
     };
 }
