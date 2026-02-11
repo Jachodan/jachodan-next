@@ -192,6 +192,15 @@ export interface RequestListItem {
     requestType: RequestType;
 }
 
+// GET /stores/{storeId}/requests/{requestId} - 요청 상세 조회 응답
+export interface RequestDetailResponse {
+    albaName: string;
+    itemName: string;
+    requestAmount: number;
+    requestDate: string;
+    requestType: RequestType;
+}
+
 // GET /stores/{storeId}/requests - 요청 목록 조회 응답
 export interface RequestListResponse {
     content: RequestListItem[];

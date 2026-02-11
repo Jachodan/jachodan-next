@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { type RequestListItem, type ItemListItem } from "@/types/item";
-import { getItems } from "@/lib/api";
+import { getItems, getRequestDetail } from "@/lib/api";
 
 export interface UseRequestModalOptions {
     onUpdate?: () => void;
@@ -30,10 +30,18 @@ export function useRequestModal(options?: UseRequestModalOptions) {
         fetchItems();
     }, [isModalOpen]);
 
-    const handleRowClick = (request: RequestListItem) => {
+    const handleRowClick = async (request: RequestListItem) => {
         setSelectedRequest(request);
         setIsModalOpen(true);
         setIsEditMode(false);
+
+        const result = await getRequestDetail(request.requestId, 1); // TODO: 세션에서 storeId 가져올 예정
+        if (result.data) {
+            setSelectedRequest({
+                ...request,
+                ...result.data,
+            });
+        }
     };
 
     const handleEditClick = () => {
