@@ -10,6 +10,11 @@ export function useRequestList() {
     const [typeFilter, setTypeFilter] = useState<RequestType | "전체">("전체");
     const [searchValue, setSearchValue] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [, setUpdateKey] = useState(0);
+
+    const triggerUpdate = useCallback(() => {
+        setUpdateKey((prev) => prev + 1);
+    }, []);
 
     const { data: requests, totalPages } = getPaginatedRequests(currentPage, PAGE_SIZE, typeFilter, searchValue);
 
@@ -56,5 +61,6 @@ export function useRequestList() {
         // 핸들러
         handleRequestTypeChange,
         handleRequestStatusChange,
+        triggerUpdate,
     };
 }
