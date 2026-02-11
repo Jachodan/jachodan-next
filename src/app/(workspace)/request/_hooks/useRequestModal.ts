@@ -77,7 +77,7 @@ export function useRequestModal(options?: UseRequestModalOptions) {
             return;
         }
 
-        const result = await updateRequest(selectedRequest.requestId, {
+      const result = await updateRequest(selectedRequest.requestId, {
             albaId: 0, // TODO: 세션에서 albaId 가져올 예정
             requestAmount: editAmount,
             requestDate: selectedRequest.requestDate,
@@ -88,7 +88,6 @@ export function useRequestModal(options?: UseRequestModalOptions) {
             toast.error("요청 수정에 실패했습니다.");
             return;
         }
-
         options?.onUpdate?.();
         toast.success("요청이 수정되었습니다.");
 
