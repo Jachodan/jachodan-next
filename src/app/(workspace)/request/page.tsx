@@ -30,11 +30,10 @@ export default function RequestPage() {
         isModalOpen,
         selectedRequest,
         isEditMode,
-        editItemId,
-        setEditItemId,
         editAmount,
         setEditAmount,
-        itemOptions,
+        editRequestType,
+        setEditRequestType,
         handleRowClick,
         handleEditClick,
         handleCancelEdit,
@@ -85,11 +84,10 @@ export default function RequestPage() {
                 onClose={handleModalClose}
                 selectedRequest={selectedRequest}
                 isEditMode={isEditMode}
-                editItemId={editItemId}
                 editAmount={editAmount}
-                itemOptions={itemOptions}
-                onEditItemIdChange={setEditItemId}
+                editRequestType={editRequestType}
                 onEditAmountChange={setEditAmount}
+                onEditRequestTypeChange={setEditRequestType}
                 onEditClick={handleEditClick}
                 onCancelEdit={handleCancelEdit}
                 onSaveEdit={handleSaveEdit}

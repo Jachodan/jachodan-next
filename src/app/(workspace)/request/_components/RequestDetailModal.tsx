@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
     type RequestListItem,
-    type ItemListItem,
+    type RequestType,
+    REQUEST_TYPE,
     REQUEST_TYPE_LABEL,
     REQUEST_STATUS_LABEL,
 } from "@/types/item";
@@ -17,11 +18,10 @@ interface RequestDetailModalProps {
     onClose: () => void;
     selectedRequest: RequestListItem | null;
     isEditMode: boolean;
-    editItemId: number | null;
     editAmount: number | undefined;
-    itemOptions: ItemListItem[];
-    onEditItemIdChange: (itemId: number) => void;
+    editRequestType: RequestType | undefined;
     onEditAmountChange: (amount: number | undefined) => void;
+    onEditRequestTypeChange: (type: RequestType) => void;
     onEditClick: () => void;
     onCancelEdit: (e: React.MouseEvent) => void;
     onSaveEdit: (e: React.MouseEvent) => void;
@@ -33,11 +33,10 @@ export default function RequestDetailModal({
     onClose,
     selectedRequest,
     isEditMode,
-    editItemId,
     editAmount,
-    itemOptions,
-    onEditItemIdChange,
+    editRequestType,
     onEditAmountChange,
+    onEditRequestTypeChange,
     onEditClick,
     onCancelEdit,
     onSaveEdit,
@@ -59,7 +58,7 @@ export default function RequestDetailModal({
                             </Button>
                             <Button onClick={onSaveEdit}>저장</Button>
                         </div>
-                    ) : (
+                    ) : selectedRequest?.requestStatus === "WAIT" ? (
                         <div className="flex gap-2">
                             <Button onClick={onEditClick}>수정</Button>
                             <Button
@@ -69,38 +68,38 @@ export default function RequestDetailModal({
                                 삭제
                             </Button>
                         </div>
-                    )
+                    ) : null
                 }
             >
                 {selectedRequest && (
                     <div className="grid gap-4">
                         <div className="grid grid-cols-2 gap-2 items-center">
                             <span className="text-sm font-medium text-gray-500">요청 유형</span>
-                            <span className="text-sm">{REQUEST_TYPE_LABEL[selectedRequest.requestType]}</span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 items-center">
-                            <span className="text-sm font-medium text-gray-500">상품명</span>
                             {isEditMode ? (
                                 <Select
-                                    value={editItemId?.toString() ?? ""}
-                                    onValueChange={(value) => onEditItemIdChange(Number(value))}
+                                    value={editRequestType}
+                                    onValueChange={(value) => onEditRequestTypeChange(value as RequestType)}
                                 >
                                     <SelectTrigger size="sm">
-                                        <SelectValue placeholder="상품 선택" />
+                                        <SelectValue placeholder="유형 선택" />
                                     </SelectTrigger>
-                                    <SelectContent position="popper" className="max-h-60">
+                                    <SelectContent position="popper">
                                         <SelectGroup>
-                                            {itemOptions.map((item) => (
-                                                <SelectItem key={item.itemId} value={item.itemId.toString()}>
-                                                    {item.itemName}
+                                            {REQUEST_TYPE.map((type) => (
+                                                <SelectItem key={type} value={type}>
+                                                    {REQUEST_TYPE_LABEL[type]}
                                                 </SelectItem>
                                             ))}
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
                             ) : (
-                                <span className="text-sm">{selectedRequest.itemName}</span>
+                                <span className="text-sm">{REQUEST_TYPE_LABEL[selectedRequest.requestType]}</span>
                             )}
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 items-center">
+                            <span className="text-sm font-medium text-gray-500">상품명</span>
+                            <span className="text-sm">{selectedRequest.itemName}</span>
                         </div>
                         <div className="grid grid-cols-2 gap-2 items-center">
                             <span className="text-sm font-medium text-gray-500">수량</span>

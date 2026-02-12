@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { type RequestListItem, type ItemListItem } from "@/types/item";
-import { getItems, getRequestDetail, updateRequest, deleteRequest } from "@/lib/api";
+import { type RequestListItem, type RequestType } from "@/types/item";
+import { type AlbaListItemResponse } from "@/types/alba";
+import { getRequestDetail, updateRequest, deleteRequest, getAlbaList } from "@/lib/api";
 
 export interface UseRequestModalOptions {
     onUpdate?: () => void;
@@ -13,22 +14,19 @@ export function useRequestModal(options?: UseRequestModalOptions) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState<RequestListItem | null>(null);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [editItemId, setEditItemId] = useState<number | null>(null);
     const [editAmount, setEditAmount] = useState<number | undefined>(undefined);
-    const [itemOptions, setItemOptions] = useState<ItemListItem[]>([]);
+    const [editRequestType, setEditRequestType] = useState<RequestType | undefined>(undefined);
+    const [albaList, setAlbaList] = useState<AlbaListItemResponse[]>([]);
 
-    // 모달이 열릴 때 아이템 목록 조회
     useEffect(() => {
-        if (!isModalOpen) return;
-
-        const fetchItems = async () => {
-            const result = await getItems({ storeId: 1, size: 100 }); // TODO: 세션에서 storeId 가져올 예정
+        const fetchAlbaList = async () => {
+            const result = await getAlbaList(1); // TODO: 세션에서 storeId 가져올 예정
             if (result.data) {
-                setItemOptions(result.data.content);
+                setAlbaList(result.data);
             }
         };
-        fetchItems();
-    }, [isModalOpen]);
+        fetchAlbaList();
+    }, []);
 
     const handleRowClick = async (request: RequestListItem) => {
         setSelectedRequest(request);
@@ -46,12 +44,8 @@ export function useRequestModal(options?: UseRequestModalOptions) {
 
     const handleEditClick = () => {
         if (selectedRequest) {
-            // 아이템 목록에서 itemName으로 매칭하여 itemId 설정
-            const matchedItem = itemOptions.find(
-                (item) => item.itemName === selectedRequest.itemName
-            );
-            setEditItemId(matchedItem?.itemId ?? null);
             setEditAmount(selectedRequest.requestAmount);
+            setEditRequestType(selectedRequest.requestType);
             setIsEditMode(true);
         }
     };
@@ -60,14 +54,14 @@ export function useRequestModal(options?: UseRequestModalOptions) {
         e?.stopPropagation();
         setIsModalOpen(false);
         setIsEditMode(false);
-        setEditItemId(null);
         setEditAmount(undefined);
+        setEditRequestType(undefined);
     };
 
     const handleSaveEdit = async (e?: React.MouseEvent) => {
         e?.stopPropagation();
 
-        if (!selectedRequest || editItemId == null) {
+        if (!selectedRequest) {
             toast.error("요청 정보가 올바르지 않습니다.");
             return;
         }
@@ -77,11 +71,19 @@ export function useRequestModal(options?: UseRequestModalOptions) {
             return;
         }
 
-      const result = await updateRequest(selectedRequest.requestId, {
-            albaId: 0, // TODO: 세션에서 albaId 가져올 예정
+        const matchedAlba = albaList.find(
+            (alba) => alba.albaName === selectedRequest.albaName
+        );
+        if (!matchedAlba) {
+            toast.error("요청자 정보를 찾을 수 없습니다.");
+            return;
+        }
+
+        const result = await updateRequest(selectedRequest.requestId, {
+            albaId: matchedAlba.albaId,
             requestAmount: editAmount,
             requestDate: selectedRequest.requestDate,
-            requestType: selectedRequest.requestType,
+            requestType: editRequestType!,
         });
 
         if (result.error) {
@@ -93,8 +95,8 @@ export function useRequestModal(options?: UseRequestModalOptions) {
 
         setIsModalOpen(false);
         setIsEditMode(false);
-        setEditItemId(null);
         setEditAmount(undefined);
+        setEditRequestType(undefined);
     };
 
     const handleDelete = async () => {
@@ -112,15 +114,15 @@ export function useRequestModal(options?: UseRequestModalOptions) {
 
         setIsModalOpen(false);
         setIsEditMode(false);
-        setEditItemId(null);
         setEditAmount(undefined);
+        setEditRequestType(undefined);
     };
 
     const handleModalClose = () => {
         setIsModalOpen(false);
         setIsEditMode(false);
-        setEditItemId(null);
         setEditAmount(undefined);
+        setEditRequestType(undefined);
     };
 
     return {
@@ -130,13 +132,10 @@ export function useRequestModal(options?: UseRequestModalOptions) {
         isEditMode,
 
         // 편집 상태
-        editItemId,
-        setEditItemId,
         editAmount,
         setEditAmount,
-
-        // 아이템 목록 (수정 모달 드롭다운용)
-        itemOptions,
+        editRequestType,
+        setEditRequestType,
 
         // 핸들러
         handleRowClick,
