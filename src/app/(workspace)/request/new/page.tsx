@@ -1,11 +1,16 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import type { AlbaListItemResponse } from "@/types/alba";
+import { getAlbaList } from "@/lib/api/alba";
 import { useItemSelection } from "./_hooks/useItemSelection";
 import { useRequestForm } from "./_hooks/useRequestForm";
 import ItemSelector from "./_components/ItemSelector";
 import RequestFormTable from "./_components/RequestFormTable";
 
 export default function RequestCreatePage() {
+    const [albaList, setAlbaList] = useState<AlbaListItemResponse[]>([]);
+
     const { searchValue, setSearchValue, selectedItemIds, setSelectedItemIds, filteredItems, getItemById, allItems } =
         useItemSelection();
 
@@ -21,6 +26,12 @@ export default function RequestCreatePage() {
         handleCancel,
         handleSubmit,
     } = useRequestForm();
+
+    useEffect(() => {
+        getAlbaList().then((res) => {
+            if (res.data) setAlbaList(res.data);
+        });
+    }, []);
 
     // 체크박스 토글 핸들러
     const handleCheckboxChange = (itemId: number, checked: boolean) => {
@@ -58,6 +69,7 @@ export default function RequestCreatePage() {
                 <RequestFormTable
                     requestItems={requestItems}
                     allItems={allItems}
+                    albaList={albaList}
                     onUpdateItem={updateRequestItem}
                     onSelectItemForManualRow={selectItemForManualRow}
                     onRemoveRow={handleRemoveRow}

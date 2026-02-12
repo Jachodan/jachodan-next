@@ -1,25 +1,42 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { generateMockItems } from "@/lib/mock/items";
+import { useState, useMemo, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { getItems } from "@/lib/api/item";
 
-// 목 데이터 생성
-const mockItemsData = generateMockItems(30);
-export const MOCK_ITEMS = mockItemsData.map((item) => ({
-    itemId: item.itemId,
-    itemName: item.itemName,
-    stockAmount: item.stock.stockAmount ?? 0,
-}));
+interface SimpleItem {
+    itemId: number;
+    itemName: string;
+    stockAmount: number;
+}
 
 export function useItemSelection() {
+    const { data: session } = useSession();
+    const storeId = session?.storeId ?? 1;
+
+    const [items, setItems] = useState<SimpleItem[]>([]);
     const [searchValue, setSearchValue] = useState("");
     const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]);
 
+    useEffect(() => {
+        getItems({ storeId, page: 1, size: 100 }).then((res) => {
+            if (res.data) {
+                setItems(
+                    res.data.content.map((item) => ({
+                        itemId: item.itemId,
+                        itemName: item.itemName,
+                        stockAmount: item.stockAmount,
+                    }))
+                );
+            }
+        });
+    }, [storeId]);
+
     // 검색 필터링된 상품 목록
     const filteredItems = useMemo(() => {
-        if (!searchValue) return MOCK_ITEMS;
-        return MOCK_ITEMS.filter((item) => item.itemName.toLowerCase().includes(searchValue.toLowerCase()));
-    }, [searchValue]);
+        if (!searchValue) return items;
+        return items.filter((item) => item.itemName.toLowerCase().includes(searchValue.toLowerCase()));
+    }, [searchValue, items]);
 
     // 체크박스 선택
     const selectItem = (itemId: number) => {
@@ -33,7 +50,7 @@ export function useItemSelection() {
 
     // 아이템 ID로 아이템 찾기
     const getItemById = (itemId: number) => {
-        return MOCK_ITEMS.find((item) => item.itemId === itemId);
+        return items.find((item) => item.itemId === itemId);
     };
 
     return {
@@ -45,6 +62,6 @@ export function useItemSelection() {
         selectItem,
         deselectItem,
         getItemById,
-        allItems: MOCK_ITEMS,
+        allItems: items,
     };
 }

@@ -171,6 +171,20 @@ export interface StockAdjustResponse {
     stockId: number;
 }
 
+// POST /stores/{storeId}/requests - 요청 생성 요청 아이템
+export interface CreateRequestItem {
+    albaId: number;
+    itemId: number;
+    requestAmount: number;
+    requestDate: string;
+    requestType: RequestType;
+}
+
+// POST /stores/{storeId}/requests - 요청 생성 요청
+export interface CreateRequestDto {
+    requests: CreateRequestItem[];
+}
+
 // GET /stores/{storeId}/requests - 요청 목록 조회 파라미터
 export interface GetRequestsParams {
     storeId: number;
