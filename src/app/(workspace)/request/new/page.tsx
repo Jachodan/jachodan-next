@@ -11,7 +11,7 @@ import RequestFormTable from "./_components/RequestFormTable";
 export default function RequestCreatePage() {
     const [albaList, setAlbaList] = useState<AlbaListItemResponse[]>([]);
 
-    const { searchValue, setSearchValue, selectedItemIds, setSelectedItemIds, filteredItems, getItemById, allItems } =
+    const { searchValue, setSearchValue, selectedItemIds, setSelectedItemIds, filteredItems, getItemById, allItems, loadMore, hasMore, isLoading } =
         useItemSelection();
 
     const {
@@ -64,6 +64,9 @@ export default function RequestCreatePage() {
                     filteredItems={filteredItems}
                     selectedItemIds={selectedItemIds}
                     onCheckboxChange={handleCheckboxChange}
+                    onLoadMore={loadMore}
+                    hasMore={hasMore}
+                    isLoading={isLoading}
                 />
 
                 <RequestFormTable
