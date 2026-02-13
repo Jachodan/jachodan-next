@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { updateRequest, type ItemRequestWithDetails } from "@/lib/mock/itemRequests";
+import { type RequestListItem, type RequestType } from "@/types/item";
+import { type AlbaListItemResponse } from "@/types/alba";
+import { getRequestDetail, updateRequest, deleteRequest, getAlbaList } from "@/lib/api";
 
 export interface UseRequestModalOptions {
     onUpdate?: () => void;
@@ -10,21 +12,40 @@ export interface UseRequestModalOptions {
 
 export function useRequestModal(options?: UseRequestModalOptions) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedRequest, setSelectedRequest] = useState<ItemRequestWithDetails | null>(null);
+    const [selectedRequest, setSelectedRequest] = useState<RequestListItem | null>(null);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [editItemId, setEditItemId] = useState<number | null>(null);
     const [editAmount, setEditAmount] = useState<number | undefined>(undefined);
+    const [editRequestType, setEditRequestType] = useState<RequestType | undefined>(undefined);
+    const [albaList, setAlbaList] = useState<AlbaListItemResponse[]>([]);
 
-    const handleRowClick = (request: ItemRequestWithDetails) => {
+    useEffect(() => {
+        const fetchAlbaList = async () => {
+            const result = await getAlbaList(1); // TODO: 세션에서 storeId 가져올 예정
+            if (result.data) {
+                setAlbaList(result.data);
+            }
+        };
+        fetchAlbaList();
+    }, []);
+
+    const handleRowClick = async (request: RequestListItem) => {
         setSelectedRequest(request);
         setIsModalOpen(true);
         setIsEditMode(false);
+
+        const result = await getRequestDetail(request.requestId, 1); // TODO: 세션에서 storeId 가져올 예정
+        if (result.data) {
+            setSelectedRequest({
+                ...request,
+                ...result.data,
+            });
+        }
     };
 
     const handleEditClick = () => {
         if (selectedRequest) {
-            setEditItemId(selectedRequest.itemId);
             setEditAmount(selectedRequest.requestAmount);
+            setEditRequestType(selectedRequest.requestType);
             setIsEditMode(true);
         }
     };
@@ -33,14 +54,14 @@ export function useRequestModal(options?: UseRequestModalOptions) {
         e?.stopPropagation();
         setIsModalOpen(false);
         setIsEditMode(false);
-        setEditItemId(null);
         setEditAmount(undefined);
+        setEditRequestType(undefined);
     };
 
-    const handleSaveEdit = (e?: React.MouseEvent) => {
+    const handleSaveEdit = async (e?: React.MouseEvent) => {
         e?.stopPropagation();
 
-        if (!selectedRequest || editItemId == null) {
+        if (!selectedRequest) {
             toast.error("요청 정보가 올바르지 않습니다.");
             return;
         }
@@ -50,32 +71,58 @@ export function useRequestModal(options?: UseRequestModalOptions) {
             return;
         }
 
-        const updated = updateRequest({
-            requestId: selectedRequest.requestId,
-            itemId: editItemId,
-            requestAmount: editAmount,
-        });
-
-        if (!updated) {
-            toast.error("요청 수정에 실패했습니다.");
+        const matchedAlba = albaList.find(
+            (alba) => alba.albaName === selectedRequest.albaName
+        );
+        if (!matchedAlba) {
+            toast.error("요청자 정보를 찾을 수 없습니다.");
             return;
         }
 
-        setSelectedRequest(updated);
+        const result = await updateRequest(selectedRequest.requestId, {
+            albaId: matchedAlba.albaId,
+            requestAmount: editAmount,
+            requestDate: selectedRequest.requestDate,
+            requestType: editRequestType!,
+        });
+
+        if (result.error) {
+            toast.error("요청 수정에 실패했습니다.");
+            return;
+        }
         options?.onUpdate?.();
         toast.success("요청이 수정되었습니다.");
 
         setIsModalOpen(false);
         setIsEditMode(false);
-        setEditItemId(null);
         setEditAmount(undefined);
+        setEditRequestType(undefined);
+    };
+
+    const handleDelete = async () => {
+        if (!selectedRequest) return;
+
+        const result = await deleteRequest(selectedRequest.requestId);
+
+        if (result.error) {
+            toast.error("요청 삭제에 실패했습니다.");
+            return;
+        }
+
+        options?.onUpdate?.();
+        toast.success("요청이 삭제되었습니다.");
+
+        setIsModalOpen(false);
+        setIsEditMode(false);
+        setEditAmount(undefined);
+        setEditRequestType(undefined);
     };
 
     const handleModalClose = () => {
         setIsModalOpen(false);
         setIsEditMode(false);
-        setEditItemId(null);
         setEditAmount(undefined);
+        setEditRequestType(undefined);
     };
 
     return {
@@ -85,16 +132,17 @@ export function useRequestModal(options?: UseRequestModalOptions) {
         isEditMode,
 
         // 편집 상태
-        editItemId,
-        setEditItemId,
         editAmount,
         setEditAmount,
+        editRequestType,
+        setEditRequestType,
 
         // 핸들러
         handleRowClick,
         handleEditClick,
         handleCancelEdit,
         handleSaveEdit,
+        handleDelete,
         handleModalClose,
     };
 }

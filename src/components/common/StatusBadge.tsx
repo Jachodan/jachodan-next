@@ -1,8 +1,13 @@
 "use client";
 
-import { type AlbaStatus } from "@/types/alba";
+import { type AlbaStatus } from "@/types/user";
 import { type WorkStatus } from "@/types/work";
-import { getEmploymentStatusClass, getWorkStatusClass } from "@/types/albaStatus";
+import {
+    getEmploymentStatusClass,
+    getWorkStatusClass,
+    getEmploymentStatusLabel,
+    getWorkStatusLabel,
+} from "@/types/albaStatus";
 import { cn } from "@/lib/utils";
 
 type BadgeType = "employment" | "work";
@@ -34,6 +39,11 @@ export default function StatusBadge({
             ? getEmploymentStatusClass(status as AlbaStatus, clickable)
             : getWorkStatusClass(status as WorkStatus, clickable);
 
+    const label =
+        type === "employment"
+            ? getEmploymentStatusLabel(status as AlbaStatus)
+            : getWorkStatusLabel(status as WorkStatus);
+
     const baseClassName = cn(
         "inline-flex items-center rounded-full font-medium",
         SIZE_CLASSES[size],
@@ -44,10 +54,10 @@ export default function StatusBadge({
     if (clickable) {
         return (
             <button className={baseClassName} onClick={onClick} type="button">
-                {status}
+                {label}
             </button>
         );
     }
 
-    return <span className={baseClassName}>{status}</span>;
+    return <span className={baseClassName}>{label}</span>;
 }

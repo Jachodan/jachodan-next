@@ -1,17 +1,17 @@
 import { useState } from "react";
-import type { Alba } from "@/types/alba";
+import type { AlbaListItem } from "@/types/alba";
 
 export function useAlbaModal() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    const [selectedAlba, setSelectedAlba] = useState<Alba | null>(null);
+    const [selectedAlba, setSelectedAlba] = useState<AlbaListItem | null>(null);
 
     const openCreateModal = () => {
         setIsCreateModalOpen(true);
     };
 
-    const openDetailModal = (alba: Alba) => {
+    const openDetailModal = (alba: AlbaListItem) => {
         setSelectedAlba(alba);
         setIsDetailModalOpen(true);
     };

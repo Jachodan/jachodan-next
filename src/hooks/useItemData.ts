@@ -1,78 +1,117 @@
-import { useState, useEffect } from "react";
-import { ItemWithStock } from "@/types/item";
-import { ItemRequest } from "@/types/itemRequest";
-import { mockItems } from "@/lib/mock/items";
-import { generateMockRequests } from "@/lib/mock/itemRequests";
+import { useState, useEffect, useCallback } from "react";
+import { ItemListItem, ItemFilter } from "@/types/item";
+import { getItems } from "@/lib/api";
 
-interface UseItemDataReturn {
-    items: ItemWithStock[];
-    requests: ItemRequest[];
-    isLoading: boolean;
-
-    // CRUD 작업
-    setItems: React.Dispatch<React.SetStateAction<ItemWithStock[]>>;
-    updateItem: (itemId: number, updates: Partial<ItemWithStock>) => void;
-    deleteItem: (itemId: number) => void;
-    addItem: (item: ItemWithStock) => void;
-
-    // 요청사항 관련
-    setRequests: React.Dispatch<React.SetStateAction<ItemRequest[]>>;
+interface UseItemDataParams {
+    excludeZero?: boolean;
+    filter?: ItemFilter;
+    keyword?: string;
+    page?: number;
+    size?: number;
 }
 
-export function useItemData(): UseItemDataReturn {
-    const [items, setItems] = useState<ItemWithStock[]>([]);
-    const [requests, setRequests] = useState<ItemRequest[]>([]);
+interface UseItemDataReturn {
+    items: ItemListItem[];
+    isLoading: boolean;
+    error: string | null;
+    // 페이지네이션 정보
+    pagination: {
+        page: number;
+        size: number;
+        totalElements: number;
+        totalPages: number;
+    };
+    // 데이터 리프레시
+    refetch: () => Promise<void>;
+    // 낙관적 업데이트 (로컬 상태만 변경)
+    // TODO: [React Query 도입 시 제거] - React Query의 optimistic updates로 대체
+    updateItemLocally: (itemId: number, updates: Partial<ItemListItem>) => void;
+}
+
+/**
+ * 아이템 목록 데이터 훅
+ *
+ * TODO: [React Query 도입 시 변경]
+ * - useQuery로 대체하면 캐싱, 자동 리페치, 로딩/에러 상태 관리가 자동화됨
+ * - 예시:
+ *   const { data, isLoading, error, refetch } = useQuery({
+ *     queryKey: ['items', { filter, keyword, page, size }],
+ *     queryFn: () => getItems({ filter, keyword, page, size }),
+ *   });
+ */
+export function useItemData({
+    excludeZero,
+    filter,
+    keyword,
+    page = 1,
+    size = 10,
+}: UseItemDataParams): UseItemDataReturn {
+    const [items, setItems] = useState<ItemListItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [pagination, setPagination] = useState({
+        page: 1,
+        size: 10,
+        totalElements: 0,
+        totalPages: 0,
+    });
 
-    // 데이터 로딩
-    useEffect(() => {
-        const loadItems = async () => {
-            setIsLoading(true);
-            await new Promise((resolve) => setTimeout(resolve, 500));
+    const fetchItems = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
 
-            const loadedItems = mockItems;
-            const loadedRequests = generateMockRequests(loadedItems.map((item) => ({ itemId: item.itemId })));
+        try {
+            const result = await getItems({
+                storeId: 1, // TODO: 세션에서 가져올 예정
+                excludeZero,
+                filter,
+                keyword,
+                page,
+                size,
+            });
 
-            setItems(loadedItems);
-            setRequests(loadedRequests);
+            if (result.data) {
+                setItems(result.data.content);
+                setPagination({
+                    page: result.data.page,
+                    size: result.data.size,
+                    totalElements: result.data.totalElements,
+                    totalPages: result.data.totalPages,
+                });
+            } else {
+                setError(result.error || "데이터를 불러오는데 실패했습니다.");
+            }
+        } catch (err) {
+            setError("네트워크 오류가 발생했습니다.");
+            console.error("Failed to fetch items:", err);
+        } finally {
             setIsLoading(false);
-        };
+        }
+    }, [excludeZero, filter, keyword, page, size]);
 
-        loadItems();
-    }, []);
+    useEffect(() => {
+        fetchItems();
+    }, [fetchItems]);
 
-    // 아이템 수정
-    const updateItem = (itemId: number, updates: Partial<ItemWithStock>) => {
+    /**
+     * 낙관적 업데이트 - 로컬 상태만 변경
+     * TODO: [React Query 도입 시 제거]
+     * - React Query의 optimistic updates + invalidateQueries로 대체
+     */
+    const updateItemLocally = useCallback((itemId: number, updates: Partial<ItemListItem>) => {
         setItems((prev) =>
             prev.map((item) =>
-                item.itemId === itemId
-                    ? {
-                          ...item,
-                          ...updates,
-                      }
-                    : item
+                item.itemId === itemId ? { ...item, ...updates } : item
             )
         );
-    };
-
-    // 아이템 삭제
-    const deleteItem = (itemId: number) => {
-        setItems((prev) => prev.filter((item) => item.itemId !== itemId));
-    };
-
-    // 아이템 추가
-    const addItem = (item: ItemWithStock) => {
-        setItems((prev) => [...prev, item]);
-    };
+    }, []);
 
     return {
         items,
-        requests,
         isLoading,
-        setItems,
-        updateItem,
-        deleteItem,
-        addItem,
-        setRequests,
+        error,
+        pagination,
+        refetch: fetchItems,
+        updateItemLocally,
     };
 }

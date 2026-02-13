@@ -1,5 +1,5 @@
 // 요청사항 카테고리
-export const REQUEST_TYPES = ["입고요청", "발주금지", "폐기요청", "유통기한확인"] as const;
+export const REQUEST_TYPES = ["주문요청", "폐기요청", "금지요청", "확인요청"] as const;
 export type RequestType = (typeof REQUEST_TYPES)[number];
 
 // 요청사항 처리 상태

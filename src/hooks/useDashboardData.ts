@@ -68,7 +68,7 @@ export function useDashboardData(): UseDashboardDataReturn {
         return requests
             .filter(
                 (req) =>
-                    req.requestType === "입고요청" &&
+                    req.requestType === "주문요청" &&
                     req.isActive &&
                     !["완료", "취소", "반려"].includes(req.requestStatus)
             )

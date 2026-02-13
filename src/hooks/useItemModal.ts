@@ -1,20 +1,21 @@
 import { useState } from "react";
-import { ItemWithStock } from "@/types/item";
+import { ItemDetailResponse } from "@/types/item";
 import { ItemFormData } from "@/app/(workspace)/items/_components/ItemModalContent";
+import { createItem, getItemDetail, updateItem, deleteItem } from "@/lib/api";
 
 interface UseItemModalProps {
-    updateItem: (itemId: number, updates: Partial<ItemWithStock>) => void;
-    addItem: (item: ItemWithStock) => void;
-    deleteItem: (itemId: number) => void;
+    refetch: () => Promise<void>;
+    updateItemLocally?: (itemId: number, updates: Partial<{ isPinned: boolean }>) => void;
 }
 
-export function useItemModal({ updateItem, addItem, deleteItem }: UseItemModalProps) {
+export function useItemModal({ refetch, updateItemLocally }: UseItemModalProps) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "detail" | "edit">("create");
-    const [selectedItem, setSelectedItem] = useState<ItemWithStock | null>(null);
+    const [selectedItem, setSelectedItem] = useState<ItemDetailResponse | null>(null);
     const [formData, setFormData] = useState<ItemFormData | null>(null);
     const [showSaveAlert, setShowSaveAlert] = useState(false);
     const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleOpenCreateModal = () => {
         setModalMode("create");
@@ -22,16 +23,30 @@ export function useItemModal({ updateItem, addItem, deleteItem }: UseItemModalPr
         setModalOpen(true);
     };
 
-    const handleOpenDetailModal = (item: ItemWithStock) => {
+    const handleOpenDetailModal = async (itemId: number) => {
         setModalMode("detail");
-        setSelectedItem(item);
+        setIsLoading(true);
         setModalOpen(true);
+
+        const result = await getItemDetail(itemId);
+
+        if (result.error) {
+            console.error("Failed to fetch item detail:", result.error);
+            setIsLoading(false);
+            return;
+        }
+
+        setSelectedItem(result.data);
+        setIsLoading(false);
     };
 
     const handleCloseModal = () => {
         setModalOpen(false);
-        setSelectedItem(null);
-        setFormData(null);
+        // 모달 닫힘 애니메이션 완료 후 상태 초기화
+        setTimeout(() => {
+            setSelectedItem(null);
+            setFormData(null);
+        }, 200);
     };
 
     const handleModeChange = (mode: "detail" | "edit") => {
@@ -42,81 +57,99 @@ export function useItemModal({ updateItem, addItem, deleteItem }: UseItemModalPr
         setFormData(data);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!formData) return;
 
         if (modalMode === "edit") {
             setShowSaveAlert(true);
         } else if (modalMode === "create") {
-            // TODO: 실제 API 호출로 변경
-            const timestamp = Date.now();
-            const itemId = timestamp;
-            const stockId = timestamp + 1;
-            const bufferId = timestamp + 2;
-            const createdAt = new Date().toISOString();
-
-            addItem({
-                itemId,
-                itemName: formData.itemName,
-                storeId: 1,
-                createdAt,
-                isActive: true,
-                isPin: false,
+            // 아이템 생성 API 호출
+            const result = await createItem({
                 imageId: formData.imageId,
-                stock: {
-                    itemId,
-                    stockId,
-                    stockAmount: formData.stockAmount,
-                    createdAt,
-                },
-                buffer: formData.bufferAmount
-                    ? {
-                          itemId,
-                          bufferId,
-                          bufferAmount: formData.bufferAmount,
-                          createdAt,
-                      }
-                    : undefined,
+                itemName: formData.itemName,
+                stockAmount: formData.stockAmount,
             });
+
+            if (result.error) {
+                console.error("Failed to create item:", result.error);
+                // TODO: 에러 토스트 표시
+                return;
+            }
+
+            console.log("Item created:", result.data);
+            // 목록 리프레시
+            await refetch();
             handleCloseModal();
         }
     };
 
-    const handleSaveConfirm = () => {
+    const handleSaveConfirm = async () => {
         if (!formData || !selectedItem) return;
 
-        // TODO: 실제 API 호출로 변경
-        updateItem(selectedItem.itemId, {
+        const result = await updateItem(selectedItem.itemId, {
+            bufferAmount: formData.bufferAmount ?? selectedItem.bufferAmount,
+            imageId: formData.imageId ?? selectedItem.imageId,
+            isPinned: selectedItem.isPinned ?? false,
             itemName: formData.itemName,
-            stock: {
-                ...selectedItem.stock,
-                stockAmount: formData.stockAmount,
-            },
-            buffer: formData.bufferAmount
-                ? {
-                      ...selectedItem.buffer,
-                      bufferId: selectedItem.buffer?.bufferId ?? Date.now(),
-                      itemId: selectedItem.itemId,
-                      bufferAmount: formData.bufferAmount,
-                      createdAt: selectedItem.buffer?.createdAt ?? new Date().toISOString(),
-                  }
-                : undefined,
-            imageId: formData.imageId,
+            targetAmount: selectedItem.stockAmount,
         });
 
+        if (result.error) {
+            console.error("Failed to update item:", result.error);
+            setShowSaveAlert(false);
+            return;
+        }
+
+        // 목록 리프레시
+        await refetch();
         setShowSaveAlert(false);
         handleCloseModal();
+    };
+
+    const handleToggleFavorite = async () => {
+        if (!selectedItem) return;
+
+        const newPinnedState = !(selectedItem.isPinned ?? false);
+
+        // 낙관적 업데이트 - 모달 상태
+        setSelectedItem({ ...selectedItem, isPinned: newPinnedState });
+
+        const result = await updateItem(selectedItem.itemId, {
+            bufferAmount: selectedItem.bufferAmount,
+            imageId: selectedItem.imageId,
+            isPinned: newPinnedState,
+            itemName: selectedItem.itemName,
+            targetAmount: 0,
+        });
+
+        if (result.error) {
+            // 실패 시 롤백
+            setSelectedItem({ ...selectedItem, isPinned: !newPinnedState });
+            console.error("Failed to toggle favorite:", result.error);
+            return;
+        }
+
+        // 목록 로컬 업데이트 (refetch 시 isLoading이 true가 되어 모달이 닫히는 문제 방지)
+        updateItemLocally?.(selectedItem.itemId, { isPinned: newPinnedState });
     };
 
     const handleDelete = () => {
         setShowDeleteAlert(true);
     };
 
-    const handleDeleteConfirm = () => {
+    const handleDeleteConfirm = async () => {
         if (!selectedItem) return;
 
-        // TODO: 실제 API 호출로 변경
-        deleteItem(selectedItem.itemId);
+        const result = await deleteItem(selectedItem.itemId);
+
+        if (result.error) {
+            console.error("Failed to delete item:", result.error);
+            setShowDeleteAlert(false);
+            return;
+        }
+
+        // 목록 리프레시
+        await refetch();
         setShowDeleteAlert(false);
         handleCloseModal();
     };
@@ -129,12 +162,14 @@ export function useItemModal({ updateItem, addItem, deleteItem }: UseItemModalPr
         formData,
         showSaveAlert,
         showDeleteAlert,
+        isLoading,
         // Handlers
         handleOpenCreateModal,
         handleOpenDetailModal,
         handleCloseModal,
         handleModeChange,
         handleFormChange,
+        handleToggleFavorite,
         handleSave,
         handleSaveConfirm,
         handleDelete,

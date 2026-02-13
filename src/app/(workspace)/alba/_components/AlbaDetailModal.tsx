@@ -5,13 +5,13 @@ import CommonModal from "@/components/common/CommonModal";
 import StatusBadge from "@/components/common/StatusBadge";
 import WorkDayDisplay from "@/components/common/WorkDayDisplay";
 import { Button } from "@/components/ui/button";
-import type { Alba } from "@/types/alba";
+import type { AlbaListItem } from "@/types/alba";
 import type { ScheduleDays } from "@/types/work";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface AlbaDetailModalProps {
     open: boolean;
-    alba: Alba | null;
+    alba: AlbaListItem | null;
     onClose: () => void;
     onEdit?: () => void;
 }
@@ -82,7 +82,7 @@ export default function AlbaDetailModal({ open, alba, onClose, onEdit }: AlbaDet
                     <StatusBadge type="employment" status={alba.albaStatus} size="md" />
 
                     {/* 우측: 근무상태 (퇴사자 제외) */}
-                    {alba.albaStatus !== "퇴사" && alba.workStatus && (
+                    {alba.albaStatus !== "RESIGN" && alba.workStatus && (
                         <StatusBadge type="work" status={alba.workStatus} size="md" />
                     )}
                 </div>

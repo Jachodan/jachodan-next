@@ -8,18 +8,30 @@ import { StockDisplay } from "./components/StockDisplay";
 import { StockActionInput } from "./components/StockActionInput";
 import { StockConfirmDialog } from "./components/StockConfirmDialog";
 
+export interface StockInOutParams {
+    actionType: "in" | "out";
+    amount: number;
+}
+
 interface StockControlProps {
     itemName: string;
     currentStock: number;
-    onStockChange: (newStock: number) => void;
+    onStockChange?: (newStock: number) => void;
+    onStockInOut?: (params: StockInOutParams) => void;
+    onStockAdjust?: (newStock: number) => void;
     variant?: "card" | "list";
 }
 
-export default function StockControl({ itemName, currentStock, onStockChange, variant = "list" }: StockControlProps) {
+export default function StockControl({ itemName, currentStock, onStockChange, onStockInOut, onStockAdjust, variant = "list" }: StockControlProps) {
     // 재고 변경 확인 다이얼로그
     const confirmDialog = useStockConfirmDialog({
-        onConfirm: (newStock) => {
-            onStockChange(newStock);
+        onConfirm: (data) => {
+            if (data.actionType === "adjust") {
+                onStockAdjust?.(data.newStock);
+                onStockChange?.(data.newStock);
+            } else {
+                onStockInOut?.({ actionType: data.actionType, amount: data.amount });
+            }
             stockEdit.resetEdit();
             stockAction.resetAction();
         },
@@ -32,15 +44,15 @@ export default function StockControl({ itemName, currentStock, onStockChange, va
     const stockEdit = useStockEdit({
         currentStock,
         onComplete: (newStock) => {
-            confirmDialog.showDialog(newStock);
+            confirmDialog.showDialog({ newStock, actionType: "adjust", amount: newStock });
         },
     });
 
     // 입고/출고 기능
     const stockAction = useStockAction({
         currentStock,
-        onConfirm: (newStock) => {
-            confirmDialog.showDialog(newStock);
+        onConfirm: (data) => {
+            confirmDialog.showDialog(data);
         },
     });
 
