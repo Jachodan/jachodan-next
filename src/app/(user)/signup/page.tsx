@@ -87,7 +87,7 @@ function SignupForm() {
 
         resendTimerRef.current = setTimeout(() => {
             setCanResend(true);
-        }, 30000);
+        }, 10000);
     }, [clearTimers]);
 
     const handleSendCode = async () => {
@@ -198,11 +198,7 @@ function SignupForm() {
                                     disabled={isVerified || (isCodeSent && !canResend)}
                                     onClick={handleSendCode}
                                 >
-                                    {isVerified
-                                        ? "인증 완료"
-                                        : hasSentBefore
-                                          ? "재발송"
-                                          : "인증 요청"}
+                                    {hasSentBefore ? "재발송" : "인증 요청"}
                                 </Button>
                             )}
                         </div>
