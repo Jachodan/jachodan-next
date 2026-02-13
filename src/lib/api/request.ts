@@ -1,5 +1,5 @@
 import { api } from "./client";
-import type { CreateRequestDto, GetRequestsParams, RequestDetailResponse, RequestListResponse, UpdateRequestDto } from "@/types/item";
+import type { CreateRequestDto, GetRequestsParams, RequestDetailResponse, RequestListResponse, UpdateRequestDto, UpdateRequestStatusDto } from "@/types/item";
 
 // 임시 storeId (추후 실제 로그인 사용자의 storeId로 교체)
 const DEFAULT_STORE_ID = 1;
@@ -64,6 +64,22 @@ export async function deleteRequest(
     storeId: number = DEFAULT_STORE_ID
 ) {
     return api.delete(`/stores/${storeId}/requests/${requestId}`);
+}
+
+/**
+ * 요청 상태 수정
+ * POST /stores/{storeId}/requests/{requestId}/status
+ */
+export async function updateRequestStatus(
+    requestId: number,
+    dto: UpdateRequestStatusDto,
+    storeId: number = DEFAULT_STORE_ID
+) {
+    return api.post(
+        `/stores/${storeId}/requests/${requestId}/status`,
+        dto,
+        { asJson: true }
+    );
 }
 
 /**

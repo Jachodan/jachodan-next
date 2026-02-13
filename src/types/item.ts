@@ -223,6 +223,11 @@ export interface UpdateRequestDto {
     requestType: RequestType;
 }
 
+// POST /stores/{storeId}/requests/{requestId}/status - 요청 상태 수정 요청
+export interface UpdateRequestStatusDto {
+    requestStatus: RequestStatus;
+}
+
 // GET /stores/{storeId}/requests - 요청 목록 조회 응답
 export interface RequestListResponse {
     content: RequestListItem[];

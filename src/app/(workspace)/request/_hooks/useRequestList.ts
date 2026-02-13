@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { type RequestType, type RequestStatus, type RequestListItem } from "@/types/item";
-import { getRequests } from "@/lib/api";
+import { getRequests, updateRequestStatus } from "@/lib/api";
+import { toast } from "sonner";
 
 const PAGE_SIZE = 10;
 
@@ -69,8 +70,18 @@ export function useRequestList() {
         // updateRequest API 연결 예정
     };
 
-    const handleRequestStatusChange = (_requestId: number, _newStatus: RequestStatus) => {
-        // updateRequest API 연결 예정
+    const handleRequestStatusChange = async (requestId: number, newStatus: RequestStatus) => {
+        const result = await updateRequestStatus(requestId, {
+            requestStatus: newStatus,
+        });
+
+        if (result.error) {
+            toast.error("요청 상태 변경에 실패했습니다.");
+            return;
+        }
+
+        toast.success("요청 상태가 변경되었습니다.");
+        fetchRequests();
     };
 
     return {
