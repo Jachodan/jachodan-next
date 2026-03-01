@@ -1,4 +1,4 @@
-import { ItemWithStock } from "@/types/item";
+import { ItemDetailResponse } from "@/types/item";
 import { ItemFormData } from "./ItemModalContent";
 import CommonModal from "@/components/common/CommonModal";
 import ItemModalContent from "./ItemModalContent";
@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 interface ItemModalManagerProps {
     open: boolean;
     mode: "create" | "detail" | "edit";
-    selectedItem: ItemWithStock | null;
-    currentSelectedItem: ItemWithStock | null;
+    selectedItem: ItemDetailResponse | null;
+    currentSelectedItem: ItemDetailResponse | null;
+    isLoading?: boolean;
     onClose: () => void;
     onModeChange: (mode: "detail" | "edit") => void;
     onFormChange: (data: ItemFormData) => void;
@@ -22,6 +23,7 @@ export default function ItemModalManager({
     mode,
     selectedItem,
     currentSelectedItem,
+    isLoading,
     onClose,
     onModeChange,
     onFormChange,
@@ -52,16 +54,22 @@ export default function ItemModalManager({
                 )
             }
         >
-            <ItemModalContent
-                key={`${mode}-${selectedItem?.itemId || "create"}`}
-                mode={mode}
-                item={currentSelectedItem || selectedItem}
-                onModeChange={onModeChange}
-                onFormChange={onFormChange}
-                onToggleFavorite={onToggleFavorite}
-                onDelete={onDelete}
-                onSave={onSave}
-            />
+            {isLoading ? (
+                <div className="flex items-center justify-center h-64">
+                    <p className="text-muted-foreground">상품 정보를 불러오는 중...</p>
+                </div>
+            ) : (
+                <ItemModalContent
+                    key={`${mode}-${selectedItem?.itemId || "create"}`}
+                    mode={mode}
+                    item={currentSelectedItem || selectedItem}
+                    onModeChange={onModeChange}
+                    onFormChange={onFormChange}
+                    onToggleFavorite={onToggleFavorite}
+                    onDelete={onDelete}
+                    onSave={onSave}
+                />
+            )}
         </CommonModal>
     );
 }

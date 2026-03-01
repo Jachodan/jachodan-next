@@ -1,5 +1,7 @@
-import type { AlbaStatus } from "@/types/alba";
+import type { AlbaStatus } from "@/types/user";
+import { ALBA_STATUS_LABEL } from "@/types/user";
 import type { WorkStatus } from "@/types/work";
+import { WORK_STATUS_LABEL } from "@/types/work";
 import { cn } from "@/lib/utils";
 
 // 색상 팔레트 정의
@@ -16,29 +18,38 @@ const COLOR_VARIANTS: Record<ColorKey, { base: string; hover: string }> = {
 
 // 상태별 색상 키 매핑
 const EMPLOYMENT_COLOR_MAP: Record<AlbaStatus, ColorKey> = {
-    재직: "green",
-    단기: "blue",
-    퇴사: "gray",
+    STAFF: "green",
+    PART: "blue",
+    RESIGN: "gray",
 };
 
 const WORK_STATUS_COLOR_MAP: Record<WorkStatus, ColorKey> = {
-    출근: "blue",
-    휴무: "gray",
-    대타: "purple",
-    지각: "yellow",
-    결근: "red",
-    퇴근: "green",
+    ON: "blue",
+    OFF: "green",
+    DAYOFF: "gray",
+    COVER: "purple",
+    LATE: "yellow",
+    NOSHOW: "red",
 };
 
 // 클래스 생성 헬퍼 함수
 export const getEmploymentStatusClass = (status: AlbaStatus, withHover = false) => {
-    const colorKey = EMPLOYMENT_COLOR_MAP[status];
+    const colorKey = EMPLOYMENT_COLOR_MAP[status] ?? "gray";
     const variant = COLOR_VARIANTS[colorKey];
     return cn(variant.base, withHover && variant.hover);
 };
 
 export const getWorkStatusClass = (status: WorkStatus, withHover = false) => {
-    const colorKey = WORK_STATUS_COLOR_MAP[status];
+    const colorKey = WORK_STATUS_COLOR_MAP[status] ?? "gray";
     const variant = COLOR_VARIANTS[colorKey];
     return cn(variant.base, withHover && variant.hover);
+};
+
+// 레이블 가져오기 헬퍼 함수
+export const getEmploymentStatusLabel = (status: AlbaStatus): string => {
+    return ALBA_STATUS_LABEL[status] ?? status;
+};
+
+export const getWorkStatusLabel = (status: WorkStatus): string => {
+    return WORK_STATUS_LABEL[status] ?? status;
 };

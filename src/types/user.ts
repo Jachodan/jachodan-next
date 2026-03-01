@@ -12,8 +12,15 @@ export interface User {
 }
 
 // 알바생 정보
-export const ALBA_STATUS = ["재직", "단기", "퇴사"] as const;
+export const ALBA_STATUS = ["STAFF", "PART", "RESIGN"] as const;
 export type AlbaStatus = (typeof ALBA_STATUS)[number];
+
+// 알바 상태 레이블 (한글 표시용)
+export const ALBA_STATUS_LABEL: Record<AlbaStatus, string> = {
+    STAFF: "직원",
+    PART: "단기",
+    RESIGN: "퇴사",
+};
 export interface Alba {
     albaId: number;
     storeId: number;

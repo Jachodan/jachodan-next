@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ItemWithStock } from "@/types/item";
+import { ItemDetailResponse } from "@/types/item";
 
 export interface ItemFormData {
     itemId?: number;
@@ -12,7 +12,7 @@ export interface ItemFormData {
 
 interface UseItemFormProps {
     mode: "create" | "detail" | "edit";
-    item?: ItemWithStock | null;
+    item?: ItemDetailResponse | null;
     onFormChange: (data: ItemFormData) => void;
 }
 
@@ -29,8 +29,8 @@ export function useItemForm({ mode, item, onFormChange }: UseItemFormProps) {
             return {
                 itemId: item.itemId,
                 itemName: item.itemName,
-                stockAmount: item.stock.stockAmount ?? 0,
-                bufferAmount: item.buffer?.bufferAmount ?? 0,
+                stockAmount: item.stockAmount ?? 0,
+                bufferAmount: item.bufferAmount ?? 0,
                 imageId: item.imageId,
             };
         }

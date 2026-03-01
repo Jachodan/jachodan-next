@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { type RequestType } from "@/types/itemRequest";
-import { createRequests } from "@/lib/mock/itemRequests";
+import { type RequestType } from "@/types/item";
+import { createRequests } from "@/lib/api/request";
 
 export interface RequestItem {
     id: string;
@@ -13,7 +13,7 @@ export interface RequestItem {
     requestType: RequestType;
     quantity: number;
     requestDate: string;
-    requester: string;
+    albaId: number | null;
     isManual: boolean;
 }
 
@@ -38,10 +38,10 @@ export function useRequestForm() {
             id: generateId(`item-${itemId}`),
             itemId,
             itemName,
-            requestType: "입고요청",
+            requestType: "ORDER",
             quantity: 1,
             requestDate: today,
-            requester: "",
+            albaId: null,
             isManual: false,
         };
         setRequestItems((prev) => [...prev, newRequestItem]);
@@ -58,10 +58,10 @@ export function useRequestForm() {
             id: generateId("manual"),
             itemId: null,
             itemName: "",
-            requestType: "입고요청",
+            requestType: "ORDER",
             quantity: 1,
             requestDate: today,
-            requester: "",
+            albaId: null,
             isManual: true,
         };
         setRequestItems((prev) => [...prev, newRequestItem]);
@@ -97,7 +97,7 @@ export function useRequestForm() {
     };
 
     // 확인 (요청 생성)
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         // 유효성 검사
         const validItems = requestItems.filter((item) => item.itemId !== null);
 
@@ -106,9 +106,9 @@ export function useRequestForm() {
             return;
         }
 
-        const invalidItems = validItems.filter((item) => !item.requester.trim());
-        if (invalidItems.length > 0) {
-            toast.error("모든 항목에 요청자를 입력해주세요.");
+        const invalidAlbaItems = validItems.filter((item) => item.albaId === null);
+        if (invalidAlbaItems.length > 0) {
+            toast.error("모든 항목에 요청자를 선택해주세요.");
             return;
         }
 
@@ -121,17 +121,22 @@ export function useRequestForm() {
         setIsSubmitting(true);
 
         try {
-            const inputs = validItems.map((item) => ({
-                itemId: item.itemId!,
-                itemName: item.itemName,
-                requestType: item.requestType,
-                quantity: item.quantity,
-                requestDate: item.requestDate,
-                requester: item.requester,
-            }));
+            const dto = {
+                requests: validItems.map((item) => ({
+                    albaId: item.albaId!,
+                    itemId: item.itemId!,
+                    requestAmount: item.quantity,
+                    requestDate: new Date(item.requestDate).toISOString(),
+                    requestType: item.requestType,
+                })),
+            };
 
-            const createdRequests = createRequests(inputs);
-            toast.success(`${createdRequests.length}건의 요청이 등록되었습니다.`);
+            const res = await createRequests(dto);
+            if (res.error) {
+                toast.error("요청 등록에 실패했습니다.");
+                return;
+            }
+            toast.success(`${validItems.length}건의 요청이 등록되었습니다.`);
             router.push("/request");
         } catch {
             toast.error("요청 등록에 실패했습니다.");

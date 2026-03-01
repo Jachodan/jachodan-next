@@ -1,6 +1,16 @@
 // 근로기록부
-export const WORK_STATUS = ["출근", "휴무", "대타", "지각", "결근", "퇴근"] as const;
+export const WORK_STATUS = ["ON", "OFF", "DAYOFF", "COVER", "LATE", "NOSHOW"] as const;
 export type WorkStatus = (typeof WORK_STATUS)[number];
+
+// 근무 상태 레이블 (한글 표시용)
+export const WORK_STATUS_LABEL: Record<WorkStatus, string> = {
+    ON: "출근",
+    OFF: "퇴근",
+    DAYOFF: "휴가",
+    COVER: "대타",
+    LATE: "지각",
+    NOSHOW: "결근",
+};
 export interface Work {
     workId: number;
     albaId: number;

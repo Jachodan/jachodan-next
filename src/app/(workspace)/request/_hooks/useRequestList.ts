@@ -1,26 +1,61 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { type RequestType, type RequestStatus } from "@/types/itemRequest";
-import { getPaginatedRequests, updateRequest } from "@/lib/mock/itemRequests";
+import { type RequestType, type RequestStatus, type RequestListItem } from "@/types/item";
+import { getRequests, updateRequestStatus } from "@/lib/api";
+import { toast } from "sonner";
 
 const PAGE_SIZE = 10;
 
 export function useRequestList() {
-    const [typeFilter, setTypeFilter] = useState<RequestType | "전체">("전체");
+    const [typeFilter, setTypeFilter] = useState<RequestType | "ALL">("ALL");
     const [searchValue, setSearchValue] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [requests, setRequests] = useState<RequestListItem[]>([]);
+    const [totalPages, setTotalPages] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const { data: requests, totalPages } = getPaginatedRequests(currentPage, PAGE_SIZE, typeFilter, searchValue);
+    const fetchRequests = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
 
-    // 페이지 범위 검증: 필터 적용 후 totalPages가 줄어들면 currentPage 조정
-    useEffect(() => {
-        if (currentPage > totalPages && totalPages > 0) {
-            setCurrentPage(totalPages);
+        try {
+            const result = await getRequests({
+                storeId: 1, // TODO: 세션에서 가져올 예정
+                page: currentPage,
+                size: PAGE_SIZE,
+                type: typeFilter === "ALL" ? undefined : typeFilter,
+            });
+
+            if (result.data) {
+                let filteredContent = result.data.content;
+
+                // API에 검색 파라미터가 없으므로 클라이언트 사이드 필터링
+                if (searchValue.trim()) {
+                    const query = searchValue.toLowerCase();
+                    filteredContent = filteredContent.filter((r) =>
+                        r.itemName.toLowerCase().includes(query)
+                    );
+                }
+
+                setRequests(filteredContent);
+                setTotalPages(result.data.totalPages);
+            } else {
+                setError(result.error || "요청 목록을 불러오는데 실패했습니다.");
+            }
+        } catch {
+            setError("네트워크 오류가 발생했습니다.");
+        } finally {
+            setIsLoading(false);
         }
-    }, [currentPage, totalPages]);
+    }, [currentPage, typeFilter, searchValue]);
 
-    const handleTypeFilterChange = (value: RequestType | "전체") => {
+    useEffect(() => {
+        fetchRequests();
+    }, [fetchRequests]);
+
+    const handleTypeFilterChange = (value: RequestType | "ALL") => {
         setTypeFilter(value);
         setCurrentPage(1);
     };
@@ -30,12 +65,23 @@ export function useRequestList() {
         setCurrentPage(1);
     };
 
-    const handleRequestTypeChange = (requestId: number, newType: RequestType) => {
-        updateRequest({ requestId, requestType: newType });
+    // TODO: 요청 수정 API 연결 시 구현
+    const handleRequestTypeChange = (_requestId: number, _newType: RequestType) => {
+        // updateRequest API 연결 예정
     };
 
-    const handleRequestStatusChange = (requestId: number, newStatus: RequestStatus) => {
-        updateRequest({ requestId, requestStatus: newStatus });
+    const handleRequestStatusChange = async (requestId: number, newStatus: RequestStatus) => {
+        const result = await updateRequestStatus(requestId, {
+            requestStatus: newStatus,
+        });
+
+        if (result.error) {
+            toast.error("요청 상태 변경에 실패했습니다.");
+            return;
+        }
+
+        toast.success("요청 상태가 변경되었습니다.");
+        fetchRequests();
     };
 
     return {
@@ -52,9 +98,12 @@ export function useRequestList() {
 
         // 데이터
         requests,
+        isLoading,
+        error,
 
         // 핸들러
         handleRequestTypeChange,
         handleRequestStatusChange,
+        triggerUpdate: fetchRequests,
     };
 }

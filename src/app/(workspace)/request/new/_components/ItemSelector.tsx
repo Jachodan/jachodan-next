@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useCallback } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,6 +18,9 @@ interface ItemSelectorProps {
     filteredItems: Item[];
     selectedItemIds: number[];
     onCheckboxChange: (itemId: number, checked: boolean) => void;
+    onLoadMore: () => void;
+    hasMore: boolean;
+    isLoading: boolean;
 }
 
 export default function ItemSelector({
@@ -25,7 +29,27 @@ export default function ItemSelector({
     filteredItems,
     selectedItemIds,
     onCheckboxChange,
+    onLoadMore,
+    hasMore,
+    isLoading,
 }: ItemSelectorProps) {
+    const observerRef = useRef<IntersectionObserver | null>(null);
+
+    const sentinelRef = useCallback(
+        (node: HTMLDivElement | null) => {
+            if (observerRef.current) observerRef.current.disconnect();
+            if (!node || !hasMore) return;
+
+            observerRef.current = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && !isLoading) {
+                    onLoadMore();
+                }
+            });
+            observerRef.current.observe(node);
+        },
+        [hasMore, isLoading, onLoadMore]
+    );
+
     return (
         <div className="w-2/5 flex flex-col border rounded-lg overflow-hidden">
             {/* 좌상단 - 검색 */}
@@ -69,6 +93,11 @@ export default function ItemSelector({
                                 <div className="text-sm text-gray-600 text-center">{item.stockAmount}</div>
                             </div>
                         ))}
+                        {hasMore && (
+                            <div ref={sentinelRef} className="px-4 py-3 text-center text-sm text-gray-400">
+                                {isLoading ? "불러오는 중..." : ""}
+                            </div>
+                        )}
                     </div>
                     <ScrollBar orientation="vertical" className="opacity-100" />
                 </ScrollArea>

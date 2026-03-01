@@ -1,6 +1,14 @@
 "use client";
 
-import { REQUEST_TYPES, REQUEST_STATUS, type RequestType, type RequestStatus } from "@/types/itemRequest";
+import {
+    REQUEST_TYPE,
+    REQUEST_STATUS,
+    REQUEST_TYPE_LABEL,
+    REQUEST_STATUS_LABEL,
+    type RequestType,
+    type RequestStatus,
+    type RequestListItem,
+} from "@/types/item";
 import {
     RequestTable,
     RequestTableHeader,
@@ -10,11 +18,10 @@ import {
     RequestTableCell,
 } from "@/components/ui/request-table";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type ItemRequestWithDetails } from "@/lib/mock/itemRequests";
 
 interface RequestListTableProps {
-    requests: ItemRequestWithDetails[];
-    onRowClick: (request: ItemRequestWithDetails) => void;
+    requests: RequestListItem[];
+    onRowClick: (request: RequestListItem) => void;
     onRequestTypeChange: (requestId: number, newType: RequestType) => void;
     onRequestStatusChange: (requestId: number, newStatus: RequestStatus) => void;
 }
@@ -63,9 +70,9 @@ export default function RequestListTable({
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectGroup>
-                                                    {REQUEST_TYPES.map((type) => (
+                                                    {REQUEST_TYPE.map((type) => (
                                                         <SelectItem key={type} value={type}>
-                                                            {type}
+                                                            {REQUEST_TYPE_LABEL[type]}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectGroup>
@@ -80,10 +87,10 @@ export default function RequestListTable({
                                     <span className="text-sm text-gray-900">{request.requestAmount ?? "-"}</span>
                                 </RequestTableCell>
                                 <RequestTableCell className="py-4 text-center text-sm text-gray-500">
-                                    {request.requestDate}
+                                    {request.requestDate?.split("T")[0]}
                                 </RequestTableCell>
                                 <RequestTableCell className="py-4 text-center">
-                                    <span className="text-sm text-gray-900">{request.requesterName}</span>
+                                    <span className="text-sm text-gray-900">{request.albaName}</span>
                                 </RequestTableCell>
                                 <RequestTableCell className="py-4">
                                     <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
@@ -98,7 +105,7 @@ export default function RequestListTable({
                                                 <SelectGroup>
                                                     {REQUEST_STATUS.map((status) => (
                                                         <SelectItem key={status} value={status}>
-                                                            {status}
+                                                            {REQUEST_STATUS_LABEL[status]}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectGroup>

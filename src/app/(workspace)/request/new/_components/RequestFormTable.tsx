@@ -2,7 +2,8 @@
 
 import { Plus, X } from "lucide-react";
 import { toast } from "sonner";
-import { REQUEST_TYPES, type RequestType } from "@/types/itemRequest";
+import { REQUEST_TYPE, REQUEST_TYPE_LABEL, type RequestType } from "@/types/item";
+import type { AlbaListItemResponse } from "@/types/alba";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,6 +19,7 @@ interface Item {
 interface RequestFormTableProps {
     requestItems: RequestItem[];
     allItems: Item[];
+    albaList: AlbaListItemResponse[];
     onUpdateItem: (id: string, field: keyof RequestItem, value: string | number) => void;
     onSelectItemForManualRow: (id: string, itemId: number, itemName: string) => void;
     onRemoveRow: (id: string) => void;
@@ -30,6 +32,7 @@ interface RequestFormTableProps {
 export default function RequestFormTable({
     requestItems,
     allItems,
+    albaList,
     onUpdateItem,
     onSelectItemForManualRow,
     onRemoveRow,
@@ -77,9 +80,9 @@ export default function RequestFormTable({
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        {REQUEST_TYPES.map((type) => (
+                                        {REQUEST_TYPE.map((type) => (
                                             <SelectItem key={type} value={type}>
-                                                {type}
+                                                {REQUEST_TYPE_LABEL[type]}
                                             </SelectItem>
                                         ))}
                                     </SelectGroup>
@@ -125,13 +128,23 @@ export default function RequestFormTable({
                             <span className="text-sm text-gray-500 text-center">{item.requestDate}</span>
 
                             {/* 요청자 */}
-                            <Input
-                                type="text"
-                                value={item.requester}
-                                onChange={(e) => onUpdateItem(item.id, "requester", e.target.value)}
-                                placeholder="이름"
-                                className="text-center h-8"
-                            />
+                            <Select
+                                value={item.albaId?.toString() || ""}
+                                onValueChange={(value) => onUpdateItem(item.id, "albaId", Number(value))}
+                            >
+                                <SelectTrigger size="sm" className="w-full">
+                                    <SelectValue placeholder="선택" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        {albaList.map((alba) => (
+                                            <SelectItem key={alba.albaId} value={alba.albaId.toString()}>
+                                                {alba.albaName}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
 
                             {/* 삭제 버튼 */}
                             <Button
