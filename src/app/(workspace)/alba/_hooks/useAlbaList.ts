@@ -10,10 +10,10 @@ export const useAlbaList = (initialList: Alba[]) => {
         const newAlba: Alba = {
             albaId: newAlbaId,
             albaName: data.albaName,
-            albaStatus: "재직",
+            albaStatus: "STAFF",
             albaPhone: data.albaPhone,
             workDays: data.workDays,
-            workStatus: "휴무",
+            workStatus: "DAYOFF",
         };
 
         setAlbaList((prev) => [...prev, newAlba]);
@@ -25,7 +25,7 @@ export const useAlbaList = (initialList: Alba[]) => {
                 if (alba.albaId !== targetId) return alba;
 
                 const hasWorkDays = data.workDays.length > 0;
-                const wasRetired = alba.albaStatus === "퇴사";
+                const wasRetired = alba.albaStatus === "RESIGN";
 
                 if (!hasWorkDays) {
                     return {
@@ -33,7 +33,7 @@ export const useAlbaList = (initialList: Alba[]) => {
                         albaName: data.albaName,
                         albaPhone: data.albaPhone,
                         workDays: data.workDays,
-                        albaStatus: "퇴사" as const,
+                        albaStatus: "RESIGN" as const,
                         workStatus: undefined,
                     };
                 }
@@ -44,8 +44,8 @@ export const useAlbaList = (initialList: Alba[]) => {
                         albaName: data.albaName,
                         albaPhone: data.albaPhone,
                         workDays: data.workDays,
-                        albaStatus: "재직" as const,
-                        workStatus: "휴무" as const,
+                        albaStatus: "STAFF" as const,
+                        workStatus: "DAYOFF" as const,
                     };
                 }
 
