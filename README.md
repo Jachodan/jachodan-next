@@ -1,3 +1,6 @@
+[![Architecture diagram of jachodan/jachodan-next](https://gitdiagram.com/jachodan/jachodan-next/diagram.png)](https://gitdiagram.com/jachodan/jachodan-next?utm_source=readme&utm_medium=picture)
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
